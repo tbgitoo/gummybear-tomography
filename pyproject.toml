@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gummybear-tomography"
+version = "0.0.1.dev0"
+description = "STL-based optical tomography phantoms, ray-based forward modelling, multi-view manifold decomposition."
+license = "Apache-2.0"
+requires-python = "==3.12.*"
+dependencies = [
+"numpy",
+"trimesh",
+"pillow",
+"matplotlib",
+"pyyaml",
+"scipy",
+"pandas",
+"openpyxl",
+]
+
+[project.optional-dependencies]
+dl = [
+"torch",
+"torchvision",
+]
+fem = [
+"ngsolve",
+]
+dev = [
+"pytest",
+"ruff",
+"mypy",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "gummybear*",
+    "gummybear_validation*",
+    "tomography_ml*",
+    "validation_notebook_tools*",
+]
+
+[tool.setuptools.package-data]
+gummybear_validation = [
+    "pytest.ini",
+    "test_data/*.stl",
+    "illustrations/*.png",
+]
+# Recursive glob (setuptools >=69): include all nested files under test_data/
+# without enumerating each sequence/role subdirectory.
+tomography_ml_validation = ["pytest.ini", "test_data/**/*"]
+validation_notebook_tools = ["pytest.ini"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "milestone(name): milestone validation",
+    "proves(text): statement proved by the test",
+]
+
