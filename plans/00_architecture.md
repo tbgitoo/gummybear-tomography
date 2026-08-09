@@ -151,7 +151,7 @@ Optional later work (not required for this release): portable export of trained 
 
 ---
 
-## 6. Repository layout (public)
+## 6. Repository layout
 
 ```text
 gummybear-tomography/
@@ -159,7 +159,7 @@ gummybear-tomography/
 ├── LICENSE                 # Apache-2.0
 ├── pyproject.toml
 ├── requirements.txt
-├── cad/                    # public phantom STL (+ FreeCAD source if included)
+├── cad/                    # phantom STL (+ FreeCAD source if included)
 ├── configs/                # Excel generation / localisation workbooks
 ├── schemas/                # sequence manifest schema
 ├── src/
@@ -195,7 +195,7 @@ pip install ".[fem,dl,dev]" -c requirements.txt   # full generation
 
 ---
 
-## 8. Design rules (public)
+## 8. Design rules
 
 1. **Sequence-first** — ordered multi-view (and multi-light) units; no random patch leakage across splits.  
 2. **Stable contracts** — bump schema / preprocess versions rather than silently changing semantics.  
