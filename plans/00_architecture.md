@@ -161,7 +161,6 @@ gummybear-tomography/
 ├── requirements.txt
 ├── cad/                    # phantom STL (+ FreeCAD source if included)
 ├── configs/                # Excel generation / localisation workbooks
-├── schemas/                # sequence manifest schema
 ├── src/
 │   ├── gummybear/          # geometry, rays, optics, particles, datasets
 │   ├── gummybear_validation/
