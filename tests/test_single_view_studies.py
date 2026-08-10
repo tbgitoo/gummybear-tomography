@@ -11,7 +11,9 @@ from tomography_ml.gummybear_data_catalog.task_dataset import DatasetTaskSpec
 from tomography_ml.studies import (
     ARCH_ORDER,
     CANONICAL_LR_BY_ARCH,
-    make_win3a_model,
+    M8_CANONICAL_LR_BY_ARCH,
+    make_m8_single_view_model,
+    probe_m8_parameter_counts,
     relabel_catalog_rows_for_split_seed,
     rmse_metrics_from_l2_errors,
     run_learning_rate_study,
@@ -45,10 +47,10 @@ class _TinyCatalogDS(torch.utils.data.Dataset):
         return x, y
 
 
-def test_make_win3a_model_and_rmse_metrics() -> None:
+def test_make_m8_single_view_model_and_rmse_metrics() -> None:
     device = torch.device("cpu")
     for arch in ARCH_ORDER:
-        model = make_win3a_model(arch, n_outputs=1, device=device)
+        model = make_m8_single_view_model(arch, n_outputs=1, device=device)
         out = model(torch.zeros(2, 1, 8, 8))
         assert out.shape == (2, 1)
 
@@ -81,6 +83,7 @@ def test_select_lr_by_arch() -> None:
     assert selected["fourier"] == 1e-3
     assert selected["flatten"] == 3e-4
     assert CANONICAL_LR_BY_ARCH["fourier"] == 0.03
+    assert M8_CANONICAL_LR_BY_ARCH["fourier"] == 0.03
 
 
 def test_run_lr_and_train_val_helpers(tmp_path: Path, monkeypatch) -> None:
@@ -228,7 +231,7 @@ def test_run_split_sensitivity_study(tmp_path: Path, monkeypatch) -> None:
         task=xyz_task,
         device=torch.device("cpu"),
         results_dir=tmp_path / "sens",
-        lr_by_arch=dict(CANONICAL_LR_BY_ARCH),
+        lr_by_arch=dict(M8_CANONICAL_LR_BY_ARCH),
         split_seeds=(60, 61),
         num_epochs=1,
         batch_size=4,

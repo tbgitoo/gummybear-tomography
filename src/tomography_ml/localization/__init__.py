@@ -54,6 +54,7 @@ from .builders import (
     win3g_normalisation_grid,
     win3g_selected_normalisation,
     win3h_optical_regime_grid,
+    m8_single_view_block_freeze,
     win3i_key_result_sources,
     win3j_single_view_freeze,
 )
@@ -219,5 +220,6 @@ __all__ = [
     "win3g_selected_normalisation",
     "win3h_optical_regime_grid",
     "win3i_key_result_sources",
+    "m8_single_view_block_freeze",
     "win3j_single_view_freeze",
 ]

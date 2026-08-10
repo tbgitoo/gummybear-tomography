@@ -1598,14 +1598,14 @@ class FrozenEncoderDeepSetsLocalizer(nn.Module):
             variant_id = "m09_1_deepsets_fourier"
             label = "DeepSets Fourier"
             note = (
-                "09_1 DeepSets; frozen WIN3J Fourier trunk; "
+                "09_1 DeepSets; frozen M8 Fourier trunk; "
                 "rho(mean_i phi(h_i))"
             )
         else:
             variant_id = "m09_1_deepsets_no_fourier"
             label = "DeepSets no-Fourier"
             note = (
-                "09_1 DeepSets; frozen WIN3J pooled (non-Fourier) trunk; "
+                "09_1 DeepSets; frozen M8 pooled (non-Fourier) trunk; "
                 "rho(mean_i phi(h_i))"
             )
         return {

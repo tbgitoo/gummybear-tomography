@@ -1,4 +1,4 @@
-"""Matplotlib helpers for WIN 3A single-view LR and train→val/test studies."""
+"""Matplotlib helpers for M8 single-view LR and train→val/test studies."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def plot_learning_rate_study(
     val_size: int,
     arch_order: Sequence[str] = ARCH_ORDER,
     arch_colors: Mapping[str, str] = ARCH_COLORS,
-    title_prefix: str = "WIN 3A LR study",
+    title_prefix: str = "M8 LR study",
     figsize: tuple[float, float] = (16.0, 4.0),
 ) -> plt.Figure:
     """Overlay train MSE vs epoch per LR and validation MSE vs LR."""

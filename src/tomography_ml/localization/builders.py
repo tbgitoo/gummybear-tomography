@@ -923,7 +923,7 @@ class SingleViewBlockFreezeRecord:
         selection_rationale: Human-readable freeze justification.
         freeze_fields: Axes that must not change without a new hypothesis.
 
-    Protocol: WIN 3J single-view block freeze.
+    Protocol: M8 single-view block freeze (formerly WIN 3J).
     """
 
     architecture: ArchitectureFreezeRecord = ArchitectureFreezeRecord()
@@ -1001,13 +1001,12 @@ class SingleViewBlockFreezeRecord:
         return self.architecture.primary_config()
 
 
-def win3j_single_view_freeze() -> SingleViewBlockFreezeRecord:
-    """Return the formal single-view block freeze for multi-view studies.
+def m8_single_view_block_freeze() -> SingleViewBlockFreezeRecord:
+    """Return the frozen single-view localization block used by M8/M9 studies.
 
-    Asserts consistency with :func:`win3e_architecture_freeze` and the
-    selected representation / normalisation helpers.
-
-    Protocol: WIN 3J single-view freeze.
+    Asserts consistency with the selected architecture / representation /
+    normalisation helpers. Prefer this name in milestone-facing notebooks;
+    :func:`win3j_single_view_freeze` remains as a back-compat alias.
 
     See also:
         :class:`~tomography_ml.localization.localizer.LocalizerSingleViewFourier` — frozen trunk reused by fusion models.
@@ -1017,15 +1016,20 @@ def win3j_single_view_freeze() -> SingleViewBlockFreezeRecord:
     rep = win3f_selected_representation()
     norm = win3g_selected_normalisation()
     if record.architecture.selected_variant != arch.selected_variant:
-        raise ValueError("3J architecture disagrees with win3e_architecture_freeze()")
+        raise ValueError("M8 block architecture disagrees with win3e_architecture_freeze()")
     if record.representation_name != rep.name or record.x_field != rep.x_field:
-        raise ValueError("3J representation disagrees with win3f_selected_representation()")
+        raise ValueError("M8 block representation disagrees with win3f_selected_representation()")
     if (
         record.normalisation_name != norm.name
         or record.image_normalize != norm.image_normalize
     ):
-        raise ValueError("3J normalisation disagrees with win3g_selected_normalisation()")
+        raise ValueError("M8 block normalisation disagrees with win3g_selected_normalisation()")
     return record
+
+
+def win3j_single_view_freeze() -> SingleViewBlockFreezeRecord:
+    """Back-compat alias for :func:`m8_single_view_block_freeze`."""
+    return m8_single_view_block_freeze()
 
 
 def default_mechanism_grid() -> tuple[SingleViewArchConfig, ...]:
@@ -1080,5 +1084,6 @@ __all__ = [
     "win3g_selected_normalisation",
     "win3h_optical_regime_grid",
     "win3i_key_result_sources",
+    "m8_single_view_block_freeze",
     "win3j_single_view_freeze",
 ]

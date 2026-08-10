@@ -1,4 +1,4 @@
-"""Reusable single-view localisation study protocols (WIN 3A-style).
+"""Reusable localisation study protocols for milestone notebooks.
 
 Notebooks should call these helpers rather than inlining Adam/MSE loops.
 """
@@ -10,11 +10,14 @@ from .single_view_m8 import (
     DEFAULT_LR_GRID,
     DEFAULT_SENSITIVITY_SPLIT_SEEDS,
     LearningRateStudyResult,
+    M8_CANONICAL_LR_BY_ARCH,
     SplitSensitivityStudyResult,
     TrainValTestStudyResult,
     dummy_batch_from_dataset,
+    make_m8_single_view_model,
     make_win3a_model,
     particle_setup_id_for_row,
+    probe_m8_parameter_counts,
     probe_win3a_parameter_counts,
     relabel_catalog_rows_for_split_seed,
     rmse_metrics_from_l2_errors,
@@ -24,23 +27,40 @@ from .single_view_m8 import (
     select_lr_by_arch,
     set_train_seed,
 )
+from .m9_frozen_fusion import (
+    DEFAULT_LR_STAGE_B,
+    DEFAULT_LR_STAGE_B_GRID,
+    M9FusionConfig,
+    M9FusionFamilyResult,
+    run_fusion_lr_study,
+    run_m9_frozen_fusion_family,
+)
 
 __all__ = [
     "ARCH_COLORS",
     "ARCH_ORDER",
     "CANONICAL_LR_BY_ARCH",
     "DEFAULT_LR_GRID",
+    "DEFAULT_LR_STAGE_B",
+    "DEFAULT_LR_STAGE_B_GRID",
     "DEFAULT_SENSITIVITY_SPLIT_SEEDS",
     "LearningRateStudyResult",
+    "M8_CANONICAL_LR_BY_ARCH",
+    "M9FusionConfig",
+    "M9FusionFamilyResult",
     "SplitSensitivityStudyResult",
     "TrainValTestStudyResult",
     "dummy_batch_from_dataset",
+    "make_m8_single_view_model",
     "make_win3a_model",
     "particle_setup_id_for_row",
+    "probe_m8_parameter_counts",
     "probe_win3a_parameter_counts",
     "relabel_catalog_rows_for_split_seed",
     "rmse_metrics_from_l2_errors",
+    "run_fusion_lr_study",
     "run_learning_rate_study",
+    "run_m9_frozen_fusion_family",
     "run_split_sensitivity_study",
     "run_train_val_test_study",
     "select_lr_by_arch",

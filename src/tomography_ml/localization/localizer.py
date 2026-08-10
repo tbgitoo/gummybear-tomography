@@ -39,7 +39,7 @@ class LocalizerSingleViewFourier(nn.Module):
     (e.g. 3 for ``particle_x, particle_y, particle_z``).
 
     See also:
-        :func:`~tomography_ml.localization.builders.win3j_single_view_freeze` — retained WIN 3J block.
+        :func:`~tomography_ml.localization.builders.m8_single_view_block_freeze` — M8 single-view block freeze.
         :meth:`encode_latent` — fusion cut consumed by compact / geometry-aware heads.
     """
 
@@ -71,7 +71,7 @@ class LocalizerSingleViewFourier(nn.Module):
                 (default ``128``).
             in_channels: Input image channels (typically ``1``).
 
-        Notebook / protocol: WIN 3J freeze; used by multi-view fusion trunks.
+        Notebook / protocol: M8 single-view block freeze; used by multi-view fusion trunks.
         """
         super().__init__()
         if n_outputs < 1:

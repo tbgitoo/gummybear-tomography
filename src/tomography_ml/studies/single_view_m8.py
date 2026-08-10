@@ -1,4 +1,4 @@
-"""WIN 3A single-view M8 study helpers (LR sweep + full train→val/test).
+"""Single-view M8 study helpers (LR sweep + full train→val/test).
 
 Matches the geometry used in ``notebooks/08_3A_0_learning_rate.ipynb`` and
 ``notebooks/08_3A_2_train_validation_study.ipynb``: shared ``Encode()`` trunk,
@@ -58,12 +58,14 @@ ARCH_COLORS: dict[str, str] = {
     "flatten": "C1",
 }
 
-# Documented WIN 3A.0 selection (used when an LR sweep is skipped).
-CANONICAL_LR_BY_ARCH: dict[str, float] = {
+# Documented M8 LR selection (used when an LR sweep is skipped).
+M8_CANONICAL_LR_BY_ARCH: dict[str, float] = {
     "pooled": 0.001,
     "fourier": 0.03,
     "flatten": 0.0003,
 }
+# Back-compat alias.
+CANONICAL_LR_BY_ARCH = M8_CANONICAL_LR_BY_ARCH
 
 
 
@@ -128,13 +130,13 @@ def set_train_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def make_win3a_model(
+def make_m8_single_view_model(
     arch: str,
     *,
     n_outputs: int,
     device: torch.device | str,
 ) -> nn.Module:
-    """Build one WIN 3A single-view localiser (``Encode`` trunk defaults).
+    """Build one M8 single-view localiser (``Encode`` trunk defaults).
 
     Fourier uses a linear head; flatten uses an MLP (``hidden=128``), matching
     the 08_3A notebooks rather than :func:`builders.make_flatten` defaults
@@ -161,6 +163,11 @@ def make_win3a_model(
     return model.to(device)
 
 
+# Back-compat alias.
+# Back-compat alias.
+make_win3a_model = make_m8_single_view_model
+
+
 def dummy_batch_from_dataset(
     dataset: Dataset,
     *,
@@ -179,7 +186,7 @@ def dummy_batch_from_dataset(
     return torch.as_tensor(sample, dtype=torch.float32, device=device).unsqueeze(0)
 
 
-def probe_win3a_parameter_counts(
+def probe_m8_parameter_counts(
     *,
     dataset: Dataset,
     x_field: str,
@@ -191,10 +198,14 @@ def probe_win3a_parameter_counts(
     dummy = dummy_batch_from_dataset(dataset, x_field=x_field, device=device)
     counts: dict[str, int] = {}
     for arch in arch_order:
-        model = make_win3a_model(arch, n_outputs=n_outputs, device=device)
+        model = make_m8_single_view_model(arch, n_outputs=n_outputs, device=device)
         materialize_lazy_modules(model, dummy)
         counts[str(arch)] = count_parameters(model)
     return counts
+
+
+# Back-compat alias.
+probe_win3a_parameter_counts = probe_m8_parameter_counts
 
 
 def rmse_metrics_from_l2_errors(
@@ -296,14 +307,14 @@ def run_learning_rate_study(
     continue_on_failure: bool = True,
     verbose: bool = True,
 ) -> LearningRateStudyResult:
-    """Sweep learning rates on full train; select by validation MSE (WIN 3A.0)."""
+    """Sweep learning rates on full train; select by validation MSE (M8 LR study)."""
     if not task.x_fields:
         raise ValueError("task.x_fields must be non-empty")
     x_field = str(task.x_fields[0])
     y_fields = tuple(str(y) for y in task.y_fields)
     n_outputs = len(y_fields)
     factory = model_factory or (
-        lambda arch: make_win3a_model(arch, n_outputs=n_outputs, device=device)
+        lambda arch: make_m8_single_view_model(arch, n_outputs=n_outputs, device=device)
     )
 
     train_ds = build_task_dataset(catalog_rows, task)
@@ -445,18 +456,18 @@ def run_train_val_test_study(
     csv_run_history: str = "run_history.csv",
     csv_session_summary: str = "session_summary.csv",
     csv_comparison: str = "comparison_last_run.csv",
-    architecture_note_prefix: str = "WIN 3A.2",
+    architecture_note_prefix: str = "M8 single-view",
     history_extra: Mapping[str, Any] | None = None,
     verbose: bool = True,
 ) -> TrainValTestStudyResult:
-    """Train each architecture on full train; evaluate val/test (WIN 3A.2)."""
+    """Train each architecture on full train; evaluate val/test (M8 train→val/test)."""
     if not task.x_fields:
         raise ValueError("task.x_fields must be non-empty")
     x_field = str(task.x_fields[0])
     y_fields = tuple(str(y) for y in task.y_fields)
     n_outputs = len(y_fields)
     factory = model_factory or (
-        lambda arch: make_win3a_model(arch, n_outputs=n_outputs, device=device)
+        lambda arch: make_m8_single_view_model(arch, n_outputs=n_outputs, device=device)
     )
     extra_cols = dict(history_extra or {})
 
@@ -752,7 +763,7 @@ def run_split_sensitivity_study(
     training_seed: int = 0,
     arch_order: Sequence[str] = ARCH_ORDER,
     model_factory: ModelFactory | None = None,
-    architecture_note_prefix: str = "WIN 3A.2 xyz split-sensitivity",
+    architecture_note_prefix: str = "M8 xyz split-sensitivity",
     verbose: bool = True,
 ) -> SplitSensitivityStudyResult:
     """Repeat xyz (or any) train→val/test once per split seed (one training run each).
