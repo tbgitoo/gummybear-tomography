@@ -227,3 +227,6 @@ configs/m8/~$m8_demo.xlsx
 configs/m10/m10_demo.xlsx
 configs/m10/~m10_demo.xlsx
 notebooks
+
+# Large ML study checkpoints (local / external publish; not in git)
+checkpoints/

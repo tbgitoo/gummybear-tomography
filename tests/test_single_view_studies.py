@@ -112,14 +112,52 @@ def test_run_lr_and_train_val_helpers(tmp_path: Path, monkeypatch) -> None:
         num_epochs=2,
         batch_size=4,
         seed=0,
+        results_dir=tmp_path / "lr_study",
+        load_existing=False,
     )
     assert set(lr_result.lr_by_arch) == set(ARCH_ORDER)
     assert lr_result.train_size == 6
     assert lr_result.val_size == 4
+    assert lr_result.checkpoint_path is not None
+    assert lr_result.checkpoint_path.is_file()
+    assert not lr_result.skipped_train
     for arch in ARCH_ORDER:
         for lr in (1e-3, 1e-2):
             curve = lr_result.lr_results[arch][lr]["train_curve"]
             assert len(curve) == 2
+            assert lr in lr_result.final_state_by_arch_lr[arch]
+            assert "encoder.stem.0.weight" in lr_result.final_state_by_arch_lr[arch][lr] or any(
+                k.endswith("weight") for k in lr_result.final_state_by_arch_lr[arch][lr]
+            )
+
+    # Selected-LR weights reload into a fresh model.
+    best_lr = lr_result.lr_by_arch["fourier"]
+    model = make_m8_single_view_model("fourier", n_outputs=1, device=device)
+    model.load_state_dict(lr_result.final_state_for("fourier"))
+    with torch.no_grad():
+        out = model(torch.zeros(2, 1, 8, 8))
+    assert out.shape == (2, 1)
+
+    lr_loaded = run_learning_rate_study(
+        catalog_rows=[{}],
+        task=z_task,
+        device=device,
+        lr_grid=(1e-3, 1e-2),
+        num_epochs=2,
+        batch_size=4,
+        seed=0,
+        results_dir=tmp_path / "lr_study",
+        load_existing=True,
+        retrain=False,
+    )
+    assert lr_loaded.skipped_train
+    assert lr_loaded.lr_by_arch == lr_result.lr_by_arch
+    assert lr_loaded.lr_results["fourier"][1e-3]["val_mse"] == (
+        lr_result.lr_results["fourier"][1e-3]["val_mse"]
+    )
+    loaded_state = lr_loaded.final_state_for("fourier", best_lr)
+    for key, tensor in lr_result.final_state_for("fourier", best_lr).items():
+        assert torch.equal(tensor, loaded_state[key])
 
     tv = run_train_val_test_study(
         catalog_rows=[{}],
@@ -134,6 +172,8 @@ def test_run_lr_and_train_val_helpers(tmp_path: Path, monkeypatch) -> None:
         batch_size=4,
         n_repeat_training=2,
         base_seed=0,
+        checkpoint_name="m08_train_val_test_z.pt",
+        load_existing=False,
     )
     assert tv.n_rep == 2
     assert tv.history_path.is_file()
@@ -141,6 +181,32 @@ def test_run_lr_and_train_val_helpers(tmp_path: Path, monkeypatch) -> None:
     assert tv.comparison_path.is_file()
     assert set(tv.full_results) == set(ARCH_ORDER)
     assert len(tv.session_summary_df) == 3
+    assert tv.checkpoint_path is not None and tv.checkpoint_path.is_file()
+    assert set(tv.final_state_by_arch) == set(ARCH_ORDER)
+    assert not tv.skipped_train
+
+    tv_loaded = run_train_val_test_study(
+        catalog_rows=[{}],
+        task=z_task,
+        device=device,
+        results_dir=tmp_path / "study",
+        lr_by_arch=lr_result.lr_by_arch,
+        notebook_id="test",
+        experiment_id="test_exp",
+        variant_prefix="m_test",
+        num_epochs=2,
+        batch_size=4,
+        n_repeat_training=2,
+        base_seed=0,
+        checkpoint_name="m08_train_val_test_z.pt",
+        load_existing=True,
+        retrain=False,
+    )
+    assert tv_loaded.skipped_train
+    assert set(tv_loaded.final_state_by_arch) == set(ARCH_ORDER)
+    for arch in ARCH_ORDER:
+        for key, tensor in tv.final_state_by_arch[arch].items():
+            assert torch.equal(tensor, tv_loaded.final_state_by_arch[arch][key])
 
 
 def _fake_catalog_row(sample_id: int, particle_setup_id: str, split: str):

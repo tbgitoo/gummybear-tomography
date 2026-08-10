@@ -363,19 +363,19 @@ def run_m9_frozen_fusion_family(cfg: M9FusionConfig) -> M9FusionFamilyResult:
     device = cfg.device
 
     if family == "fourier":
-        csv_comparison = "m09_1a_comparison.csv"
-        csv_lr = "m09_1a_lr_study.csv"
-        ckpt_name = "m09_1a_frozen_fourier_fusion.pt"
-        json_name = "m09_1a_frozen_fourier_fusion.json"
-        experiment_id = "m09_1a_frozen_fourier_fusion"
+        csv_comparison = "m09_comparison_fourier.csv"
+        csv_lr = "m09_lr_study_fourier.csv"
+        ckpt_name = "m09_frozen_fourier_fusion.pt"
+        json_name = "m09_frozen_fourier_fusion.json"
+        experiment_id = "m09_frozen_fourier_fusion"
         variant_order = FOURIER_VARIANT_ORDER
         display_map = FOURIER_DISPLAY
     else:
-        csv_comparison = "m09_1b_comparison.csv"
-        csv_lr = "m09_1b_lr_study.csv"
-        ckpt_name = "m09_1b_frozen_pooled_fusion.pt"
-        json_name = "m09_1b_frozen_pooled_fusion.json"
-        experiment_id = "m09_1b_frozen_pooled_fusion"
+        csv_comparison = "m09_comparison_pooled.csv"
+        csv_lr = "m09_lr_study_pooled.csv"
+        ckpt_name = "m09_frozen_pooled_fusion.pt"
+        json_name = "m09_frozen_pooled_fusion.json"
+        experiment_id = "m09_frozen_pooled_fusion"
         variant_order = POOLED_VARIANT_ORDER
         display_map = POOLED_DISPLAY
 
@@ -400,8 +400,8 @@ def run_m9_frozen_fusion_family(cfg: M9FusionConfig) -> M9FusionFamilyResult:
         angle_stride_deg=cfg.angle_stride_deg,
     )
 
-    have_results = comparison_path.is_file()
-    skip_train = bool(cfg.load_existing and have_results and not cfg.retrain)
+    have_checkpoint = checkpoint_path.is_file()
+    skip_train = bool(cfg.load_existing and have_checkpoint and not cfg.retrain)
 
     if cfg.verbose:
         print(
@@ -605,50 +605,51 @@ def run_m9_frozen_fusion_family(cfg: M9FusionConfig) -> M9FusionFamilyResult:
     mean_describe = concat_describe = ds_describe = None
 
     if skip_train:
-        comparison_df = pd.read_csv(comparison_path)
+        blob = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+        if comparison_path.is_file():
+            comparison_df = pd.read_csv(comparison_path)
+        elif blob.get("comparison") is not None:
+            comparison_df = pd.DataFrame(blob["comparison"])
+            comparison_df.to_csv(comparison_path, index=False)
+        else:
+            raise FileNotFoundError(
+                f"M9 checkpoint {display_path(checkpoint_path)} has no comparison table"
+            )
         if "display_label" not in comparison_df.columns:
             comparison_df["display_label"] = comparison_df["variant_id"].map(
                 lambda v: display_map.get(v, v)
             )
-        lr_study_df = (
-            pd.read_csv(lr_study_path) if lr_study_path.is_file() else pd.DataFrame()
-        )
-        blob = (
-            torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-            if checkpoint_path.is_file()
-            else None
-        )
+        if lr_study_path.is_file():
+            lr_study_df = pd.read_csv(lr_study_path)
+        elif blob.get("lr_study") is not None:
+            lr_study_df = pd.DataFrame(blob["lr_study"])
+            lr_study_df.to_csv(lr_study_path, index=False)
+        else:
+            lr_study_df = pd.DataFrame()
         f_mean = make_compact(packing=PACKING_MEAN_POOL)
         f_concat = make_compact(packing=PACKING_ORDERED_CONCAT)
         f_ds = make_deepsets()
-        if blob is not None:
-            if blob.get("mean_pool_state") is not None:
-                f_mean.load_state_dict(blob["mean_pool_state"])
-            if blob.get("model_state") is not None:
-                f_concat.load_state_dict(blob["model_state"])
-            if blob.get(ckpt_ds_key) is not None:
-                f_ds.load_state_dict(blob[ckpt_ds_key])
-            lr_map = blob.get("lr_stage_b") or {}
-            selected_lrs = {
-                "mean_pool": float(lr_map.get("mean_pool", cfg.lr_stage_b_mean_pool)),
-                "ordered_concat": float(
-                    lr_map.get("ordered_concat", cfg.lr_stage_b_ordered_concat)
-                ),
-                "deepsets": float(
-                    lr_map.get(
-                        "deepsets_fourier"
-                        if family == "fourier"
-                        else "deepsets_no_fourier",
-                        cfg.lr_stage_b_deepsets,
-                    )
-                ),
-            }
-        else:
-            selected_lrs = {
-                "mean_pool": float(cfg.lr_stage_b_mean_pool),
-                "ordered_concat": float(cfg.lr_stage_b_ordered_concat),
-                "deepsets": float(cfg.lr_stage_b_deepsets),
-            }
+        if blob.get("mean_pool_state") is not None:
+            f_mean.load_state_dict(blob["mean_pool_state"])
+        if blob.get("model_state") is not None:
+            f_concat.load_state_dict(blob["model_state"])
+        if blob.get(ckpt_ds_key) is not None:
+            f_ds.load_state_dict(blob[ckpt_ds_key])
+        lr_map = blob.get("lr_stage_b") or {}
+        selected_lrs = {
+            "mean_pool": float(lr_map.get("mean_pool", cfg.lr_stage_b_mean_pool)),
+            "ordered_concat": float(
+                lr_map.get("ordered_concat", cfg.lr_stage_b_ordered_concat)
+            ),
+            "deepsets": float(
+                lr_map.get(
+                    "deepsets_fourier"
+                    if family == "fourier"
+                    else "deepsets_no_fourier",
+                    cfg.lr_stage_b_deepsets,
+                )
+            ),
+        }
         selection_modes = {
             "mean_pool": "loaded",
             "ordered_concat": "loaded",
@@ -658,7 +659,11 @@ def run_m9_frozen_fusion_family(cfg: M9FusionConfig) -> M9FusionFamilyResult:
         concat_describe = f_concat.describe()
         ds_describe = f_ds.describe()
         if cfg.verbose:
-            print(f"SKIP_TRAIN: loaded comparison ({len(comparison_df)} rows)", flush=True)
+            print(
+                f"SKIP_TRAIN: loaded {display_path(checkpoint_path)} "
+                f"({len(comparison_df)} comparison rows)",
+                flush=True,
+            )
     else:
         if cfg.verbose:
             print(

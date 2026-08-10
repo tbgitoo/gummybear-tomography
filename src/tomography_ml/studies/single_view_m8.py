@@ -22,6 +22,7 @@ from gummybear.datasets.randomization import (
     DEFAULT_SPLIT_FRACTIONS,
     assign_particle_splits,
 )
+from gummybear.paths import display_path
 from tomography_ml.gummybear_data_catalog.IlluminationOnlyDataset import (
     particle_id_from_sequence_id,
 )
@@ -37,6 +38,12 @@ from tomography_ml.localization.alternative_localizer import (
 )
 from tomography_ml.localization.builders import count_parameters, materialize_lazy_modules
 from tomography_ml.localization.encoder import Encode
+from tomography_ml.studies.study_checkpoints import (
+    clone_state_dict,
+    load_study_checkpoint,
+    save_study_checkpoint,
+    should_load_checkpoint,
+)
 from tomography_ml.training.training_helpers import (
     collect_prediction_errors,
     make_batch_xy_single,
@@ -278,6 +285,55 @@ def select_lr_by_arch(
     return selected
 
 
+DEFAULT_LR_STUDY_CHECKPOINT = "m08_learning_rate_study.pt"
+
+FinalStateByArchLr = dict[str, dict[float, dict[str, torch.Tensor]]]
+
+
+def _clone_state_dict(model: nn.Module) -> dict[str, torch.Tensor]:
+    """CPU clone of ``model.state_dict()`` suitable for ``torch.save``."""
+    return {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+
+
+def _normalize_final_states(
+    raw: Mapping[str, Mapping[Any, Mapping[str, torch.Tensor]]],
+    *,
+    arch_order: Sequence[str],
+    lr_results: Mapping[str, Mapping[float, Mapping[str, Any]]],
+) -> FinalStateByArchLr:
+    """Coerce checkpoint weight tables to ``arch → float(lr) → state_dict``.
+
+    Requires a complete final ``state_dict`` for every successful arch×LR entry
+    in ``lr_results`` (failed runs with an ``error`` key may omit weights).
+    """
+    out: FinalStateByArchLr = {}
+    for arch in arch_order:
+        arch_key = str(arch)
+        by_lr_raw = raw.get(arch_key)
+        if by_lr_raw is None:
+            raise KeyError(
+                f"checkpoint missing final_state_by_arch_lr[{arch_key!r}]"
+            )
+        normalized = {
+            float(lr): {k: v for k, v in state.items()} for lr, state in by_lr_raw.items()
+        }
+        for lr, metrics in lr_results.get(arch_key, {}).items():
+            if "error" in metrics:
+                continue
+            if float(lr) not in normalized:
+                match = next(
+                    (k for k in normalized if abs(float(k) - float(lr)) < 1e-15),
+                    None,
+                )
+                if match is None:
+                    raise KeyError(
+                        f"checkpoint missing final weights for "
+                        f"arch={arch_key!r} lr={float(lr):g}"
+                    )
+        out[arch_key] = normalized
+    return out
+
+
 @dataclass
 class LearningRateStudyResult:
     """Outputs of :func:`run_learning_rate_study`."""
@@ -291,6 +347,81 @@ class LearningRateStudyResult:
     lr_grid: tuple[float, ...]
     y_fields: tuple[str, ...]
     x_field: str
+    final_state_by_arch_lr: FinalStateByArchLr
+    checkpoint_path: Path | None = None
+    skipped_train: bool = False
+
+    def final_state_for(self, arch: str, lr: float | None = None) -> dict[str, torch.Tensor]:
+        """Return the final ``state_dict`` for ``arch`` at ``lr`` (default: selected LR)."""
+        arch_key = str(arch)
+        selected = float(self.lr_by_arch[arch_key] if lr is None else lr)
+        by_lr = self.final_state_by_arch_lr[arch_key]
+        if selected not in by_lr:
+            match = next((k for k in by_lr if abs(float(k) - selected) < 1e-15), None)
+            if match is None:
+                raise KeyError(
+                    f"no final weights for arch={arch_key!r} lr={selected:g}; "
+                    f"have {sorted(by_lr)}"
+                )
+            selected = float(match)
+        return by_lr[selected]
+
+
+def _normalize_lr_results(
+    raw: Mapping[str, Mapping[Any, Mapping[str, Any]]],
+    *,
+    arch_order: Sequence[str],
+) -> dict[str, dict[float, dict[str, Any]]]:
+    """Coerce checkpoint / in-memory LR tables to ``arch → float(lr) → metrics``."""
+    out: dict[str, dict[float, dict[str, Any]]] = {}
+    for arch in arch_order:
+        arch_key = str(arch)
+        by_lr = raw.get(arch_key, {})
+        out[arch_key] = {float(lr): dict(metrics) for lr, metrics in by_lr.items()}
+    return out
+
+
+def _learning_rate_study_from_checkpoint(
+    blob: Mapping[str, Any],
+    *,
+    arch_order: Sequence[str],
+    checkpoint_path: Path,
+) -> LearningRateStudyResult:
+    """Rebuild :class:`LearningRateStudyResult` from a saved ``.pt`` payload."""
+    if "final_state_by_arch_lr" not in blob:
+        raise KeyError(
+            f"checkpoint {display_path(checkpoint_path)} is missing "
+            "final_state_by_arch_lr (re-run the LR study to write a complete checkpoint)"
+        )
+    lr_results = _normalize_lr_results(blob["lr_results"], arch_order=arch_order)
+    lr_by_arch_raw = blob.get("lr_by_arch") or select_lr_by_arch(
+        lr_results, arch_order=arch_order
+    )
+    lr_by_arch = {str(k): float(v) for k, v in lr_by_arch_raw.items()}
+    grid = tuple(float(x) for x in blob.get("lr_grid", ()))
+    if not grid:
+        grid = tuple(
+            sorted({lr for by_lr in lr_results.values() for lr in by_lr.keys()})
+        )
+    final_states = _normalize_final_states(
+        blob["final_state_by_arch_lr"],
+        arch_order=arch_order,
+        lr_results=lr_results,
+    )
+    return LearningRateStudyResult(
+        lr_results=lr_results,
+        lr_by_arch=lr_by_arch,
+        train_size=int(blob.get("train_size", 0)),
+        val_size=int(blob.get("val_size", 0)),
+        num_epochs=int(blob.get("num_epochs", 0)),
+        batch_size=int(blob.get("batch_size", 0)),
+        lr_grid=grid,
+        y_fields=tuple(str(y) for y in blob.get("y_fields", ())),
+        x_field=str(blob.get("x_field", "")),
+        final_state_by_arch_lr=final_states,
+        checkpoint_path=Path(checkpoint_path),
+        skipped_train=True,
+    )
 
 
 def run_learning_rate_study(
@@ -306,8 +437,19 @@ def run_learning_rate_study(
     model_factory: ModelFactory | None = None,
     continue_on_failure: bool = True,
     verbose: bool = True,
+    results_dir: Path | None = None,
+    checkpoint_name: str = DEFAULT_LR_STUDY_CHECKPOINT,
+    load_existing: bool = False,
+    retrain: bool = False,
 ) -> LearningRateStudyResult:
-    """Sweep learning rates on full train; select by validation MSE (M8 LR study)."""
+    """Sweep learning rates on full train; select by validation MSE (M8 LR study).
+
+    When ``results_dir`` is set, the sweep payload (curves, val MSE, selected
+    LRs, and **final** ``state_dict`` per arch×LR) is written to
+    ``results_dir / checkpoint_name``. If ``load_existing`` is true and that
+    file exists (and ``retrain`` is false), the file is loaded and training is
+    skipped.
+    """
     if not task.x_fields:
         raise ValueError("task.x_fields must be non-empty")
     x_field = str(task.x_fields[0])
@@ -316,6 +458,29 @@ def run_learning_rate_study(
     factory = model_factory or (
         lambda arch: make_m8_single_view_model(arch, n_outputs=n_outputs, device=device)
     )
+    grid = tuple(float(lr) for lr in lr_grid)
+
+    checkpoint_path: Path | None = None
+    if results_dir is not None:
+        results_dir = Path(results_dir)
+        results_dir.mkdir(parents=True, exist_ok=True)
+        checkpoint_path = results_dir / str(checkpoint_name)
+        if (
+            bool(load_existing)
+            and not bool(retrain)
+            and checkpoint_path.is_file()
+        ):
+            blob = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+            if verbose:
+                print(
+                    f"Loaded LR study from {display_path(checkpoint_path)}",
+                    flush=True,
+                )
+            return _learning_rate_study_from_checkpoint(
+                blob,
+                arch_order=arch_order,
+                checkpoint_path=checkpoint_path,
+            )
 
     train_ds = build_task_dataset(catalog_rows, task)
     val_ds = build_task_dataset(
@@ -334,8 +499,8 @@ def run_learning_rate_study(
         y_fields=y_fields,
         device=device,
     )
-    grid = tuple(float(lr) for lr in lr_grid)
     lr_results: dict[str, dict[float, dict[str, Any]]] = {a: {} for a in arch_order}
+    final_state_by_arch_lr: FinalStateByArchLr = {str(a): {} for a in arch_order}
 
     for arch in arch_order:
         if verbose:
@@ -380,6 +545,7 @@ def run_learning_rate_study(
                     "val_mse": _mean_mse(model, val_loader, batch_xy),
                     "n_params": count_parameters(model),
                 }
+                final_state_by_arch_lr[str(arch)][float(lr)] = _clone_state_dict(model)
             except Exception as exc:  # noqa: BLE001 — keep sweep going on blow-ups
                 if not continue_on_failure:
                     raise
@@ -403,9 +569,29 @@ def run_learning_rate_study(
                     flush=True,
                 )
 
+    lr_by_arch = select_lr_by_arch(lr_results, arch_order=arch_order)
+    if checkpoint_path is not None:
+        payload = {
+            "lr_results": lr_results,
+            "lr_by_arch": lr_by_arch,
+            "final_state_by_arch_lr": final_state_by_arch_lr,
+            "train_size": len(train_ds),
+            "val_size": len(val_ds),
+            "num_epochs": int(num_epochs),
+            "batch_size": int(batch_size),
+            "lr_grid": list(grid),
+            "y_fields": list(y_fields),
+            "x_field": x_field,
+            "seed": int(seed),
+            "arch_order": list(arch_order),
+        }
+        torch.save(payload, checkpoint_path)
+        if verbose:
+            print(f"Wrote LR study checkpoint {display_path(checkpoint_path)}", flush=True)
+
     return LearningRateStudyResult(
         lr_results=lr_results,
-        lr_by_arch=select_lr_by_arch(lr_results, arch_order=arch_order),
+        lr_by_arch=lr_by_arch,
         train_size=len(train_ds),
         val_size=len(val_ds),
         num_epochs=int(num_epochs),
@@ -413,6 +599,9 @@ def run_learning_rate_study(
         lr_grid=grid,
         y_fields=y_fields,
         x_field=x_field,
+        final_state_by_arch_lr=final_state_by_arch_lr,
+        checkpoint_path=checkpoint_path,
+        skipped_train=False,
     )
 
 
@@ -434,7 +623,68 @@ class TrainValTestStudyResult:
     lr_by_arch: dict[str, float]
     y_fields: tuple[str, ...]
     x_field: str
+    final_state_by_arch: dict[str, dict[str, torch.Tensor]] = field(default_factory=dict)
+    checkpoint_path: Path | None = None
+    skipped_train: bool = False
     extra: dict[str, Any] = field(default_factory=dict)
+
+
+def _train_val_test_from_checkpoint(
+    blob: Mapping[str, Any],
+    *,
+    results_dir: Path,
+    csv_run_history: str,
+    csv_session_summary: str,
+    csv_comparison: str,
+    checkpoint_path: Path,
+) -> TrainValTestStudyResult:
+    """Rebuild :class:`TrainValTestStudyResult` from a checkpoint payload."""
+    if "final_state_by_arch" not in blob:
+        raise KeyError(
+            f"checkpoint {display_path(checkpoint_path)} missing final_state_by_arch"
+        )
+    if "full_results" not in blob:
+        raise KeyError(
+            f"checkpoint {display_path(checkpoint_path)} missing full_results"
+        )
+    session_summary_df = pd.DataFrame(blob["session_summary"])
+    comparison_df = pd.DataFrame(blob["comparison"])
+    history_path = results_dir / csv_run_history
+    session_summary_path = results_dir / csv_session_summary
+    comparison_path = results_dir / csv_comparison
+    results_dir.mkdir(parents=True, exist_ok=True)
+    session_summary_df.to_csv(session_summary_path, index=False)
+    comparison_df.to_csv(comparison_path, index=False)
+    if "history_rows" in blob:
+        pd.DataFrame(blob["history_rows"]).to_csv(history_path, index=False)
+    elif not history_path.is_file():
+        # Minimal history stub so downstream loaders still find a path.
+        session_summary_df.to_csv(history_path, index=False)
+
+    final_state_by_arch = {
+        str(arch): {k: v for k, v in state.items()}
+        for arch, state in dict(blob["final_state_by_arch"]).items()
+    }
+    return TrainValTestStudyResult(
+        full_results=dict(blob["full_results"]),
+        session_run_ids=[int(x) for x in blob.get("session_run_ids", [])],
+        session_summary_df=session_summary_df,
+        comparison_df=comparison_df,
+        history_path=history_path,
+        session_summary_path=session_summary_path,
+        comparison_path=comparison_path,
+        train_size=int(blob.get("train_size", 0)),
+        val_size=int(blob.get("val_size", 0)),
+        test_size=int(blob.get("test_size", 0)),
+        n_rep=int(blob.get("n_rep", 0)),
+        lr_by_arch={str(k): float(v) for k, v in dict(blob.get("lr_by_arch", {})).items()},
+        y_fields=tuple(str(y) for y in blob.get("y_fields", ())),
+        x_field=str(blob.get("x_field", "")),
+        final_state_by_arch=final_state_by_arch,
+        checkpoint_path=Path(checkpoint_path),
+        skipped_train=True,
+        extra=dict(blob.get("extra", {})),
+    )
 
 
 def run_train_val_test_study(
@@ -459,8 +709,16 @@ def run_train_val_test_study(
     architecture_note_prefix: str = "M8 single-view",
     history_extra: Mapping[str, Any] | None = None,
     verbose: bool = True,
+    checkpoint_name: str | None = None,
+    load_existing: bool = False,
+    retrain: bool = False,
 ) -> TrainValTestStudyResult:
-    """Train each architecture on full train; evaluate val/test (M8 train→val/test)."""
+    """Train each architecture on full train; evaluate val/test (M8 train→val/test).
+
+    When ``checkpoint_name`` is set, the final per-arch weights plus plot/table
+    payloads are stored under ``results_dir / checkpoint_name``. Loading skips
+    training when ``load_existing`` is true and the file exists.
+    """
     if not task.x_fields:
         raise ValueError("task.x_fields must be non-empty")
     x_field = str(task.x_fields[0])
@@ -473,6 +731,27 @@ def run_train_val_test_study(
 
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = (
+        results_dir / str(checkpoint_name) if checkpoint_name else None
+    )
+    if should_load_checkpoint(
+        checkpoint_path, load_existing=load_existing, retrain=retrain
+    ):
+        assert checkpoint_path is not None
+        blob = load_study_checkpoint(checkpoint_path)
+        if verbose:
+            print(
+                f"Loaded train/val/test study from {display_path(checkpoint_path)}",
+                flush=True,
+            )
+        return _train_val_test_from_checkpoint(
+            blob,
+            results_dir=results_dir,
+            csv_run_history=csv_run_history,
+            csv_session_summary=csv_session_summary,
+            csv_comparison=csv_comparison,
+            checkpoint_path=checkpoint_path,
+        )
 
     train_ds = build_task_dataset(catalog_rows, task)
     val_ds = build_task_dataset(
@@ -509,6 +788,7 @@ def run_train_val_test_study(
     session_history_rows: list[dict[str, Any]] = []
     full_results: dict[str, dict[str, Any]] = {}
     comparison_rows: list[dict[str, Any]] = []
+    final_state_by_arch: dict[str, dict[str, torch.Tensor]] = {}
 
     for rep in range(n_rep):
         seed = int(session_base_seed) + int(rep)
@@ -596,6 +876,8 @@ def run_train_val_test_study(
                 "test_rmse": test_rmse,
                 "variant_id": variant_id,
             }
+            if rep == n_rep - 1:
+                final_state_by_arch[str(arch)] = clone_state_dict(model)
             if verbose:
                 print(
                     f"{arch:8s}  params={n_params:,}  lr={lr:g}  seed={seed}  "
@@ -677,6 +959,32 @@ def run_train_val_test_study(
     comparison_path = results_dir / csv_comparison
     comparison_df.to_csv(comparison_path, index=False)
 
+    if checkpoint_path is not None:
+        save_study_checkpoint(
+            checkpoint_path,
+            {
+                "full_results": full_results,
+                "session_summary": session_summary_df.to_dict(orient="list"),
+                "comparison": comparison_df.to_dict(orient="list"),
+                "history_rows": session_history_rows,
+                "session_run_ids": session_run_ids,
+                "final_state_by_arch": final_state_by_arch,
+                "lr_by_arch": dict(lr_by_arch),
+                "train_size": len(train_ds),
+                "val_size": len(val_ds),
+                "test_size": len(test_ds),
+                "n_rep": int(n_rep),
+                "y_fields": list(y_fields),
+                "x_field": x_field,
+                "extra": dict(extra_cols),
+            },
+        )
+        if verbose:
+            print(
+                f"Wrote train/val/test checkpoint {display_path(checkpoint_path)}",
+                flush=True,
+            )
+
     return TrainValTestStudyResult(
         full_results=full_results,
         session_run_ids=session_run_ids,
@@ -692,6 +1000,9 @@ def run_train_val_test_study(
         lr_by_arch=dict(lr_by_arch),
         y_fields=y_fields,
         x_field=x_field,
+        final_state_by_arch=final_state_by_arch,
+        checkpoint_path=checkpoint_path,
+        skipped_train=False,
     )
 
 
@@ -709,6 +1020,11 @@ class SplitSensitivityStudyResult:
     lr_by_arch: dict[str, float]
     y_fields: tuple[str, ...]
     x_field: str
+    final_state_by_seed_arch: dict[int, dict[str, dict[str, torch.Tensor]]] = field(
+        default_factory=dict
+    )
+    checkpoint_path: Path | None = None
+    skipped_train: bool = False
 
 
 def _summary_df_from_split_metrics(
@@ -765,12 +1081,18 @@ def run_split_sensitivity_study(
     model_factory: ModelFactory | None = None,
     architecture_note_prefix: str = "M8 xyz split-sensitivity",
     verbose: bool = True,
+    checkpoint_name: str | None = None,
+    load_existing: bool = False,
+    retrain: bool = False,
 ) -> SplitSensitivityStudyResult:
     """Repeat xyz (or any) train→val/test once per split seed (one training run each).
 
     Relabels catalog rows in memory for each seed; the live workbook is unchanged.
     Training RNG seed is fixed (``training_seed``) so variability is from the
     particle-level split assignment.
+
+    When ``checkpoint_name`` is set, metrics tables plus final per-seed/arch
+    weights are stored under ``results_dir / checkpoint_name``.
     """
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -778,8 +1100,61 @@ def run_split_sensitivity_study(
     if not seeds:
         raise ValueError("split_seeds must be non-empty")
 
+    checkpoint_path = (
+        results_dir / str(checkpoint_name) if checkpoint_name else None
+    )
+    y_fields = tuple(str(y) for y in task.y_fields)
+    x_field = str(task.x_fields[0])
+    per_seed_path = results_dir / "sensitivity_per_seed.csv"
+    summary_path = results_dir / "sensitivity_summary.csv"
+
+    if should_load_checkpoint(
+        checkpoint_path, load_existing=load_existing, retrain=retrain
+    ):
+        assert checkpoint_path is not None
+        blob = load_study_checkpoint(checkpoint_path)
+        if "final_state_by_seed_arch" not in blob:
+            raise KeyError(
+                f"checkpoint {display_path(checkpoint_path)} missing "
+                "final_state_by_seed_arch"
+            )
+        per_seed_metrics = pd.DataFrame(blob["per_seed_metrics"])
+        summary_df = pd.DataFrame(blob["summary"])
+        per_seed_metrics.to_csv(per_seed_path, index=False)
+        summary_df.to_csv(summary_path, index=False)
+        final_state_by_seed_arch = {
+            int(seed): {
+                str(arch): {k: v for k, v in state.items()}
+                for arch, state in by_arch.items()
+            }
+            for seed, by_arch in dict(blob["final_state_by_seed_arch"]).items()
+        }
+        if verbose:
+            print(
+                f"Loaded split-sensitivity study from {display_path(checkpoint_path)}",
+                flush=True,
+            )
+        return SplitSensitivityStudyResult(
+            split_seeds=tuple(int(s) for s in blob.get("split_seeds", seeds)),
+            per_seed_studies={},
+            per_seed_metrics=per_seed_metrics,
+            summary_df=summary_df,
+            summary_path=summary_path,
+            per_seed_path=per_seed_path,
+            results_dir=results_dir,
+            lr_by_arch={
+                str(k): float(v) for k, v in dict(blob.get("lr_by_arch", {})).items()
+            },
+            y_fields=tuple(str(y) for y in blob.get("y_fields", y_fields)),
+            x_field=str(blob.get("x_field", x_field)),
+            final_state_by_seed_arch=final_state_by_seed_arch,
+            checkpoint_path=checkpoint_path,
+            skipped_train=True,
+        )
+
     per_seed_studies: dict[int, TrainValTestStudyResult] = {}
     metric_rows: list[dict[str, Any]] = []
+    final_state_by_seed_arch: dict[int, dict[str, dict[str, torch.Tensor]]] = {}
 
     for split_seed in seeds:
         if verbose:
@@ -817,6 +1192,7 @@ def run_split_sensitivity_study(
             verbose=verbose,
         )
         per_seed_studies[int(split_seed)] = study
+        final_state_by_seed_arch[int(split_seed)] = dict(study.final_state_by_arch)
         for arch in arch_order:
             row = study.full_results[str(arch)]
             metric_rows.append(
@@ -845,13 +1221,29 @@ def run_split_sensitivity_study(
         variant_prefix=variant_prefix,
         arch_order=arch_order,
     )
-    per_seed_path = results_dir / "sensitivity_per_seed.csv"
-    summary_path = results_dir / "sensitivity_summary.csv"
     per_seed_metrics.to_csv(per_seed_path, index=False)
     summary_df.to_csv(summary_path, index=False)
 
-    y_fields = tuple(str(y) for y in task.y_fields)
-    x_field = str(task.x_fields[0])
+    if checkpoint_path is not None:
+        save_study_checkpoint(
+            checkpoint_path,
+            {
+                "split_seeds": list(seeds),
+                "per_seed_metrics": per_seed_metrics.to_dict(orient="list"),
+                "summary": summary_df.to_dict(orient="list"),
+                "final_state_by_seed_arch": final_state_by_seed_arch,
+                "lr_by_arch": dict(lr_by_arch),
+                "y_fields": list(y_fields),
+                "x_field": x_field,
+                "training_seed": int(training_seed),
+            },
+        )
+        if verbose:
+            print(
+                f"Wrote split-sensitivity checkpoint {display_path(checkpoint_path)}",
+                flush=True,
+            )
+
     return SplitSensitivityStudyResult(
         split_seeds=seeds,
         per_seed_studies=per_seed_studies,
@@ -863,4 +1255,7 @@ def run_split_sensitivity_study(
         lr_by_arch=dict(lr_by_arch),
         y_fields=y_fields,
         x_field=x_field,
+        final_state_by_seed_arch=final_state_by_seed_arch,
+        checkpoint_path=checkpoint_path,
+        skipped_train=False,
     )

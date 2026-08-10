@@ -39,6 +39,19 @@ def repo_relative_path(path: str | Path) -> str:
     return resolved.as_posix()
 
 
+def checkpoint_dir(repo_root: str | Path, milestone: str) -> Path:
+    """Return ``<repo_root>/checkpoints/<milestone>/`` for ML study artifacts.
+
+    Example: ``checkpoint_dir(ROOT, "m8") / "m08_learning_rate_study.pt"``.
+    """
+    name = str(milestone).strip().lower().lstrip("/")
+    if not name or "/" in name or name in {".", ".."}:
+        raise ValueError(f"milestone must be a simple directory name; got {milestone!r}")
+    path = Path(repo_root) / "checkpoints" / name
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def display_path(path: str | Path | None) -> str:
     """Return a path safe for logs, reprs, and notebook output.
 

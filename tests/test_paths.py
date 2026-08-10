@@ -5,7 +5,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from gummybear.paths import display_path, repo_relative_path
+from gummybear.paths import checkpoint_dir, display_path, repo_relative_path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,6 +13,20 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 def test_repo_relative_path_under_repo():
     target = REPO_ROOT / "configs" / "m8" / "localization_single_particle.xlsx"
     assert repo_relative_path(target) == "configs/m8/localization_single_particle.xlsx"
+
+
+def test_checkpoint_dir_creates_milestone_folder(tmp_path: Path):
+    out = checkpoint_dir(tmp_path, "m8")
+    assert out == tmp_path / "checkpoints" / "m8"
+    assert out.is_dir()
+    assert checkpoint_dir(tmp_path, "M8") == out
+
+
+def test_checkpoint_dir_rejects_nested_milestone(tmp_path: Path):
+    import pytest
+
+    with pytest.raises(ValueError):
+        checkpoint_dir(tmp_path, "m8/extra")
 
 
 def test_display_path_none_and_empty():

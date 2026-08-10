@@ -23,6 +23,12 @@ from .m9_frozen_fusion import (
     plot_m9_rmse_fourier_vs_pooled,
     plot_m9_rmse_ladder,
 )
+from .m9_e2e_geometry_fusion import (
+    ensure_e2e_display_label,
+    plot_m9_e2e_param_counts_fourier_vs_pooled,
+    plot_m9_e2e_rmse_fourier_vs_pooled,
+    plot_m9_e2e_rmse_ladder,
+)
 from .single_view_studies import (
     plot_error_histograms,
     plot_learning_rate_study,
@@ -41,9 +47,13 @@ __all__ = [
     "display_anomaly_camera_light_grid",
     "display_anomaly_still_vs_orbit",
     "ensure_display_label",
+    "ensure_e2e_display_label",
     "plot_error_histograms",
     "plot_illumination_fusion_results",
     "plot_learning_rate_study",
+    "plot_m9_e2e_param_counts_fourier_vs_pooled",
+    "plot_m9_e2e_rmse_fourier_vs_pooled",
+    "plot_m9_e2e_rmse_ladder",
     "plot_m9_lr_study",
     "plot_m9_param_counts_fourier_vs_pooled",
     "plot_m9_rmse_fourier_vs_pooled",
