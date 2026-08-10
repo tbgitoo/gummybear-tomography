@@ -35,7 +35,7 @@ def _repo_root() -> Path:
 
 
 REPO_ROOT = _repo_root()
-EXAMPLE_WORKBOOK = REPO_ROOT / "configs" / "m6" / "m6_generation_plan.xlsx"
+EXAMPLE_WORKBOOK = REPO_ROOT / "configs" / "m6" / "m6_test.xlsx"
 
 
 @pytest.fixture

@@ -217,7 +217,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-configs/~$m6_generation_plan.xlsx
+configs/~$m6_test.xlsx
 docs/specific paper discussions/
 cad/proto_bear.20260711-112522.FCBak
 cad/proto_bear_head.20260727-205253.FCBak
@@ -226,3 +226,4 @@ data
 configs/m8/~$m8_demo.xlsx
 configs/m10/m10_demo.xlsx
 configs/m10/~m10_demo.xlsx
+notebooks

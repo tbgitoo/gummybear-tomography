@@ -54,7 +54,7 @@ def _write_validation_fixture(root: Path) -> Path:
         return {
             "source_sheet": sheet,
             "source_excel_row": 2,
-            "workbook_name": "m6_generation_plan.xlsx",
+            "workbook_name": "m6_test.xlsx",
             "workbook_sheet": sheet,
         }
 
@@ -95,7 +95,7 @@ def _write_validation_fixture(root: Path) -> Path:
             "stl_sha256": "a" * 64,
         },
         "workbook": {
-            "workbook_path": "configs/m6/m6_generation_plan.xlsx",
+            "workbook_path": "configs/m6/m6_test.xlsx",
             "sha256": "b" * 64,
             "sequence_sheet": "sequences",
             "sequence_excel_row": 2,

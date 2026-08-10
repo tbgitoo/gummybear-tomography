@@ -132,7 +132,31 @@ def test_load_role_array_raw_float_derives_path_without_raw_key(
     np.testing.assert_allclose(array[0, 0], 0.125)
 
 
-def test_load_role_array_raw_float_rejects_anomaly(tmp_path: Path):
+def test_load_role_array_raw_float_rejects_unsupported_role(tmp_path: Path):
+    sequence_dir = tmp_path / "seq_mask"
+    sequence_dir.mkdir(parents=True)
+    (sequence_dir / "mask").mkdir()
+    png_rel = "mask/preview.png"
+    Image.fromarray(
+        np.full((2, 2), 128, dtype=np.uint8), mode="L"
+    ).save(sequence_dir / png_rel)
+    manifest_path = sequence_dir / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "frames": [
+                    {"index": 0, "filenames": {"mask": png_rel}}
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    role_ref = RoleRef(manifest_path=str(manifest_path), role_name="mask")
+    with pytest.raises(ValueError, match="only defined for roles"):
+        load_role_array(role_ref, image_representation="raw_float")
+
+
+def test_load_role_array_jpeg_uint8_loads_anomaly_png(tmp_path: Path):
     sequence_dir = tmp_path / "seq_anomaly"
     sequence_dir.mkdir(parents=True)
     (sequence_dir / "anomaly").mkdir()
@@ -152,8 +176,6 @@ def test_load_role_array_raw_float_rejects_anomaly(tmp_path: Path):
         encoding="utf-8",
     )
     role_ref = RoleRef(manifest_path=str(manifest_path), role_name="anomaly")
-    with pytest.raises(ValueError, match="only defined for roles"):
-        load_role_array(role_ref, image_representation="raw_float")
     array = load_role_array(
         role_ref, image_representation="jpeg_uint8"
     )

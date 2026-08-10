@@ -1285,7 +1285,7 @@ def validate_generation_plan(
     """
     if repo_root is None:
         # Prefer repository root inferred from workbook path when possible.
-        # configs/m6/m6_generation_plan.xlsx -> repo root is parent of configs/.
+        # configs/m6/m6_test.xlsx -> repo root is parent of configs/.
         candidate = workbook.path.parent
         if candidate.name == "configs":
             repo_root_path = candidate.parent

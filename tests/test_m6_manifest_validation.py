@@ -57,7 +57,7 @@ def test_absolute_workbook_and_stl_paths_fail(m6_sequence_factory):
 def test_windows_absolute_workbook_path_fails(m6_sequence_factory):
     sequence_dir, manifest, write_manifest = m6_sequence_factory()
     manifest["workbook"]["workbook_path"] = (
-        r"C:\Users\example\private\m6_generation_plan.xlsx"
+        r"C:\Users\example\private\m6_test.xlsx"
     )
     write_manifest()
 
