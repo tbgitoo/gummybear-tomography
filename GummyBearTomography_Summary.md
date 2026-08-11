@@ -135,7 +135,6 @@ $\phi_c(x,y) = 2\pi \left( k_h(c)\frac{x}{W-1} + k_v(c)\frac{y}{H-1} \right)$
 - Frequency pairs $(k_h,k_v)$ are integers assigned in order of increasing total degree $k_h+k_v$, with every non-DC mode appearing twice: $(0,0),$  $(1,0),(1,0),$  $(0,1),(0,1),$  $(2,0),(2,0),$  $(1,1),(1,1)$,  $(0,2),(0,2),$  $...$
 - and $B_c(x,y)$ is:
 
-$$ B_c(x,y)= \begin{cases} 1, & c=0,\\ \cos(\phi_c(x,y)), & c \text{ odd},\\ \sin(\phi_c(x,y)), & c \text{ even}. \end{cases} $$
 
 ```math
 B_c(x,y)=
@@ -278,6 +277,8 @@ The different datasets are obtained using the same five-step pipeline. The prima
 
 
 ### M8 - Fixed Illumination Dataset
+
+For the reproducible execution, see the notebook [Open the main notebook](GummyBearTomography_Final_Report.ipynb). Here, in this summary document, onle the figures are reported.
 
 #### Step 1: Configuration including particle position and train/val/test randomization
 
