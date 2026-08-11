@@ -365,7 +365,7 @@ Three spatial-readout architectures share the same CNN trunk and differ only in 
 
 **Protocol:**
 
-1. **Learning-rate study on `particle_z` only** (geometrically most evident axis) — Learning rate determination by optimal performance in terms of loss function.
+1. **Learning-rate study on `particle_z` only** (geometrically most evident axis, from feet to head) — Learning rate determination by optimal performance in terms of loss function.
 2. **Full train → validation / test on `particle_z`.** This directly compares the architectures to each other in the clearest setting (geometrically most distinct axis)
 3. **Full train → validation / test on `(particle_x, particle_y, particle_z)`.** Challenge in a richer prediction setting
 4. **Split sensitivity on xyz:** repeat step 3 for re-randomized train/validation/test splits. This permits to understand the robustness of the result in the face of train/val/test re-randomization. Sensitivity only: Primary split used in steps 1-3 is authoritative.
@@ -455,10 +455,10 @@ The idea here is to understand whether increased sophistication of the fusion la
 
 Approach:
 
-| Step | Description | Test |
-|-------|-------------|-----|
-| Step 1 | Frozen encoder: Train encoder, free. | Fourier vs. Pooling on 5 fusion architecture variants |
-| Step 2| Per channel, the feature map is multiplied element-wise by Fourier terms, and averaged | Fourier vs. Pooling on 5 fusion architecture variants |
+| Step | Description |
+|-------|-------------|
+| Step 1 | Sequential scheme: Train encoder, then Fusion heads with frozen encoder | Fourier vs. Pooling on 5 fusion architecture variants |
+| Step 2| End-to-end training of the full network. |
 
 Note: The reason to include a "DeepSet" inspired architecture is that DeepSets (REF) is consideted a powerful middleground solution for image fusion while maintaining the process order agnostic.
 
