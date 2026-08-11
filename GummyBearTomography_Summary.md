@@ -278,61 +278,30 @@ The different datasets are obtained using the same five-step pipeline. The prima
 
 ### M8 - Fixed Illumination Dataset
 
-For the reproducible execution, see the notebook [Open the main notebook](GummyBearTomography_Final_Report.ipynb). Here, in this summary document, onle the figures are reported.
+For reproducible execution, see the notebook [Open the main notebook](GummyBearTomography_Final_Report.ipynb). Here, in this summary document, onle the figures are reported.
 
-#### Step 1: Configuration including particle position and train/val/test randomization
+The dataset are made available as PyTorch compatible objects respecting the indexation contract 
+```python
+[x,y]=dataset[i]
+```
 
-#### Randomization of particle position (M8)
+#### Sample definition in M8 and M9
 
-Particle positions are sampled randomly and uniformly within the gummy bear volume. Candidate positions are drawn randomly and accepted only if they lie inside the gummy bear mesh. Positions outside the mesh are rejected, and a new candidate position is drawn until a valid position is obtained.
+![M8 sample (single view)](figures/m8_sample_still_single_view.png)
 
-This corresponds to the assumption that particles are uniformly distributed throughout the gummy bear volume.
-
-The randomized particle position assignment is generated programmatically (code below) and recorded for traceability and consistent use in the Excel workbook. Reusing the same random seed produces identical particle configurations, ensuring reproducible dataset generation.
-
-The reason for using one global randomization of particle position assignment is that the main question here is the impact of architecture parameters under otherwise identical conditions.
-
-#### Train / validation / test split randomization (M8)
-
-Train, validation, and test assignments are generated programmatically (code below) at the particle-identity level and recorded for traceability in the Excel workbook. All observations derived from the same particle configuration inherit the same assignment.
-
-A 70%/15%/15% split was selected as a commonly used compromise between training-set size and independent evaluation subsets. For the demonstration configuration, which contains only 10 particle sequences, a 60%/20%/20% split is used to ensure that each partition contains at least two sequences. This facilitates testing and demonstration of the full processing pipeline while preserving separate training, validation, and test subsets.
-
-Note that fixed train/validation/test randomization is a deliberate project choice. It is trivial to re-randomize the train/val/test split after particle generation (by running the cell below with a different seed and optionally different proportions); however a single predefined split is retained throughout the study to ensure that all architectural variants are evaluated under identical conditions (same rationale as for particle positions, above). Multiple split realizations could be explored in a future robustness study but are outside the scope of the present investigation.
-
-If simulations already exist under the mode output root, re-running this cell still updates the live workbook (unlike particle-centre randomization), but prints a warning: changing the split changes which samples train vs evaluate and therefore the exact ML metrics, even when the images themselves are unchanged.
-
-#### Step 2: Run optical pipeline (M8)
-
-#### Step 3: Load catalog from disk (M8)
+![M9 sample camera orbit](figures/m9_sample_camera_orbit.gif)
 
 
-#### Step 4: Extract Dataset (M8)
+In M8 a sample is an image represented by a [V=1,C=1,H=128,W=128] tensor, the leading two dimensions being singletons (single view, grayscale). A sample in M9 is an ordered sequence of angular views, and is represented by a [V>1,C=1,H=128,W=128] tensor. V=10 in demo and inspection mode, and V=36 in full mode. The image data is raw float as negative and positive deviations from background are recorded. **Physically, a sample** in M8 and M9 corresponds to the set of camera views acquired for a single particle placed at known xyz position in the gummybear; in M8 one view is used, in M9 all available views are used. In general, the image tensor is the feature data, and the position $x,y,z$ or in some steps only one position such as $z$ is the label.
 
-The catalog provides a complete set of information associated with each sequence. The dataset for ML is more restricted:
-- In terms of rows, for training, we need the training split, for validation, the validation split, for testing, the testing split.
-- In terms of columns, we need to extract:
-  - Certain columns as features, also known as "x" or regressors. These features will be used for prediction by the models.
-  - Certain columns as labels, also known as "y" or targets. The labels are used to construct the loss function and thus to train the models.
-
-With the idea of a generic optical simulation framework possibly adapted to various tasks beyond this project, I want to have a way of deliberately selecting features, labels and data split from my catalog, while leaving the catalog as loaded for other tasks. To materialize the configuration for a given ML task, I defined a specific class "DatasetTaskSpec" that allows to me to select suitable split, features and labels for various ML tasks. I then supply the desired task specification to a helper function build_task_dataset and get the PyTorch-style, indexable dataset that I can use for the ML tasks.
-
-For M8 and M9, the camera views are the features, and the xyz particle positions are the labels, since we want to predict particle position from images in the localization task.
-
-For consistency, images use the common shape [V, C, H, W] in M8 and M9:
-   V = number of camera views
-   C = image channels (1 for grayscale)
-
-M8 uses single-view acquisition and therefore yields V=1.
-The view dimension is retained intentionally so that M8 and M9 share the same dataset interface; V=1 is squeezed as suitable in the later implementation if necessary for feeding the CNN (e.g. Conv2d).
-
-Therefore a sample in M8 is an image represented by a [V=1,C=1,H=128,W=128] tensor, the leading two dimensions being singletons (single view, grayscale). A sample in M9 is an ordered sequence of angular views, and is represented by a [V>1,C=1,H=128,W=128] tensor. V=10 in demo and inspection mode, and V=36 in full mode. The image data is raw float as negative and positive deviations from background are recorded. **Physically, a sample** in M8 and M9 corresponds to the set of camera views acquired for a single particle placed at known xyz position in the gummybear; in M8 one view is used, in M9 all available views are used.
-
-Sample definition in M8 and M9
 
 ### M10 - Multi-illumination Dataset
 
-M10 extends the M8/M9 sample geometry with a revolving point light. On disk, each sequence is still one (particle, illumination) pair with a camera orbit. For ML, the joint unit uses the canonical **illumination-major** layout:
+M10 extends the M8/M9 sample geometry with a revolving point light. On disk, each sequence is still one (particle, illumination) pair with a camera orbit. 
+
+#### Sample definition in M10
+
+For ML, the joint unit uses the canonical **illumination-major** layout:
 
 ```text
 [I, V, C, H, W]
@@ -342,45 +311,8 @@ C = channels (1 = greyscale)
 H, W = image height, width
 ```
 
-This matches notebook `10_2` joint units. **10_1** subsamples a fixed camera → `[I, C, H, W]`.
+![M10 sample illumination×camera grid](figures/m10_sample_illumination_camera_grid.gif)
 
-The demo workbook is **hand-maintained** (`tomography_ml_validation` packaged resource / `configs/m10/m10_demo.xlsx`). Current demo scale: **3 illuminations** × **N camera views** (from the Excel camera schedule) × **8 particles** with particle-level **4 / 2 / 2** → **24 sequences**.
-
-#### Step 1: Configuration including particle position and train/val/test randomization
-
-#### Randomization of particle position (M10)
-
-When simulations already exist, the notebook uses a temporary copy to demonstrate randomization. Re-randomizing the Excel worksheet when simulations exist will invalidate the simulations. This would trigger a hash-mismatch error later.
-
-#### Train / validation / test split randomization (M10)
-
-Reuses the M8 helper ``_run_split_randomization`` (seed **53**, particle-level stratification via ``randomize_workbook_sequence_splits``). All sequences that share a ``particle_setup_id`` (the multi-light joint unit) keep one split.
-
-Default fractions are **70/15/15**. For the small M10 demo (8 particles), fractions are set to **50/25/25** so each partition has at least two particles (4/2/2).
-
-If simulations already exist, split re-randomization is still allowed on the live workbook, with a warning that changing the assignment changes exact ML metrics even when images are unchanged.
-
-#### Step 2: Run optical pipeline (M10)
-
-Demo generation writes 24 sequences under `data/generated/m10_demo`. Full mode uses the live M10 illumination workbook (1500 sequences).
-
-#### Step 3: Load catalog from disk (M10)
-
-#### Step 4: Prepare Dataset (M10)
-
-M8/M9 use a 4D view stack `[V, C, H, W]`. M10 joint samples use a **5D illumination-major grid**:
-
-```text
-views[light_i, cam_j]  →  shape [I, V, C, H, W]
-light_angles [I]
-camera_angles [V]
-```
-
-One ML sample is one particle observed under the full light × camera set, with shared xyz labels. On disk this is assembled from one catalog sequence per light (each sequence already carries the camera orbit). **10_1** keeps a single camera index (`V=1` after subsample).
-
-#### Sample definition in M10
-
-A single GIF sweeps the full illumination-major light × camera grid (same ordering as the 5D sample tensor: all camera views per light, then the next light). GIF rate is **2 fps** in `inspect` / `demo` and **10 fps** in `full`.
 
 ### Dataset Validity
 
