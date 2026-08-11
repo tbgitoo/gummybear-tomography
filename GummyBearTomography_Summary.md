@@ -2,46 +2,11 @@
 
 # Gummybear Tomography: Particle Localization in Translucent Simulated Phantoms
 
-# 0. Before you start: installation, setup
-
-This project combines deep learning experiments (PyTorch) with optical diffusion simulations (Netgen/NGSolve). While all code included in the repository was used to generate the results reported in this notebook, reproducing the complete environment may require additional setup depending on the operating system and hardware configuration.
-
-The project was developed and tested using Python 3.12 on an Apple Silicon M2 system, using Metal GPU support for PyTorch. During development, newer Python versions (3.13 and 3.14) resulted in compatibility issues with parts of the software stack and were therefore not used for the reported experiments. Compatibility on other operating systems and Python versions was not systematically evaluated.
-
-A typical environment configuration sequence from repo root is:
-
-```bash
-python3.12 -m venv ./venv
-source ./venv/bin/activate # Windows: .\venv\Scripts\activate 
-pip install -r requirements.txt    
-```
-
-### Package installation from repo
-
-### Reproducibility mode (`DATA_MODE`)
-
-Optical simulations in `"full"`mode take time. The `"demo"` shortens execution time considerably, while `"inspection"`skips the optical pipeline integrally and displays instead pre-generated, expected output.
-
-| Mode | Role |
-|------|------|
-| `"inspect"` | Use packaged / on-disk artifacts only (no optical generation; pre-packaged figures where optical simulation is necessary). |
-| `"demo"` | Small regenerable demo corpora + live optical illustration where applicable. First run: ~ 10-20 minutes for dataset preparation part, then cached|
-| `"full"` | Full workbooks / corpora + live optical illustration where applicable. First run: ca. 2h with 10 core parallel processing; then cached  |
-
-Default: `"demo"`.
-
-### ML checkpoint mode (`READ_CHECKPOINTS`)
-
-Slow localisation studies (learning-rate sweeps, full train→val/test, multi-view fusion) write checkpoints under `checkpoints/<milestone>/` (e.g. `checkpoints/m8/m08_learning_rate_study.pt`). **Checkpoint read/write is only enabled when `DATA_MODE=="full"`**, so demo/inspect runs cannot overwrite the full-scale artifact. When `READ_CHECKPOINTS=True` and a checkpoint is present, those cells **load** it instead of retraining. When `False`, full-mode studies re-run and **overwrite** the checkpoint.
+# 0. Huggingface repository
 
 The checkpoints and the integral optical data from a full run is on Huggingface, at https://huggingface.co/datasets/tbhugging/gummybear-tomography/tree/main
 
-If you do not want to run the full simulation and ML pipeline (12h+):
-- Get the checkpoints folder from the Huggingface repository, and add it at the repo root
-- Get the data folder from the Hugginface repository, and add it at repo root. Attention, within the data folder, in data/generated/
 
-
-### Imports
 
 # 1. Problem statement
 
@@ -99,7 +64,7 @@ I here anticipate that intentionally including limited modes at higher spatial f
 
 Exploration of the low-spatial frequeny domain, as opposed to high spatial frequencies as explored by Tancik et al., is physically motivated: In diffuse optical systems, scattering tends to attenuate higher spatial frequencies, making low-frequency spatial representations particularly relevant for localization from indirect optical observations.
 
-## Relative and Absolute Positional Encoding with Fourier wavelets
+## Relative and Absolute Positional Encoding with Fourier cosine and sine terms
 
 Summarizing, Fourier representations have been incorporated into various neural networks. Two fundamentally different objectives relevant to this project are:
 - Vaswani et al. (https://arxiv.org/pdf/1706.03762) employ sinusoidal functions as additive, relative positional encodings in self-attention; this is a specific case of Rotary Positional Embeddings.
@@ -164,7 +129,7 @@ where $x,y$ are the image coordinates, $X_c(x,y)$ is the activation in the $c^{\
 Fourier pooling, the spatial pooling mode of specific interest here, is accomplished by element-wise multiplication of the feature maps $X(x,y)$ produced by the CNN with $B_c(x,y)$ functionals, before actual averaging, e.g. $u_c = \frac{1}{HW}\sum_{x,y} X_c(x,y)B_c(x,y)$ as indicated above. The $B_c$ functionals are standard Fourier cosine and sine terms, defined in detail as follows:
 
 - $\phi_c(x,y)$ is the phase angle in channel $c$ at position $x,y$:
-$$
+$
 \phi_c(x,y)
 =
 2\pi
@@ -173,7 +138,7 @@ k_h(c)\frac{x}{W-1}
 +
 k_v(c)\frac{y}{H-1}
 \right)
-$$
+$
 Frequency pairs $(k_h,k_v)$ are integers assigned in order of increasing total degree $k_h+k_v$, with every non-DC mode appearing twice: $(0,0),$  $(1,0),(1,0),$  $(0,1),(0,1),$  $(2,0),(2,0),$  $(1,1),(1,1)$,  $(0,2),(0,2),$  $...$
 - and $B_c(x,y)$ is:
 
