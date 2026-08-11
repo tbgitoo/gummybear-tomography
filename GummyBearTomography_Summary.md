@@ -290,7 +290,7 @@ The dataset are made available as PyTorch compatible objects respecting the inde
 ![M8 sample (single view)](figures/m8_sample_still_single_view.png) ![M9 sample camera orbit](figures/m9_sample_camera_orbit.gif)
 
 
-In M8 a sample is an image represented by a [V=1,C=1,H=128,W=128] tensor, the leading two dimensions being singletons (single view, grayscale). A sample in M9 is an ordered sequence of angular views, and is represented by a [V>1,C=1,H=128,W=128] tensor. V=10 in demo and inspection mode, and V=36 in full mode. The image data is raw float as negative and positive deviations from background are recorded. **Physically, a sample** in M8 and M9 corresponds to the set of camera views acquired for a single particle placed at known xyz position in the gummybear; in M8 one view is used, in M9 all available views are used. In general, the image tensor is the feature data, and the position $x,y,z$ or in some steps only one position such as $z$ is the label.
+In M8 a sample is an image represented by a [V=1,C=1,H=128,W=128] tensor, the leading two dimensions being singletons (single view, grayscale). A sample in M9 is an ordered sequence of angular views, and is represented by a [V>1,C=1,H=128,W=128] tensor. V=10 in demo and inspection mode, and V=36 in full mode. The image data is raw float as negative and positive deviations from background are recorded. **Physically, a sample** in M8 and M9 corresponds to the set of camera views acquired for a single particle placed at known xyz position in the gummybear; in M8 one view is used, in M9 all available views are used. In general, the image tensor is provided in the feature data, and the position $x,y,z$ or in some steps only one position such as $z$ is the label.
 
 
 ### M10 - Multi-illumination Dataset
@@ -349,7 +349,9 @@ This section shows the bare-minimum prediction pass in direct PyTorch. Packaged 
 - Fourier pooling
 - Small MLP projecting to predicted coordinates
 
-Below: a hard-coded forward pass on one M8 training sample (untrained weights).
+In the main [GummyBearTomography_Final_Report.ipynb](GummyBearTomography_Final_Report.ipynb), a hard-coded minimal example of the architecture can found, including optimizer setup (Adam) and an example training step. 
+
+The loss function used throughout this porject is mean squared error MSE as this reflects the nature of Euclidian geometry when trying to localize particles in 3D space. Parameter count is discussed as fit as an additional measure with possible mobile or embedded deployment in mind.
 
 ## M8. Milestone M8: Single-view localization studies
 
@@ -361,26 +363,21 @@ Three spatial-readout architectures share the same CNN trunk and differ only in 
 | **fourier** | fixed low-frequency | CNN → Fourier-coded pool → Linear → targets |
 | **flatten** | full learned | CNN → Flatten → MLP → targets |
 
-**Protocol (in order):**
+**Protocol:**
 
-1. **Learning-rate study on `particle_z` only** (geometrically most evident axis) — illustrative sweep over a learning-rate grid; subsequent studies always use the historical consensus LRs (`M8_CANONICAL_LR_BY_ARCH`), regardless of which LR the sweep prefers
+1. **Learning-rate study on `particle_z` only** (geometrically most evident axis) — Learning rate determination by optimal performance in terms of loss function.
 2. **Full train → validation / test on `particle_z`.** This directly compares the architectures to each other in the clearest setting (geometrically most distinct axis)
 3. **Full train → validation / test on `(particle_x, particle_y, particle_z)`.** Challenge in a richer prediction setting
-4. **Split sensitivity on xyz:** repeat step 3 for `N_sensitivity` new particle-level splits (seeds 60–64), with **one** training run per split. Permits to understand the robustness of the result in the face of train/val/test re-randomization. Sensitivity only: Primary split is authoritative.
+4. **Split sensitivity on xyz:** repeat step 3 for re-randomized train/validation/test splits. This permits to understand the robustness of the result in the face of train/val/test re-randomization. Sensitivity only: Primary split used in steps 1-3 is authoritative.
 
-**Input:** `anomaly_ref` (particle-attributable signal), single view at 180° (`keep_angles_deg=180`).
+**Input:** Particle-attributable signal (no noise or artificial image corruption), single view at 180° (`keep_angles_deg=180`). z-score normalization per image including in image series to maximimze contrast: The aim is to assess architecture, not robustness to poor image quality.
 
-**Data mode:** `inspect` / `demo` use the M8 demo corpus with shorter schedules; `full` uses the full M8 localization corpus.
-
-Note that historical runs are registered at `data/generated/m8_1`, for historical reasons with folder names starting with `_08_3a`. In this way, re-run data (different seeds) is accumulated for historical analysis of larger result sets.
 
 ### M8 Study setup
 
-In the shared setup, folder locations, the M8 dataset and common model parameters are defined.
-
 ### M8 Step 1: Learning-rate study
 
-For each architecture, train on the full training split over a learning-rate grid and report the LR with lowest **validation MSE** (thickened in the curves below). This sweep is **illustrative only**: subsequent train/val studies always use `M8_CANONICAL_LR_BY_ARCH` (historical consensus, for reproducibility), not the sweep-selected LRs. Study on foot to head axis, which is geometrically cleanest, to establish learning rates to be subsequently. No evaluation on test split. In this step, the optimal LR for each architecture is determined, no scientific conclusions drawn.
+For each architecture, train on the full training split over a learning-rate grid and use LR with lowest **validation MSE** (thickened in the curves below; in practice, historical consensus used). Study on foot to head axis, which is geometrically cleanest, to establish learning rates to be subsequently. No evaluation on test split. In this step, the optimal LR for each architecture is determined, no scientific conclusions drawn.
 
 ![M8 learning-rate study (particle_z)](figures/m8_learning_rate_study_z.png)
 
