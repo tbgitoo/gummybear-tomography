@@ -411,7 +411,7 @@ In terms of study design, step 2 and 3 are authoritative because the use the mai
 
 - Average pooling performs worse than the other architectures, in z-localization and in 3D localization. Fourier performs substantially better, and usually (dependent on experimental fluctuations from run to run), Flatten performs best.
 - This is interpreted to be related to Fourier-coded pooling and Flatten both preserving spatial information and achieving much lower validation / test error on both z and on xyz. Although not proof of the project hypothesis (you can never prove exactly a hypothesis) it supports the project hypothesis.
-- It is also noteworthy that Fourier achieves comparable held-out performance with orders of magnitude fewer learned parameters (30k vs. >100M).
+- It is also noteworthy that Fourier achieves comparable held-out performance with orders of magnitude fewer learned parameters (32k vs. 134M, e.g. a factor of about 4000).
 - The split-sensitivity panel reports how those xyz conclusions hold under `N_SENSITIVITY` independent particle-level train/val/test partitions (one training seed each - only the partition is independent, the datast is the same).
 
 The split sensitivity analysis merits particular discussion.
@@ -460,9 +460,8 @@ Approach:
 | Step 1 | Sequential scheme: Train encoder, then Fusion heads with frozen encoder | Fourier vs. Pooling on 5 fusion architecture variants |
 | Step 2| End-to-end training of the full network. |
 
-Note: The reason to include a "DeepSet" inspired architecture is that DeepSets (REF) is consideted a powerful middleground solution for image fusion while maintaining the process order agnostic.
+Note: The reason to include a "DeepSet" inspired architecture is that DeepSets ([[Zaheer et al., 2017]](https://arxiv.org/abs/1703.06114)) is consideted a powerful middleground solution for image fusion while maintaining the process order agnostic.
 
-Also note: Technically, the implementation uses rebatching (i.e. `views.reshape(batch * n_views, ...`, not directly parallel processing.
 
 ### M9 dataflow
 
@@ -536,23 +535,12 @@ flowchart TD
   class B1,B2,F1,F2,F3 variant;
 ```
 
-### M9 Step 1: Frozen Encoder
 
-In this part, we train the M9 network separately for the CNN / MLP -> xyz per view, freeze the weights, and then train the fusion layer (where trainable, i.e. variant 3,4,5).
+### M9 step 1 results
 
-The question is whether the advantage of the Fourier-modulated embeddings observed in M8 over GAP pooling persist across multi-view fusion, first in the case of separately trained encoder and fusion head.
+M9 permits to address the question of whether the advantage of the Fourier-modulated embeddings observed in M8 persist across multi-view fusion. The design of the study means that this answer is limited to the case of the use of separately trained encoder and fusion heads. In particular, the xyz-averaging method is realistic when localization estimations form different views are collected and later pooled arithmetically.
 
-#### M9 Step 1 Setup
-
-#### M9 Step 1. Train Fourier and pooled fusion heads, two stage (frozen) mode
-
-Stage A (single-view baseline encoder training) then Stage B (Frozen encoder from A + fusion heads).
-
-#### M9 Step 1 Learning-rate curves, parameter counts, and validation / test RMSE
-
-LR study for learning rate selection (illustrative), test-val final loss output on Fourier vs. Pooled, Fourier-vs-pooled parameter counts, then comparative Fourier-vs-pooled validation and test RMSE.
-
-With these data, the step permits to address the question of whether the advantage of the Fourier-modulated embeddings observed in M8 persist across multi-view fusion. The design of the study means that this answer is limited to the case of the use of separately trained encoder and fusion heads. In particular, the xyz-averaging method is realistic when localization estimations form different views are collected and later pooled arithmetically.
+Note that the architectures here are also compared at optimal learning rate each (LR study not shown).
 
 ![M9 frozen Fourier RMSE ladder](figures/m9_frozen_fourier_rmse_ladder.png)
 
@@ -585,12 +573,9 @@ The network architectures compared are simplified and slightly adapated to the t
 
 Comparing a similarly constructed, but more or less expressive fusion head provides a simple measure on the impact of gradient descent in end to end training.
 
-#### M9 Step 2: Train end-to-end Fourier and pooled ladders
-
-End-to-end training with warm start on initial encoder (here, not prior weights), then full end-to-end training.
 
 #### M9 Step 2: Results
-Comparison of Fourier vs. Pooling on validation and test split loss.
+Comparison of Fourier vs. Pooling on validation and test split loss after end to end-training.
 
 ![M9 e2e Fourier RMSE ladder](figures/m9_e2e_fourier_rmse_ladder.png)
 
