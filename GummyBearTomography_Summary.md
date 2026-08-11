@@ -590,7 +590,7 @@ Comparison of Fourier vs. Pooling on validation and test split loss after end to
 #### Interpretation M9 step 2
 
 - End-to-end training abolishes the beneficial effect of Fourier encoding in the multi-view camera setting. 
-- The advantage is still seen on the single view and xyz-mean controls which do not have a trainable fusion part, this is not an algorithmic issue.
+- The advantage is still seen on the single view and xyz-mean controls which do not have a trainable fusion head. Therefore, the conclusion is specific to the use of fusion heads.
 - This comes with substantially larger models (albeit still moderate by modern standards)
 - Scientifically, a plausible interpretation is that the gradient descent provides the CNN with the opportunity to encode information in the embeddings that are "re-traceable" by the downstream, powerful MLP. 
 - Fourier-modulated embeddings might even somewhat harmful. Possibly the higher frequency content modulation adds noise, possibly the gradient descents is able to find better encodings, possibly the small non-inferiority of the Fourier approach seen in the test split is statistical noise. Further analysis and experiment repetition would be needed to better understand this.
@@ -616,9 +616,6 @@ For each study, learning rate is established first for each model and then used 
 ### M10 Step 1 - separate encoder and illumination fusion training
 #### Setup
 
-### Train frozen illumination fusion (10_1A)
-
-Stage A (SV trunks on all lights) → Stage B (frozen encoder + C/D heads, Fourier and pooled).
 
 ### M10 Step 1 - Single Camera View, Multi-illumination, Separate Encoder and Fusion Head Training
 ####Results: Learning rates, val/test performance, model size, Fourier vs. Pooled comparison
@@ -632,57 +629,54 @@ The models compared are:
 
 Fourier vs. Pooled indicates utility of Four layer in each of these architectures. The reason for including explicit angle as learned feature-wise linear transformation (FiLM) is to understand whether the model needs explicit angular information or whether illumination cues and ordering are sufficient. 
 
-Also note that while A is evaluated on a single view (illumination 0°, camera 180° per sample), training is on all illumination samples concatenated.
-
-![M10 frozen Fourier A–D RMSE ladder](figures/m10_frozen_fourier_ad_rmse_ladder.png)
-
-![M10 frozen pooled A–D RMSE ladder](figures/m10_frozen_pooled_ad_rmse_ladder.png)
-
-![M10 frozen parameter counts Fourier vs pooled](figures/m10_frozen_param_counts_fourier_vs_pooled.png)
-
-![M10 frozen Fourier A–D RMSE (mean ± std)](figures/m10_frozen_fourier_ad_rmse_mean_std.png)
+Also note that while A is evaluated on a single view (illumination 0°, camera 180° per sample), training is on all illumination samples concatenated, that is the physical instruction offered by the multi-illumination setting enters the model training.
 
 ![M10 frozen Fourier vs pooled test RMSE](figures/m10_frozen_fourier_vs_pooled_test_rmse.png)
 
-### M10 Step 1
+### M10 Step 1: Conclusions
 
 - Fourier encoding remains useful, by a small margin, on single view evaluation (Model A).
-- The fact that the margin is much smaller than in M8 or M9 with separate training is very interesting. Compared to M8 and M9
+- The fact that the margin is much smaller than in M8 or M9 with separate training is very interesting.
+- For the more more complex fusion heads, and in fact even for simple xyz averaging, Fourier performs less well than the other models.
+- In terms of fusion heads, the more complex, angle-aware fusion head D seems slightly more performant than the somewhat less complex head C.
+- The conclusion is that Fourier is clearly not uniformly better, it is a good augmentation in the information scarce setting of a single view, but with end-to-end trained larger models in multi-camera-view (M9), and not when richer illumination information is available.
 
-### M10 end-to-end illumination fusion (10_1B)
 
-Same A–D ladder with jointly trained trunks (e2e C/D). Checkpoint policy matches frozen M10.
+### M10 Step 2 end-to-end illumination fusion (10_1B)
 
-### Learning-rate curves, ladders, and Fourier vs pooled (10_1B)
+The question is here whether end-to-end training has a further impact on the relative performance of Fourier and GAP post-CNN pooling.
 
-![M10 e2e Fourier A–D RMSE ladder](figures/m10_e2e_fourier_ad_rmse_ladder.png)
-
-![M10 e2e pooled A–D RMSE ladder](figures/m10_e2e_pooled_ad_rmse_ladder.png)
-
-![M10 e2e parameter counts Fourier vs pooled](figures/m10_e2e_param_counts_fourier_vs_pooled.png)
-
-![M10 e2e Fourier A–D RMSE (mean ± std)](figures/m10_e2e_fourier_ad_rmse_mean_std.png)
+The A–D model ladder, but trained end-to-end was used.
 
 ![M10 e2e Fourier vs pooled test RMSE](figures/m10_e2e_fourier_vs_pooled_test_rmse.png)
 
-### Interpretation notes (M10 e2e)
+### M10 Step 2: Conclusions
 
-- Compare to 10_1A: does joint training change the Fourier vs pooled gap or the value of light∠ conditioning (D uses concat angle tokens in e2e, not FiLM)?
-- Stage-B LR sweeps (when enabled) are illustrative; reported models use the historical Stage-B default LR `3e-3`.
-- Checkpoints: `m10_frozen_illumination_fusion.pt` / `m10_e2e_illumination_fusion.pt` under `checkpoints/m10/` in full mode.
+The conclusion of step 2 (end-to-end training, N=3 repeat of the training) is that Fourier embedding is not advantageous, and if fact slightly to increasingly detrimental with larger model sizes, confirming M10 Step 1 for the multi-illumination setting.
 
-### M10 hierarchical light-then-camera fusion (10_2)
 
-Factorized fusion: lights within each camera → cameras → xyz. Adds a pooled (GAP) trunk control beside Fourier. Single repeat (N=1); same M10 corpus and checkpoint policy as 10_1. LR sweeps (when enabled) are illustrative; Stage-B uses the historical fixed LR (`3e-4`).
+### M10 Step 3: Hierarchical light-then-camera fusion
 
-### Stage-B LR and Fourier vs pooled RMSE (10_2)
+Factorized fusion was originally planned in the project but could not be completed due to long executions and lack of time.
 
-### Interpretation notes (M10 hierarchical)
 
-- Ask whether hierarchical 10_2 beats SV / xyz-mean on joint camera×light units, and whether Fourier retains its edge over pooled under the same two-stage fusion.
-- Checkpoint: `m10_hierarchical_light_then_camera.pt` under `checkpoints/m10/` in full mode.
 
 ### Software verification
 
 The repository unit-test suite (`pytest`) checks catalog contracts, workbook randomization, and ML dataset loading used throughout this report. The cell below runs that suite against the same installed packages and local CAD/config assets as the notebook environment.
 
+
+
+# Overall project conclusion
+
+This project investigated whether physically informed Fourier-based spatial representations can improve particle localisation in translucent media while maintaining low model complexity. To address this question, a complete synthetic optical tomography framework was developed, enabling controlled evaluation of localisation architectures under single-view, multi-view, and multi-illumination conditions.
+
+The results show that preserving spatial information is critical for accurate localisation. The single-view setting (M8), characterized as being relatively information-scarce due to absence of both illumination and view angle variation, Fourier pooling substantially outperformed Global Average Pooling while using orders of magnitude fewer parameters than flatten-based approaches. This effect remained valid multiple train/validation/test partitions, the exact error varied with split composition, but the overall ranking remained stable: architectures that preserved spatial information consistently performed better than aggressive spatial averaging.
+
+At the same time, the benefit of Fourier representations was not universal. In multi-view (M9) and multi-illumination (M10) experiments, their advantage decreased as additional observations and more expressive fusion models became available. Under end-to-end training, Fourier pooling often became neutral or slightly detrimental, suggesting that sufficiently powerful networks can learn alternative spatial encodings directly from the data.
+
+The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A learning was also that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferrable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation biais.
+
+Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work should investigate more realistic optical conditions, multi-particle scenarios, hierarchical fusion methods, and possibly transfer learning from simulation to experimental data. Milestone 10-2 could also eventually be completed but a priori, no fundamentally new result is anticipated.
+
+In summary, the central finding of this work is that explicit preservation of spatial information with Fourier embedding multipliers improves localisation performance under information-constrained conditions, while richer observations progressively reduce the need for handcrafted spatial-frequency priors.
