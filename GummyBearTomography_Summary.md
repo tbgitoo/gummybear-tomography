@@ -287,9 +287,7 @@ The dataset are made available as PyTorch compatible objects respecting the inde
 
 #### Sample definition in M8 and M9
 
-![M8 sample (single view)](figures/m8_sample_still_single_view.png)
-
-![M9 sample camera orbit](figures/m9_sample_camera_orbit.gif)
+![M8 sample (single view)](figures/m8_sample_still_single_view.png) ![M9 sample camera orbit](figures/m9_sample_camera_orbit.gif)
 
 
 In M8 a sample is an image represented by a [V=1,C=1,H=128,W=128] tensor, the leading two dimensions being singletons (single view, grayscale). A sample in M9 is an ordered sequence of angular views, and is represented by a [V>1,C=1,H=128,W=128] tensor. V=10 in demo and inspection mode, and V=36 in full mode. The image data is raw float as negative and positive deviations from background are recorded. **Physically, a sample** in M8 and M9 corresponds to the set of camera views acquired for a single particle placed at known xyz position in the gummybear; in M8 one view is used, in M9 all available views are used. In general, the image tensor is the feature data, and the position $x,y,z$ or in some steps only one position such as $z$ is the label.
