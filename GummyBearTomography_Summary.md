@@ -135,15 +135,7 @@ $\phi_c(x,y) = 2\pi \left( k_h(c)\frac{x}{W-1} + k_v(c)\frac{y}{H-1} \right)$
 - Frequency pairs $(k_h,k_v)$ are integers assigned in order of increasing total degree $k_h+k_v$, with every non-DC mode appearing twice: $(0,0),$  $(1,0),(1,0),$  $(0,1),(0,1),$  $(2,0),(2,0),$  $(1,1),(1,1)$,  $(0,2),(0,2),$  $...$
 - and $B_c(x,y)$ is:
 
-$B_c(x,y)=\begin{cases}1,
-& c=0,
-\\[4pt]
-\cos\!\bigl(\phi_c(x,y)\bigr),
-& c\geq 1, \text{odd},
-\\[4pt]
-\sin\!\bigl(\phi_c(x,y)\bigr),
-& c\geq 1, \text{even},.
-\end{cases}$
+$B_c(x,y)=\begin{cases}1,& c=0,\\[4pt]\cos\!\bigl(\phi_c(x,y)\bigr),& c\geq 1, \text{odd},\\[4pt]\sin\!\bigl(\phi_c(x,y)\bigr),& c\geq 1, \text{even},.\end{cases}$
 
 For the first channel $c=0$, $B_c(x,y) \equiv 1$ such that the 0-th order Fourier channel reduces to the corresponding GAP value. Note that 0-based indexing is used in accordance with Python conventions. In terms of implementation, only the Fourier Pooling layer was implemented specifically for this project. The CNN backbone, Global Average Pooling (GAP), Flatten operation, and MLP head were implemented using standard PyTorch modules.
 
