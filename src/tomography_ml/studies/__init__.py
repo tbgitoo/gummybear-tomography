@@ -37,10 +37,23 @@ from .study_checkpoints import (
     M09_E2E_POOLED_GEOMETRY_FUSION,
     M09_FROZEN_FOURIER_FUSION,
     M09_FROZEN_POOLED_FUSION,
+    M10_E2E_ILLUMINATION_FUSION,
+    M10_FROZEN_ILLUMINATION_FUSION,
+    M10_HIERARCHICAL_LIGHT_THEN_CAMERA,
     StudyCheckpointPolicy,
     study_checkpoint_path,
     study_checkpoint_policy,
     study_results_dir,
+)
+from .m10_illumination_fusion import (
+    M10IlluminationConfig,
+    M10IlluminationResult,
+    run_m10_illumination_fusion,
+)
+from .m10_hierarchical_fusion import (
+    M10HierarchicalConfig,
+    M10HierarchicalResult,
+    run_m10_hierarchical_fusion,
 )
 from .m9_frozen_fusion import (
     DEFAULT_LR_STAGE_B,
@@ -74,6 +87,13 @@ __all__ = [
     "M09_E2E_POOLED_GEOMETRY_FUSION",
     "M09_FROZEN_FOURIER_FUSION",
     "M09_FROZEN_POOLED_FUSION",
+    "M10_E2E_ILLUMINATION_FUSION",
+    "M10_FROZEN_ILLUMINATION_FUSION",
+    "M10_HIERARCHICAL_LIGHT_THEN_CAMERA",
+    "M10HierarchicalConfig",
+    "M10HierarchicalResult",
+    "M10IlluminationConfig",
+    "M10IlluminationResult",
     "M8_CANONICAL_LR_BY_ARCH",
     "M9E2EConfig",
     "M9E2EFamilyResult",
@@ -92,6 +112,8 @@ __all__ = [
     "rmse_metrics_from_l2_errors",
     "run_fusion_lr_study",
     "run_learning_rate_study",
+    "run_m10_hierarchical_fusion",
+    "run_m10_illumination_fusion",
     "run_m9_e2e_geometry_fusion_family",
     "run_m9_frozen_fusion_family",
     "run_split_sensitivity_study",

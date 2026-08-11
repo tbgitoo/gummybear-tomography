@@ -286,6 +286,7 @@ def plot_illumination_fusion_results(
     comparison_df: pd.DataFrame | None = None,
     lr_study_df: pd.DataFrame | None = None,
     show: bool = True,
+    plot_lr_study: bool = True,
 ) -> dict[str, Any]:
     """Draw mean±std root-mean-square error (RMSE) bar charts (and optional LR study) for 10_1 notebooks.
 
@@ -303,6 +304,7 @@ def plot_illumination_fusion_results(
         session_run_ids: Optional filter to specific ``run_id`` values.
         session_summary_df, comparison_df, lr_study_df: In-memory alternatives.
         show: If True, display figures; otherwise save and close.
+        plot_lr_study: If False, skip the Stage-B LR figure (already drawn elsewhere).
 
     Returns:
         dict: ``summary_df`` (aggregated table or None) and ``summary_src``
@@ -597,13 +599,14 @@ def plot_illumination_fusion_results(
             else:
                 plt.close(fig)
 
-    plot_stage_b_lr_study(
-        results_dir=results_dir,
-        config=config,
-        lr_study_df=lr_study_df,
-        lr_study_path=lr_study_path,
-        show=show,
-    )
+    if plot_lr_study:
+        plot_stage_b_lr_study(
+            results_dir=results_dir,
+            config=config,
+            lr_study_df=lr_study_df,
+            lr_study_path=lr_study_path,
+            show=show,
+        )
 
     if history_path.is_file():
         hist_all = pd.read_csv(history_path)
@@ -614,3 +617,276 @@ def plot_illumination_fusion_results(
         )
 
     return {"summary_df": summary_df, "summary_src": summary_src}
+
+
+def plot_m10_backbone_rmse_ladder(
+    summary_or_comparison: pd.DataFrame,
+    *,
+    config: IlluminationFusionPlotConfig,
+    backbone_kind: str,
+    title: str | None = None,
+    figsize: tuple[float, float] | None = None,
+) -> plt.Figure | None:
+    """M9-style val/test RMSE ladder for one backbone (Fourier or pooled)."""
+    df = summary_or_comparison.copy()
+    if "backbone_kind" not in df.columns:
+        df["backbone_kind"] = df["variant_id"].map(
+            lambda v: "pooled" if str(v).endswith("_pooled") else "fourier"
+        )
+    sub = df[df["backbone_kind"] == backbone_kind]
+    if not len(sub):
+        return None
+
+    # Prefer aggregated mean columns; else long-form comparison RMSE_total.
+    if any(c.startswith("RMSE_validation") for c in sub.columns):
+        splits = [
+            s
+            for s in ("validation", "test")
+            if f"RMSE_{s}_mean" in sub.columns or f"RMSE_{s}_total_mean" in sub.columns
+        ]
+        if not splits:
+            return None
+        if figsize is None:
+            figsize = (5.2 * len(splits), 4.4)
+        fig, axes = plt.subplots(
+            1, len(splits), figsize=figsize, sharey=True, constrained_layout=True
+        )
+        if len(splits) == 1:
+            axes = [axes]
+        order = (
+            list(config.order_fourier)
+            if backbone_kind == "fourier"
+            else [p for _, p, _ in config.order_pairs]
+        )
+        short = dict(config.short_labels)
+        n_runs = int(sub["n_runs"].iloc[0]) if "n_runs" in sub.columns else 1
+        for ax, split_key in zip(axes, splits):
+            col_m, col_s = _mean_std_cols(sub, split_key)
+            ordered = (
+                sub.set_index("variant_id")
+                .reindex([v for v in order if v in set(sub["variant_id"])])
+                .reset_index()
+            )
+            labels = [short.get(v, v) for v in ordered["variant_id"]]
+            means = ordered[col_m].to_numpy(dtype=float)
+            stds = (
+                ordered[col_s].to_numpy(dtype=float)
+                if col_s in ordered.columns
+                else np.zeros_like(means)
+            )
+            x = np.arange(len(labels))
+            ax.bar(
+                x,
+                means,
+                yerr=_yerr(stds, n_runs),
+                capsize=4,
+                color=[f"C{i}" for i in range(len(labels))],
+                edgecolor="none",
+            )
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, rotation=20, ha="right")
+            ax.set_ylabel("RMSE total")
+            ax.set_title(split_key)
+            ax.grid(True, axis="y", alpha=0.3)
+            _annotate_bars(ax, x, means, stds, n_runs)
+    else:
+        if "split" not in sub.columns or "RMSE_total" not in sub.columns:
+            return None
+        splits = [s for s in ("validation", "test") if s in set(sub["split"])]
+        if not splits:
+            return None
+        if figsize is None:
+            figsize = (5.2 * len(splits), 4.4)
+        fig, axes = plt.subplots(
+            1, len(splits), figsize=figsize, sharey=True, constrained_layout=True
+        )
+        if len(splits) == 1:
+            axes = [axes]
+        order = (
+            list(config.order_fourier)
+            if backbone_kind == "fourier"
+            else [p for _, p, _ in config.order_pairs]
+        )
+        short = dict(config.short_labels)
+        for ax, split in zip(axes, splits):
+            rows = sub[sub["split"] == split].drop_duplicates("variant_id", keep="last")
+            rows = (
+                rows.set_index("variant_id")
+                .reindex([v for v in order if v in set(rows["variant_id"])])
+                .reset_index()
+            )
+            labels = [short.get(v, v) for v in rows["variant_id"]]
+            vals = rows["RMSE_total"].to_numpy(dtype=float)
+            x = np.arange(len(labels))
+            bars = ax.bar(
+                x, vals, color=[f"C{i}" for i in range(len(labels))], edgecolor="none"
+            )
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, rotation=20, ha="right")
+            ax.set_ylabel("RMSE total")
+            ax.set_title(split)
+            ax.grid(True, axis="y", alpha=0.3)
+            for bar, val in zip(bars, vals):
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_height(),
+                    f"{val:.3f}",
+                    ha="center",
+                    va="bottom",
+                    fontsize=7,
+                )
+
+    fig.suptitle(
+        title
+        or f"{config.title_prefix} — {backbone_kind} A–D RMSE",
+        fontsize=12,
+    )
+    return fig
+
+
+def plot_m10_param_counts_fourier_vs_pooled(
+    comparison_df: pd.DataFrame,
+    *,
+    config: IlluminationFusionPlotConfig,
+    title: str | None = None,
+    figsize: tuple[float, float] = (7.2, 4.0),
+) -> plt.Figure | None:
+    """M9-style log-y trainable-param bars for matched Fourier vs pooled heads."""
+    if "learned_parameter_count" not in comparison_df.columns:
+        return None
+    df = comparison_df.copy()
+    if "split" in df.columns:
+        df = df[df["split"] == "test"].drop_duplicates("variant_id", keep="last")
+    else:
+        df = df.drop_duplicates("variant_id", keep="last")
+    counts = dict(zip(df["variant_id"], df["learned_parameter_count"]))
+    labels, va, vb = [], [], []
+    for vf, vp, short in config.order_pairs:
+        if vf in counts and vp in counts and pd.notna(counts[vf]) and pd.notna(counts[vp]):
+            labels.append(short)
+            va.append(float(counts[vf]))
+            vb.append(float(counts[vp]))
+    if not labels:
+        return None
+    x = np.arange(len(labels))
+    w = 0.38
+    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    ax.bar(x - w / 2, va, w, label="Fourier", color="C0")
+    ax.bar(x + w / 2, vb, w, label="pooled", color="C3")
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel("trainable params")
+    ax.set_yscale("log")
+    ax.set_title(title or f"{config.title_prefix} trainable params — Fourier vs pooled")
+    ax.legend()
+    ax.grid(True, axis="y", alpha=0.3)
+    for xi, yf, yp in zip(x, va, vb):
+        ax.text(xi - w / 2, yf, f"{int(yf):,}", ha="center", va="bottom", fontsize=6)
+        ax.text(xi + w / 2, yp, f"{int(yp):,}", ha="center", va="bottom", fontsize=6)
+    return fig
+
+
+# --- 10_2 hierarchical light-then-camera (Fourier vs pooled) -------------------
+
+_HIER_PAIR = (
+    ("m10_2_single_view_reference", "m10_2_single_view_pooled_reference", "SV"),
+    ("m10_2_shared_xyz_mean_joint", "m10_2_shared_xyz_mean_pooled", "xyz mean"),
+    (
+        "m10_2_hierarchical_light_then_camera",
+        "m10_2_hierarchical_pooled_light_then_camera",
+        "10_2 hier.",
+    ),
+)
+
+
+def plot_m10_hierarchical_lr_study(
+    lr_study_df: pd.DataFrame,
+    *,
+    title: str = "10_2 Stage B LR study — Fourier vs pooled",
+    figsize: tuple[float, float] = (6.5, 4.2),
+) -> plt.Figure | None:
+    """Log-x Stage-B LR vs best val RMSE for hierarchical Fourier and pooled."""
+    if lr_study_df is None or not len(lr_study_df):
+        return None
+    df = lr_study_df.copy()
+    if "backbone_kind" not in df.columns:
+        df["backbone_kind"] = "fourier"
+    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    plotted = False
+    style = {"fourier": ("C0", "Fourier"), "pooled": ("C3", "pooled")}
+    for kind, (color, label) in style.items():
+        sub = df[df["backbone_kind"] == kind].sort_values("lr")
+        if len(sub) < 1:
+            continue
+        ax.plot(sub["lr"], sub["best_val_rmse"], "o-", color=color, label=label)
+        plotted = True
+    if not plotted:
+        plt.close(fig)
+        return None
+    ax.set_xscale("log")
+    ax.set_xlabel("Stage B learning rate")
+    ax.set_ylabel("best val RMSE")
+    ax.set_title(title)
+    ax.grid(True, which="both", alpha=0.3)
+    _legend_if_labeled(ax, fontsize=8)
+    return fig
+
+
+def plot_m10_hierarchical_rmse_fourier_vs_pooled(
+    comparison_df: pd.DataFrame,
+    *,
+    title: str | None = None,
+    figsize: tuple[float, float] | None = None,
+) -> plt.Figure | None:
+    """Grouped Fourier vs pooled total RMSE for SV / xyz-mean / hierarchical."""
+    if comparison_df is None or not len(comparison_df):
+        return None
+    df = comparison_df.copy()
+    if "display_label" not in df.columns:
+        short = {
+            "m10_2_single_view_reference": "SV ref",
+            "m10_2_shared_xyz_mean_joint": "xyz mean",
+            "m10_2_hierarchical_light_then_camera": "10_2 hier.",
+            "m10_2_single_view_pooled_reference": "SV pooled",
+            "m10_2_shared_xyz_mean_pooled": "xyz mean pooled",
+            "m10_2_hierarchical_pooled_light_then_camera": "10_2 hier. pooled",
+        }
+        df["display_label"] = df["variant_id"].map(lambda v: short.get(v, v))
+    splits = [s for s in ("validation", "test") if s in set(df["split"])]
+    if not splits:
+        return None
+    if figsize is None:
+        figsize = (5.5 * len(splits), 4.4)
+    fig, axes = plt.subplots(
+        1, len(splits), figsize=figsize, sharey=True, constrained_layout=True
+    )
+    if len(splits) == 1:
+        axes = [axes]
+    for ax, split in zip(axes, splits):
+        sub = df[df["split"] == split].drop_duplicates("variant_id", keep="last")
+        a_map = dict(zip(sub["variant_id"], sub["RMSE_total"]))
+        labels, va, vb = [], [], []
+        for vf, vp, short in _HIER_PAIR:
+            if vf in a_map and vp in a_map:
+                labels.append(short)
+                va.append(float(a_map[vf]))
+                vb.append(float(a_map[vp]))
+        if not labels:
+            continue
+        x = np.arange(len(labels))
+        w = 0.38
+        ax.bar(x - w / 2, va, w, label="Fourier", color="C0")
+        ax.bar(x + w / 2, vb, w, label="pooled", color="C3")
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=15, ha="right")
+        ax.set_ylabel("RMSE total")
+        ax.set_title(split)
+        ax.grid(True, axis="y", alpha=0.3)
+        _legend_if_labeled(ax, fontsize=8)
+        for xi, yf, yp in zip(x, va, vb):
+            ax.text(xi - w / 2, yf, f"{yf:.3f}", ha="center", va="bottom", fontsize=7)
+            ax.text(xi + w / 2, yp, f"{yp:.3f}", ha="center", va="bottom", fontsize=7)
+    fig.suptitle(
+        title or "10_2 hierarchical — Fourier vs pooled RMSE", fontsize=12
+    )
+    return fig

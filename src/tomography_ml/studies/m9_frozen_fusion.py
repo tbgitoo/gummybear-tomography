@@ -123,7 +123,8 @@ class M9FusionConfig:
     lr_stage_b_ordered_concat: float = DEFAULT_LR_STAGE_B
     lr_stage_b_deepsets: float = DEFAULT_LR_STAGE_B
     compact_select_best_val_lr: bool = False
-    deepsets_select_best_val_lr: bool = True
+    # LR sweeps remain illustrative; reported Stage-B models use lr_stage_b_*.
+    deepsets_select_best_val_lr: bool = False
     load_existing: bool = True
     retrain: bool = False
     fusion_hidden: int = FUSION_HIDDEN

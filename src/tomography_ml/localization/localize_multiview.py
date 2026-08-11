@@ -108,6 +108,7 @@ GEOMETRY_MODE_CONCAT = "concat"
 GEOMETRY_MODE_FILM = "film"
 # Two-stage light-then-camera hierarchical fusion. Protocol: 10_2.
 FUSION_PATTERN_10_2 = "hierarchical_light_then_camera_fusion"
+FUSION_PATTERN_10_2_POOLED = "hierarchical_pooled_light_then_camera_fusion"
 # Mean locked latents → affine head (demoted sanity control).
 FUSION_PATTERN_MEAN_LATENT_SANITY = "shared_xyz_mean_sanity"
 
@@ -2635,7 +2636,7 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
 
     def __init__(
         self,
-        backbone: LocalizerSingleViewFourier | None = None,
+        backbone: nn.Module | None = None,
         *,
         n_cameras: int,
         n_lights: int,
@@ -2648,6 +2649,7 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
         n_outputs: int = 3,
         hidden: int = 128,
         in_channels: int = 1,
+        backbone_kind: str | None = None,
     ):
         """Two-stage hierarchical fusion over camera×light observations.
 
@@ -2665,11 +2667,11 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
 
         Preferred path vs flat joint camera×illumination pooling. Both fusion
         stages use compact multilayer perceptrons (MLPs) (default 128 hidden ×
-        depth 1). Full end-to-end (e2e) — shared Fourier trunk trains with both
-        fusion heads.
+        depth 1). Full end-to-end (e2e) — shared trunk trains with both fusion
+        heads. Fourier is the primary trunk; pooled GAP is the negative control.
 
         Args:
-            backbone: Fourier trunk; default from
+            backbone: Fourier or pooled trunk with ``encode_latent``; default from
                 :func:`new_frozen_single_view_expert`.
             n_cameras, n_lights: Acquisition grid size ``V``, ``I``.
             camera_angles_deg, light_angles_deg: Registered orbit angles.
@@ -2678,6 +2680,8 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
             flat_layout: How flat ``[B, I·V, …]`` inputs reshape —
                 ``light_major`` (canonical) or ``camera_major`` (legacy).
             n_outputs, hidden, in_channels: Trunk hyperparameters.
+            backbone_kind: ``fourier`` or ``pooled`` metadata (inferred from
+                trunk type when omitted).
 
         Notebook / protocol: 10_2.
         """
@@ -2715,16 +2719,45 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
                 f"got {flat_layout!r}"
             )
 
-        self.backbone = backbone or new_frozen_single_view_expert(
-            n_outputs=n_outputs,
-            hidden=hidden,
-            in_channels=in_channels,
-        )
-        if not isinstance(self.backbone, LocalizerSingleViewFourier):
-            raise TypeError(
-                "backbone must be LocalizerSingleViewFourier; "
-                f"got {type(self.backbone)!r}"
+        if backbone_kind is not None:
+            kind = str(backbone_kind).strip().lower()
+        elif backbone is None:
+            kind = "fourier"
+        elif isinstance(backbone, LocalizerSingleViewFourier):
+            kind = "fourier"
+        else:
+            kind = "pooled"
+        if kind not in ("fourier", "pooled", "no_fourier"):
+            raise ValueError(
+                "backbone_kind must be 'fourier' or 'pooled'/'no_fourier'; "
+                f"got {backbone_kind!r}"
             )
+        if kind == "no_fourier":
+            kind = "pooled"
+
+        if backbone is None:
+            if kind == "pooled":
+                backbone = new_frozen_pooled_single_view_expert(
+                    n_outputs=n_outputs, embed_dim=hidden
+                )
+            else:
+                backbone = new_frozen_single_view_expert(
+                    n_outputs=n_outputs,
+                    hidden=hidden,
+                    in_channels=in_channels,
+                )
+        if not callable(getattr(backbone, "encode_latent", None)):
+            raise TypeError(
+                "backbone must implement encode_latent(x) → [B, hidden]; "
+                f"got {type(backbone)!r}"
+            )
+        if not hasattr(backbone, "hidden"):
+            raise TypeError(
+                "backbone must expose .hidden latent width; "
+                f"got {type(backbone)!r}"
+            )
+        self.backbone = backbone
+        self.backbone_kind = kind
         self.n_cameras = int(n_cameras)
         self.n_lights = int(n_lights)
         self.camera_angles_deg = cam_angles
@@ -2734,7 +2767,9 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
         self.camera_latent_dim = int(camera_latent_dim)
         self.flat_layout = layout_key
         self.n_outputs = int(n_outputs)
-        self.fusion_pattern = FUSION_PATTERN_10_2
+        self.fusion_pattern = (
+            FUSION_PATTERN_10_2_POOLED if kind == "pooled" else FUSION_PATTERN_10_2
+        )
 
         latent_dim = int(self.backbone.hidden)
         light_token_dim = latent_dim + 2
@@ -2755,7 +2790,7 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
     @classmethod
     def for_10_2(
         cls,
-        backbone: LocalizerSingleViewFourier | None = None,
+        backbone: nn.Module | None = None,
         *,
         n_cameras: int,
         n_lights: int,
@@ -2763,7 +2798,7 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
         light_angles_deg: Sequence[float] | None = None,
         **kwargs: Any,
     ) -> HierarchicalLightThenCameraFusionLocalizer:
-        """Hierarchical light-then-camera fusion factory.
+        """Hierarchical light-then-camera fusion factory (Fourier trunk).
 
         Defaults light orbit to :data:`M10_LIGHT_ANGLES_DEG` when
         ``light_angles_deg`` is omitted. End-to-end shared trunk + two compact
@@ -2776,6 +2811,7 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
             if light_angles_deg is not None
             else tuple(M10_LIGHT_ANGLES_DEG)
         )
+        kwargs.pop("backbone_kind", None)
         return cls(
             backbone,
             n_cameras=n_cameras,
@@ -2788,6 +2824,54 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
                 kwargs.pop("camera_latent_dim", M10_2_CAMERA_LATENT_DIM)
             ),
             flat_layout=str(kwargs.pop("flat_layout", "light_major")),
+            backbone_kind="fourier",
+            **kwargs,
+        )
+
+    @classmethod
+    def for_10_2_pooled(
+        cls,
+        backbone: nn.Module | None = None,
+        *,
+        n_cameras: int,
+        n_lights: int,
+        camera_angles_deg: Sequence[float],
+        light_angles_deg: Sequence[float] | None = None,
+        **kwargs: Any,
+    ) -> HierarchicalLightThenCameraFusionLocalizer:
+        """Hierarchical light-then-camera fusion with pooled (GAP) trunk.
+
+        Same two-stage light→camera wiring as :meth:`for_10_2`; negative-control
+        backbone for Fourier vs pooled comparison.
+
+        Notebook / protocol: 10_2 pooled control.
+        """
+        lights = (
+            tuple(float(a) for a in light_angles_deg)
+            if light_angles_deg is not None
+            else tuple(M10_LIGHT_ANGLES_DEG)
+        )
+        kwargs.pop("backbone_kind", None)
+        n_outputs = int(kwargs.pop("n_outputs", 3))
+        embed_dim = int(kwargs.pop("embed_dim", kwargs.pop("hidden", 128)))
+        trunk = backbone or new_frozen_pooled_single_view_expert(
+            n_outputs=n_outputs, embed_dim=embed_dim
+        )
+        return cls(
+            trunk,
+            n_cameras=n_cameras,
+            n_lights=n_lights,
+            camera_angles_deg=camera_angles_deg,
+            light_angles_deg=lights,
+            fusion_hidden=int(kwargs.pop("fusion_hidden", M10_2_FUSION_HIDDEN)),
+            fusion_depth=int(kwargs.pop("fusion_depth", M10_2_FUSION_DEPTH)),
+            camera_latent_dim=int(
+                kwargs.pop("camera_latent_dim", M10_2_CAMERA_LATENT_DIM)
+            ),
+            flat_layout=str(kwargs.pop("flat_layout", "light_major")),
+            n_outputs=n_outputs,
+            hidden=embed_dim,
+            backbone_kind="pooled",
             **kwargs,
         )
 
@@ -2870,9 +2954,15 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
 
         Notebook / protocol: 10_2.
         """
+        pooled = self.backbone_kind == "pooled"
         return {
-            "variant_id": "m10_2_hierarchical_light_then_camera_fusion",
+            "variant_id": (
+                "m10_2_hierarchical_pooled_light_then_camera_fusion"
+                if pooled
+                else "m10_2_hierarchical_light_then_camera_fusion"
+            ),
             "fusion_pattern": self.fusion_pattern,
+            "backbone_kind": self.backbone_kind,
             "latent_cut": "after_first_mlp_proj_relu",
             "latent_dim": int(self.backbone.hidden),
             "camera_latent_dim": self.camera_latent_dim,
@@ -2896,8 +2986,12 @@ class HierarchicalLightThenCameraFusionLocalizer(nn.Module):
             "learned_parameter_count": self.learned_parameter_count(),
             "learned_fusion_module": True,
             "note": (
-                "M9/M10 10_2; fuse illuminations within each camera, then fuse "
-                "camera-level latents across viewpoints"
+                "M10 10_2 pooled; GAP trunk + light-then-camera hierarchical fusion"
+                if pooled
+                else (
+                    "M9/M10 10_2; fuse illuminations within each camera, then fuse "
+                    "camera-level latents across viewpoints"
+                )
             ),
         }
 
@@ -2925,6 +3019,7 @@ __all__ = [
     "FUSION_PATTERN_10_1_D_FROZEN",
     "FUSION_PATTERN_10_1_D_FROZEN_POOLED",
     "FUSION_PATTERN_10_2",
+    "FUSION_PATTERN_10_2_POOLED",
     "FUSION_PATTERN_MEAN_LATENT_SANITY",
     "PACKING_MEAN_POOL",
     "PACKING_ORDERED_CONCAT",

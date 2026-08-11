@@ -13,6 +13,10 @@ from .illumination_fusion import (
     PLOT_CONFIG_10_1A,
     PLOT_CONFIG_10_1B,
     plot_illumination_fusion_results,
+    plot_m10_backbone_rmse_ladder,
+    plot_m10_hierarchical_lr_study,
+    plot_m10_hierarchical_rmse_fourier_vs_pooled,
+    plot_m10_param_counts_fourier_vs_pooled,
     plot_stage_b_lr_study,
 )
 from .m9_frozen_fusion import (
@@ -51,6 +55,10 @@ __all__ = [
     "plot_error_histograms",
     "plot_illumination_fusion_results",
     "plot_learning_rate_study",
+    "plot_m10_backbone_rmse_ladder",
+    "plot_m10_hierarchical_lr_study",
+    "plot_m10_hierarchical_rmse_fourier_vs_pooled",
+    "plot_m10_param_counts_fourier_vs_pooled",
     "plot_m9_e2e_param_counts_fourier_vs_pooled",
     "plot_m9_e2e_rmse_fourier_vs_pooled",
     "plot_m9_e2e_rmse_ladder",
