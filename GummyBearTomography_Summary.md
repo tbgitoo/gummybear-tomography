@@ -96,8 +96,9 @@ The experiments employ a common backbone with a CNN → spatial aggregation → 
       ├─────────────── GAP ───────────────► MLP ► Position
       │                              C
       ├──────────── Fourier Pool ─────────► MLP ► Position
-      │                             F=(C×H×W)
+      │
       └───────────── Flatten ─────────────► MLP ► Position
+                                    F=(C×H×W)
 ```
 Note that for simplicity, batching is ignored in the scheme, the actual tensor dimension after the CNN is $[B,C,H,W]$, with $B=1$, $B=16$ or $B=32$ depending on the exact example. The extreme cases of GAP and full flattenging are indicated, but for comparison, a DeepSet-architecture will also be used on some experiments with a learned permutation-invariant spatial aggregation step.
 
@@ -219,7 +220,7 @@ Given the complexity of the combined task of optical simulation, dataset generat
 |---|---|---|---|
 | Optical simulation framework | M1-M5 | No ML dataset produced. These stages establish the physical and geometric simulation capability used later for dataset generation. | `gummybear`, `gummybear_validation` |
 | Dataset-generation capability | M6-M7 | No final ML dataset produced. These stages develop the configurable workbook-driven generation pipeline, caching logic, and reusable data-generation infrastructure. | `gummybear`, `gummybear_validation`, `tomography_ml`, `tomography_ml_validation`|
-| Single-view localization | M8 | **M8 fixed illumination dataset**. Single-particle localization under fixed illumination and multiple optical regimes. In M8, camera location remains fixed. | `gummybear`, `tomography_ml`, (helpers from `tomography_ml_validation`) |
+| Single-view localization | M8 | **M8 fixed illumination dataset**. Single-particle localization under fixed illumination and multiple optical regimes. The corpus retains a camera orbit; M8 ML consumes a single fixed camera angle (180°). | `gummybear`, `tomography_ml`, (helpers from `tomography_ml_validation`) |
 | Multi-view camera fusion | M9 | Reuses the M8 single-illumination dataset. The dataset is unchanged; the experiment uses multiple camera views to be consumed by the model. | `tomography_ml` (with M8 dataset) |
 | Multi-illumination fusion | M10 | **M10 multi-illumination dataset**. Particle placements are simulated under multiple illumination directions for illumination-fusion experiments. | `gummybear`, `tomography_ml`, (helpers from `tomography_ml_validation`) |
 
@@ -273,7 +274,7 @@ As outlined already above, two datasets are produced:
 - **M8 fixed illumination** Dataset: Fixed illumination, variable camera, random particle positions. Also contains 3 different gummybear optical property sets.
 - **M10 variable illumination** Datset: Variable illumination, variable camera, random particle position, fixed gummybear properties.
 
-The different datasets are obtained using the same five-step pipeline. The primary differences are the experiment configuration defined in Step 1 and the task-specific dataset and tensor representations used in Steps 4 and 5.
+The different datasets are obtained using the same four-step pipeline. The primary differences are the experiment configuration defined in Step 1 and the task-specific dataset and tensor representations used in Step 4.
 
 
 ### M8 - Fixed Illumination Dataset
@@ -365,7 +366,7 @@ Three spatial-readout architectures share the same CNN trunk and differ only in 
 
 **Protocol:**
 
-1. **Learning-rate study on `particle_z` only** (geometrically most evident axis, from feet to head) — Learning rate determination by optimal performance in terms of loss function.
+1. **Learning-rate study on `particle_z` only** (geometrically most evident axis, from feet to head) — illustrative LR grid; reported runs use historical canonical LRs per architecture.
 2. **Full train → validation / test on `particle_z`.** This directly compares the architectures to each other in the clearest setting (geometrically most distinct axis)
 3. **Full train → validation / test on `(particle_x, particle_y, particle_z)`.** Challenge in a richer prediction setting
 4. **Split sensitivity on xyz:** repeat step 3 for re-randomized train/validation/test splits. This permits to understand the robustness of the result in the face of train/val/test re-randomization. Sensitivity only: Primary split used in steps 1-3 is authoritative.
@@ -377,13 +378,13 @@ Three spatial-readout architectures share the same CNN trunk and differ only in 
 
 ### M8 Step 1: Learning-rate study
 
-For each architecture, train on the full training split over a learning-rate grid and use LR with lowest **validation MSE** (thickened in the curves below; in practice, historical consensus used). Study on foot to head axis, which is geometrically cleanest, to establish learning rates to be subsequently. No evaluation on test split. In this step, the optimal LR for each architecture is determined, no scientific conclusions drawn.
+For each architecture, train on the full training split over a learning-rate grid (curves below). Reported subsequent runs use historical canonical LRs rather than the grid argmin. Study on foot to head axis, which is geometrically cleanest. No evaluation on test split. In this step, no scientific conclusions are drawn.
 
 ![M8 learning-rate study (particle_z)](figures/m8_learning_rate_study_z.png)
 
 ### M8 Step 2. z-axis localization study. Train → validation / test on `particle_z`
 
-Test of Fourier vs. Pooling layers, with Flattened as full embedding retention control. Restricted to the z-axis. Each architecture is trained on the full training split with the LR from the study above, then evaluated on validation and test.
+Test of Fourier vs. Pooling layers, with Flattened as full embedding retention control. Restricted to the z-axis. Each architecture is trained on the full training split with the historical canonical LR for that architecture, then evaluated on validation and test.
 
 This step answers the question of the performance of the Fourier layer with respect to GAP pooling (spatial averaging) and flatten (full embedding retention) in the simplified task of z-position estimation (foot-head coordinate). The design of the study means that performance evaluation is interpreted for this particular dataset and split; some training variability is taken into account by evaluation over 3 repeated training runs.
 
@@ -391,7 +392,7 @@ This step answers the question of the performance of the Fourier layer with resp
 
 ### M8 Step 3 Train → validation / test on `(x, y, z)`
 
-Repeat the full train → val/test comparison with three-dimensional targets, reusing the z-selected learning rates. Again, no loss-vs-epoch overlay — only held-out RMSE summaries. Full 3D target leads to higher RMSE losses (three coordinates) and could potentially be more variable.
+Repeat the full train → val/test comparison with three-dimensional targets, reusing the historical canonical learning rates. Again, no loss-vs-epoch overlay — only held-out RMSE summaries. Full 3D target leads to higher RMSE losses (three coordinates) and could potentially be more variable.
 
 This step answers the question of whether the performance advantage of the Fourier layer with relative to pooling, approaching flattening, extends to the task of 3D position estimation. Again, the design of the study means that performance evaluation is interpreted for this particular dataset and split; some training variability is taken into account by evaluation over 3 repeated training runs.
 
@@ -540,7 +541,7 @@ flowchart TD
 
 M9 permits to address the question of whether the advantage of the Fourier-modulated embeddings observed in M8 persist across multi-view fusion. The design of the study means that this answer is limited to the case of the use of separately trained encoder and fusion heads. In particular, the xyz-averaging method is realistic when localization estimations form different views are collected and later pooled arithmetically.
 
-Note that the architectures here are also compared at optimal learning rate each (LR study not shown).
+Note that the architectures here use the historical Stage-B learning-rate defaults (illustrative LR sweeps are not used to select reported runs).
 
 ![M9 frozen Fourier RMSE ladder](figures/m9_frozen_fourier_rmse_ladder.png)
 
@@ -607,11 +608,11 @@ Based on the M9 results (which were not available at overall project design time
 
 | Protocol | Training | Fusion head variant |
 |----------|----------|---------------------|
-| Step 1 | Frozen: CNN Enccoder, Fusion MLP separately | single illumination / mean xyz controls, small head and larger illumination-angle informed head |
-| Step 2 | End-to-End: CNN Encoder and Fusion MLP jointy | single illumination / mean xyz controls, small head and larger illumination-angle informed head |
+| Step 1 | Frozen: CNN Encoder, Fusion MLP separately | single-illumination / mean-xyz controls; compact ordered-concat heads C (no light angle) and D (same capacity, light-angle FiLM) |
+| Step 2 | End-to-End: CNN Encoder and Fusion MLP jointly | same A–D ladder as Step 1 (C and D share compact capacity; D adds light-angle conditioning) |
 | Step 3 | Hierarchical fusion: Illumination, then camera views | One defined fusion strategy, evaluated for Fourier and pooled: CNN per view (one illumination, one camera angle) -> MLP fuses illumination, using cos/sin illumination angle token -> MLP fuses camera views -> xyz |
 
-For each study, learning rate is established first for each model and then used for comparison.
+Reported runs use historical / default learning rates rather than per-model optimal selection from LR sweeps.
 
 ### M10 Step 1 - separate encoder and illumination fusion training
 #### Setup
@@ -622,10 +623,10 @@ For each study, learning rate is established first for each model and then used 
 
 The models compared are:
 
-- A Evaluation from the first view per particle (xyz): "Single View reference"
+- A Evaluation from illumination 0° at camera 180° per particle (xyz): "Single View reference"
 - B Evaluation as the average of the xyz positions across all the illumination views "xyz mean"
 - C Illumination fusion head (per illumination: CNN -> Fourier/GAP -> 64 -> Linear -> 128 concat I illumination embedding -> MLP (Linear 128*I -> 128, Relu, then Linear to xyz) -> 3), no illumination angle input
-- D Same as C, but additionally explicit angle input (via FiLM after CNN, cos(angle) and sin(angle) as input) 
+- D Same compact capacity as C, but with explicit light-angle conditioning (FiLM on the 128-d latents after encode, using cos(angle) and sin(angle))
 
 Fourier vs. Pooled indicates utility of Four layer in each of these architectures. The reason for including explicit angle as learned feature-wise linear transformation (FiLM) is to understand whether the model needs explicit angular information or whether illumination cues and ordering are sufficient. 
 
@@ -638,8 +639,8 @@ Also note that while A is evaluated on a single view (illumination 0°, camera 1
 - Fourier encoding remains useful, by a small margin, on single view evaluation (Model A).
 - The fact that the margin is much smaller than in M8 or M9 with separate training is very interesting.
 - For the more more complex fusion heads, and in fact even for simple xyz averaging, Fourier performs less well than the other models.
-- In terms of fusion heads, the more complex, angle-aware fusion head D seems slightly more performant than the somewhat less complex head C.
-- The conclusion is that Fourier is clearly not uniformly better, it is a good augmentation in the information scarce setting of a single view, but with end-to-end trained larger models in multi-camera-view (M9), and not when richer illumination information is available.
+- In terms of fusion heads, the angle-aware head D seems slightly more performant than the angle-unaware head C at the same compact capacity.
+- The conclusion is that Fourier is clearly not uniformly better: it remains a useful augmentation in the information-scarce single-view setting (Model A), but not when richer multi-illumination information is available for fusion.
 
 
 ### M10 Step 2 end-to-end illumination fusion (10_1B)
@@ -652,7 +653,7 @@ The A–D model ladder, but trained end-to-end was used.
 
 ### M10 Step 2: Conclusions
 
-The conclusion of step 2 (end-to-end training, N=3 repeat of the training) is that Fourier embedding is not advantageous, and if fact slightly to increasingly detrimental with larger model sizes, confirming M10 Step 1 for the multi-illumination setting.
+The conclusion of step 2 (end-to-end training, N=3 repeat of the training) is that Fourier embedding is not advantageous, and in fact slightly detrimental on the fusion heads, confirming M10 Step 1 for the multi-illumination setting.
 
 
 ### M10 Step 3: Hierarchical light-then-camera fusion
@@ -677,6 +678,6 @@ At the same time, the benefit of Fourier representations was not universal. In m
 
 The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A learning was also that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferrable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation biais.
 
-Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work should investigate more realistic optical conditions, multi-particle scenarios, hierarchical fusion methods, and possibly transfer learning from simulation to experimental data. Milestone 10-2 could also eventually be completed but a priori, no fundamentally new result is anticipated.
+Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work should investigate more realistic optical conditions, multi-particle scenarios, hierarchical fusion methods, and possibly transfer learning from simulation to experimental data. Hierarchical light-then-camera fusion (M10 Step 3) could also eventually be completed but a priori, no fundamentally new result is anticipated.
 
 In summary, the central finding of this work is that explicit preservation of spatial information with Fourier embedding multipliers improves localisation performance under information-constrained conditions, while richer observations progressively reduce the need for handcrafted spatial-frequency priors.
