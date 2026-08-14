@@ -54,7 +54,7 @@ With the advent of transformers, explicit efforts were made to encode positional
 
 Beyond spatial encoding, Fourier-based approaches offer an interesting opportunity for frequency modulation. This has explicitly been advocated by Tancik et al. (2020, https://arxiv.org/abs/2006.10739). By applying Fourier feature mappings to the network input, they succesfully modulate the spectral response towards higher frequencies otherwise difficult to fit in image treatment, with succesful application for instance in image sharpening.
 
-The present work adopts a different strategy. Rather than applying Fourier representations to the network input coordinates, Fourier basis functions are introduced after CNN feature extraction and immediately before spatial aggregation. The objective is therefore not to alter the representation available to the entire network, but to preserve spatial information at the pooling bottleneck while maintaining a compact embedding.
+The present work adopts a different strategy. Rather than applying Fourier transformations to the network input, Fourier basis functions are introduced after CNN feature extraction and immediately before spatial aggregation. The objective is therefore not to alter the representation available to the entire network, but to preserve spatial information at the pooling bottleneck while maintaining a compact embedding.
 
 It is interesting to reconsider Table 1 in the light of spatial frequency content. GAP, by averaging, has the same effect as applying the constant, 0-th order Fourier term and is thus the low limit representation of spatial frequency transfer. Flattening retains all the spatial information and thus potentially the full set of spatial frequencies. DeepSets occupies an intermediate position: its learned pre-aggregation transformation is not restricted to uniform averaging and may therefore selectively preserve or emphasise information associated with spatial variation that would otherwise be lost under GAP.
 
@@ -148,7 +148,10 @@ B_c(x,y)=
 \end{cases}
 ```
 
-For the first channel $c=0$, $B_c(x,y) \equiv 1$ such that the 0-th order Fourier channel reduces to the corresponding GAP value. Note that 0-based indexing is used in accordance with Python conventions. In terms of implementation, only the Fourier Pooling layer was implemented specifically for this project. The CNN backbone, Global Average Pooling (GAP), Flatten operation, and MLP head were implemented using standard PyTorch modules.
+For the first channel $c=0$, $B_c(x,y) \equiv 1$ such that the 0-th order Fourier channel reduces to the corresponding GAP value. Note that 0-based indexing is used in accordance with Python conventions.
+ 
+In terms of implementation, only the Fourier Pooling layer was implemented specifically for this project. The CNN backbone, Global Average Pooling (GAP), Flatten operation, and MLP head were implemented using standard PyTorch modules. Also note that as defined, the output dimensionality remains identical to GAP (one pooled value per channel, yielding C values for C channels), while introducing spatial sensitivity. Retention of multiple Fourier terms per channel was not pursued here in order to maintain a compact embedding and correspondingly small downstream MLP. Such richer spectral representations could constitute an interesting direction for future work.
+
 
 # 3. Gummybear phantom: A simplifed, high throughput optical simulation
 
