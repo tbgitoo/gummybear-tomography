@@ -644,7 +644,7 @@ Reported runs use historical / default learning rates rather than per-model opti
 
 
 ### M10 Step 1 - Single Camera View, Multi-illumination, Separate Encoder and Fusion Head Training
-####Results: Learning rates, val/test performance, model size, Fourier vs. Pooled comparison
+#### Results: Learning rates, val/test performance, model size, Fourier vs. Pooled comparison
 
 The models compared are:
 
