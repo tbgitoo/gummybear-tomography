@@ -14,7 +14,7 @@ Many imaging tasks require estimating the three-dimensional position of objects 
 
 Automated image analysis with the aid of artificial intelligence is increasingly applied to tomographic imaging. In  information-constrained settings, neural networks must infer spatial location from indirect visual cues. However, common convolutional neural network architectures often rely on global pooling operations that improve parameter efficiency at the cost of discarding spatial information. This project investigates whether physically informed spatial-frequency representations can compensate for this loss of spatial information and improve localization accuracy when observational information is scarce, while simultaneously identifying potential costs of using such priors. The aim is to derive design principles for architectures that are both precise and parameter-economical. Although not implemented in this project, application aims include mobile and possibly embedded devices.
 
-This project uses a synthetic optical tomography framework, based on a combination of refractive ray bending, scattering energy deposition and finite-element simulation for diffusion of light in a gummybear phantom. Based on the synthetic, full y controlled dataset obtained, the study evaluates the usefulness of physically informed spatial representations in the setting of the information-scarce case of positional inferrence from a single camera view. The results are further compared to richer tomographic settings including multiple views and multiple light sources. The goal is to identify when physically informed representations can compensate for information scarcity and to derive design principles for accurate yet parameter-efficient localization systems.
+This project uses a synthetic optical tomography framework, based on a combination of refractive ray bending, scattering energy deposition and finite-element simulation for diffusion of light in a gummybear phantom. Based on the synthetic, fully controlled dataset obtained, the study evaluates the usefulness of physically informed spatial representations in the setting of the information-scarce case of positional inference from a single camera view. The results are further compared to richer tomographic settings including multiple views and multiple light sources. The goal is to identify when physically informed representations can compensate for information scarcity and to derive design principles for accurate yet parameter-efficient localization systems.
 
 # 2. Introduction: Background, Research Aim and Approach
 
@@ -52,17 +52,19 @@ In Table 1, one can see a broad correlation between model size (parameter count)
 
 With the advent of transformers, explicit efforts were made to encode positional information without substantially increasing model size. In their seminal transformer paper, Vaswani et al. (2017, https://arxiv.org/abs/1706.03762) introduced sinusoidal positional encodings, in which sine and cosine functions of different frequencies are added to token embeddings to provide position information while introducing no additional trainable parameters. Rotary Positional Embeddings (RoPE) are a later approach that similarly exploits sinusoidal structure, but encodes position through rotations in embedding space rather than additive positional vectors (Su et al., 2021, https://arxiv.org/abs/2104.09864). In RoPE-based transformers, the dot product between query and key vectors converts these rotations into relative positional information, causing attention scores to depend on the relative displacement between tokens rather than their absolute positions. These works illustrate the broader usefulness of Fourier-inspired basis functions for compact positional and spatial representations, and provide examples of both additive and multiplicative uses of Fourier terms.
 
-Beyond spatial encoding, Fourier-based approaches offer an interesting opportunity for frequency modulation. This has explicitly been advocated by Tancik et al. (2020, https://arxiv.org/abs/2006.10739). Doing so, they succesfully modulate the spectral response towards higher frequencies otherwise difficult to fit in image treatment, with succesful application for instance in image sharpening. Interestingly, however, they apply Fourier transformation not in the embedding, but the coordinate space.
+Beyond spatial encoding, Fourier-based approaches offer an interesting opportunity for frequency modulation. This has explicitly been advocated by Tancik et al. (2020, https://arxiv.org/abs/2006.10739). By applying Fourier feature mappings to the network input, they succesfully modulate the spectral response towards higher frequencies otherwise difficult to fit in image treatment, with succesful application for instance in image sharpening.
 
-It is interesting to reconsider Table 1 in the light of spatial frequency content. GAP, by averaging, has the same effect as applying the constant, 0-th order Fourier term and is thus the low limit representation of spatial frequency transfer. Flattening retains all the spatial information and thus potentially the full set of spatial frequences. DeepSets occupies an intermediate position: its learned pre-aggregation transformation is not restricted to uniform averaging and may therefore selectively preserve or emphasise information associated with spatial variation that would otherwise be lost under GAP.
+The present work adopts a different strategy. Rather than applying Fourier representations to the network input coordinates, Fourier basis functions are introduced after CNN feature extraction and immediately before spatial aggregation. The objective is therefore not to alter the representation available to the entire network, but to preserve spatial information at the pooling bottleneck while maintaining a compact embedding.
 
-I here anticipate that intentionally including limited modes at higher spatial frequency will allow improvements in localization tasks with negligeable increase in parameter counts. Using approaches inspired by Tancik (2020, https://arxiv.org/abs/2006.10739) this can be done without, or with limited model size increase. Given that fully dense heads can transfer the entire spatial frequency spectrum, the approach seems particularly useful when model size is a constraint, such as in embedded or to some extent in model or real-time deployment. In this context, a cautionary project hypothesis is:
+It is interesting to reconsider Table 1 in the light of spatial frequency content. GAP, by averaging, has the same effect as applying the constant, 0-th order Fourier term and is thus the low limit representation of spatial frequency transfer. Flattening retains all the spatial information and thus potentially the full set of spatial frequencies. DeepSets occupies an intermediate position: its learned pre-aggregation transformation is not restricted to uniform averaging and may therefore selectively preserve or emphasise information associated with spatial variation that would otherwise be lost under GAP.
+
+I therefore anticipate that intentionally including a limited number of non-zero spatial-frequency modes will allow improvements in localization tasks without, or with negligible increase in parameter counts. Although applied at a different stage of the network, the present approach shares with Tancik et al. (2020) the advantage that Fourier structure can be introduced with little or no increase in trainable parameter count. Given that fully dense heads can transfer the entire spatial frequency spectrum, the approach seems particularly useful when model size is a constraint, such as in embedded or to some extent in model or real-time deployment. In this context, a cautionary project hypothesis is:
 
 ***
 **Fourier-based low-spatial-frequency representations are most useful for tomographic particle localization when spatial information diversity is limited.**
 ***
 
-Exploration of the low-spatial frequeny domain, as opposed to high spatial frequencies as explored by Tancik et al., is physically motivated: In diffuse optical systems, scattering tends to attenuate higher spatial frequencies, making low-frequency spatial representations particularly relevant for localization from indirect optical observations.
+Exploration of the low-spatial frequeny domain, as opposed to high spatial frequencies as explored by Tancik et al., is further physically motivated: In diffuse optical systems, scattering tends to attenuate higher spatial frequencies, making low-frequency spatial representations particularly relevant for localization from indirect optical observations.
 
 ## Relative and Absolute Positional Encoding with Fourier cosine and sine terms
 
@@ -100,7 +102,7 @@ The experiments employ a common backbone with a CNN → spatial aggregation → 
       └───────────── Flatten ─────────────► MLP ► Position
                                     F=(C×H×W)
 ```
-Note that for simplicity, batching is ignored in the scheme, the actual tensor dimension after the CNN is $[B,C,H,W]$, with $B=1$, $B=16$ or $B=32$ depending on the exact example. The extreme cases of GAP and full flattenging are indicated, but for comparison, a DeepSet-architecture will also be used on some experiments with a learned permutation-invariant spatial aggregation step.
+Note that for simplicity, batching is ignored in the scheme, the actual tensor dimension after the CNN is $[B,C,H,W]$, with $B=1$, $B=16$ or $B=32$ depending on the exact example. The extreme cases of GAP and full flattening are indicated, but for comparison, a DeepSet-architecture will also be used on some experiments with a learned permutation-invariant spatial aggregation step.
 
 
 The canonical tensor sizes (again ignoring batching):
@@ -191,12 +193,12 @@ Right: Step 4 — Image collection. The pipeline simulates a pinhole camera by i
 
 ### Limitations of the optical simulation pipeline
 
-The optics pipeline is a compromise between realism and simplification for speed and developement feasibility. Major limitations are:
+The optics pipeline is a compromise between realism and simplification for speed and development feasibility. Major limitations are:
 - Single refraction: At most 1 refraction event is taken into account per light source ray
 - Diffuse imaging only: Although the gummybear optics python package handles both diffusive and direct ray-based energy transport to the camera, only diffuse parts are considered here for particle localization. The diffuse part is the major contribution in translucent, highly scattering media of interests here.
 - Single particle only: Already mentioned above, the simulation itself handles multipe, non-overlapping particles. For the scientific question of the utility of a Fourier aggregation layer for particle localization, the simpler single-particle scenario offers a clearer hypothesis testing path. 
 - Optical simplifications. The major technical simplication at the level of the physics are:
-  - Ballistic transport vs. Isotropic diffusion only (e.g. scaler representatio of diffuse intensity, not angle-resolved). Partial anisotropic transport, secondary reflected or scattered rays are not considered. 
+  - Ballistic transport vs. Isotropic diffusion only (e.g. scalar representatio of diffuse intensity, not angle-resolved). Partial anisotropic transport, secondary reflected or scattered rays are not considered. 
   - Stationnary solution of the diffusion equation (no time-of-flight analysis)
   - Refraction only: This simulation is based on non-coherent optics, no constructive / destructive interference, Fresnel, Newton rings etc.
   - Pinhole camera without explicit lense effects.
@@ -204,7 +206,7 @@ The optics pipeline is a compromise between realism and simplification for speed
 Summarizing, a series of deliberate optical and design limitations were made. These simplify optical simulation considerably, enabling the generation of a clearly structured data body with:
 - key label: particle position; 
 - meta-data or feature depending on the experiment: camera position, lighting position. 
-Also, the simplification and aggressive cashing permitted to simulate a large body (hundreds to thousands of particle configurations, tens of thousands of individual views) on my personal machine in a reasonable time frame. 
+Also, the simplification and aggressive caching permitted to simulate a large body (hundreds to thousands of particle configurations, tens of thousands of individual views) on my personal machine in a reasonable time frame. 
 
 The simplifications were explicitly made with a translucent, non-specular, non-coherent image mode that nevertheless produces interpretable optical signal for the particle localization elements. The one less intuitive element that was necessary in the simulation was the Robin boundary length to capture the fact the diffusive radiation captured transiently in the gummybear contributes significantly to the realistic aspect of a translucent object partially illuminated by the scattered energy (in the manner of a translucent lightbulb).
 
@@ -436,7 +438,7 @@ In terms of study design, step 2 and 3 are authoritative because the use the mai
 ### Concusions from M8
 
 - Average pooling performs worse than the other architectures, in z-localization and in 3D localization. Fourier performs substantially better, and usually (dependent on experimental fluctuations from run to run), Flatten performs best.
-- This is interpreted to be related to Fourier-coded pooling and Flatten both preserving spatial information and achieving much lower validation / test error on both z and on xyz. Although not proof of the project hypothesis (you can never prove exactly a hypothesis) it supports the project hypothesis.
+- This is interpreted to be related to Fourier-coded pooling and Flatten both preserving spatial information and achieving much lower validation / test error on both z and on xyz. Although not proof of the project hypothesis (you can never prove exactly a hypothesis) the result is consistent the project hypothesis.
 - It is also noteworthy that Fourier achieves comparable held-out performance with orders of magnitude fewer learned parameters (32k vs. 134M, e.g. a factor of about 4000).
 - The split-sensitivity panel reports how those xyz conclusions hold under `N_SENSITIVITY` independent particle-level train/val/test partitions (one training seed each - only the partition is independent, the datast is the same).
 
@@ -625,7 +627,7 @@ Comparison of Fourier vs. Pooling on validation and test split loss after end to
 
 M10 adds illumination as a source of physical information variation.
 
-Compared to the addition of views, the addition of various illumination angles adds a majour soure of physical information: while camera views essentially complete the "hidden face" of a given gummybear physics, revolving the illumination source around the bear permits the particle to cast a revoving shadow and scatter halo in the gummybear.
+Compared to the addition of views, the addition of various illumination angles adds a major source of physical information: while camera views essentially complete the "hidden face" of a given gummybear physics, revolving the illumination source around the bear permits the particle to cast a revoving shadow and scatter halo in the gummybear.
 
 The question for M10 is however the same as for M9: Does the advantage of Fourier embedding pooling survive through fusion of information from different views?
 
@@ -701,7 +703,7 @@ The results show that preserving spatial information is critical for accurate lo
 
 At the same time, the benefit of Fourier representations was not universal. In multi-view (M9) and multi-illumination (M10) experiments, their advantage decreased as additional observations and more expressive fusion models became available. Under end-to-end training, Fourier pooling often became neutral or slightly detrimental, suggesting that sufficiently powerful networks can learn alternative spatial encodings directly from the data.
 
-The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A learning was also that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferrable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation biais.
+The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A learning was also that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation bias.
 
 Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work should investigate more realistic optical conditions, multi-particle scenarios, hierarchical fusion methods, and possibly transfer learning from simulation to experimental data. Hierarchical light-then-camera fusion (M10 Step 3) could also eventually be completed but a priori, no fundamentally new result is anticipated.
 
