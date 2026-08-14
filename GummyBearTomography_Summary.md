@@ -294,7 +294,7 @@ The dataset are made available as PyTorch compatible objects respecting the inde
 
 **M8 single view**
 
-M8 (1, 1, 128, 128); V=1 (still), C=1 (greyscale)
+M8 Sample tensor shape [1, 1, 128, 128]: Still, greyscale
 
 ![M8 sample (single view)](figures/m8_sample_still_single_view.png)
 
@@ -303,7 +303,7 @@ M8 (1, 1, 128, 128); V=1 (still), C=1 (greyscale)
 
 **M9 multiple views**
 
-M9 (36, 1, 128, 128); V=36 (orbit), C=1 (greyscale)
+M9 Sample tensor shape [36, 1, 128, 128]: 36 Orbit images, greyscale
 
 ![M9 sample camera orbit](figures/m9_sample_camera_orbit.gif)
 
@@ -333,7 +333,7 @@ H, W = image height, width
 
 **M10 multi-view, multi-illumination**
 
-M10 sample (6, 36, 1, 128, 128) = [I,V,C,H,W]  GIF sweeps 216 frames @ 10 fps
+M10 sample [6, 36, 1, 128, 128] = 6 illuminations, 36 orbit views, greyscale
 
 ![M10 sample illumination×camera grid](figures/m10_sample_illumination_camera_grid.gif)
 
