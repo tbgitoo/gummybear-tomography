@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from tomography_ml.studies.single_view_m8 import ARCH_COLORS, ARCH_ORDER
+from tomography_ml_validation.plotting.report_titles import apply_report_titles
 
 
 def plot_learning_rate_study(
@@ -24,9 +25,18 @@ def plot_learning_rate_study(
     arch_order: Sequence[str] = ARCH_ORDER,
     arch_colors: Mapping[str, str] = ARCH_COLORS,
     title_prefix: str = "M8 LR study",
+    heading: str | None = None,
+    caption: str | None = None,
     figsize: tuple[float, float] = (16.0, 4.0),
 ) -> plt.Figure:
-    """Overlay train MSE vs epoch per LR and validation MSE vs LR."""
+    """Overlay train MSE vs epoch per LR and validation MSE vs LR.
+
+    Args:
+        heading: Optional large over-title (pass from the notebook).
+        caption: Optional 11px technical line under the heading. If omitted,
+            built from ``title_prefix``, epoch count, fields, and split sizes.
+        title_prefix: Stem of the auto-generated technical caption.
+    """
     fig, axes = plt.subplots(1, 4, figsize=figsize)
     cmap_lr = plt.cm.viridis(np.linspace(0.1, 0.9, len(lr_grid)))
 
@@ -67,13 +77,18 @@ def plot_learning_rate_study(
     ax_sum.grid(True, which="both", alpha=0.3)
     ax_sum.legend(fontsize=8)
 
-    fig.suptitle(
+    technical = caption or (
         f"{title_prefix}  |  {num_epochs} epochs  |  "
         f"x={x_field}  y={list(y_fields)}  |  "
-        f"train n={train_size}  val n={val_size}",
-        fontsize=11,
+        f"train n={train_size}  val n={val_size}"
     )
-    fig.tight_layout()
+    if heading:
+        apply_report_titles(
+            fig, heading, technical, steal_existing=False
+        )
+    else:
+        fig.suptitle(technical, fontsize=11)
+        fig.tight_layout()
     return fig
 
 

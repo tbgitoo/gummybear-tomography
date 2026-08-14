@@ -7,6 +7,7 @@ GIF for multi-view orbits. Not the ML training normalisation path
 
 from __future__ import annotations
 
+import html as html_lib
 from base64 import b64encode
 from io import BytesIO
 from typing import Sequence
@@ -139,6 +140,26 @@ def build_anomaly_orbit_gif(
     return buf.getvalue()
 
 
+def _panel_heading_html(heading: str | None) -> str:
+    """Larger panel heading, or empty if heading is omitted."""
+    if heading is None or not str(heading).strip():
+        return ""
+    return (
+        "<div style='font: 600 18px sans-serif; margin-bottom:0.2rem;'>"
+        f"{html_lib.escape(str(heading).strip())}</div>"
+    )
+
+
+def _panel_caption_html(caption: str | None) -> str:
+    """12px technical title under the heading, or empty if omitted."""
+    if caption is None or not str(caption).strip():
+        return ""
+    return (
+        "<div style='font: 12px sans-serif; margin-bottom:0.35rem;'>"
+        f"{html_lib.escape(str(caption).strip())}</div>"
+    )
+
+
 def anomaly_still_vs_orbit_html(
     still_hw: np.ndarray,
     orbit_vhw: np.ndarray,
@@ -153,6 +174,8 @@ def anomaly_still_vs_orbit_html(
     fps: float = DEFAULT_FPS,
     still_caption: str | None = None,
     orbit_caption: str | None = None,
+    still_heading: str | None = None,
+    orbit_heading: str | None = None,
 ) -> HTML:
     """Build side-by-side HTML for an M8 still and M9 orbit GIF.
 
@@ -165,7 +188,10 @@ def anomaly_still_vs_orbit_html(
         mean, std: Fixed display affine (not ML per-view z-score).
         display_px: Shared on-screen size (nearest upsample).
         fps: GIF playback rate.
-        still_caption / orbit_caption: Optional titles above each panel.
+        still_caption / orbit_caption: Technical titles (12px) above each panel.
+            If omitted, a shape/layout string is generated.
+        still_heading / orbit_heading: Larger panel headings; ``None`` or ``""``
+            omits them. Pass from the notebook for report figures.
 
     Returns:
         ``IPython.display.HTML`` suitable for ``display(...)``.
@@ -206,12 +232,14 @@ def anomaly_still_vs_orbit_html(
     return HTML(
         "<div style='display:flex;gap:1.25rem;align-items:flex-start;'>"
         "<div style='text-align:center;'>"
-        f"<div style='font: 12px sans-serif; margin-bottom:0.35rem;'>{left_title}</div>"
+        f"{_panel_heading_html(still_heading)}"
+        f"{_panel_caption_html(left_title)}"
         f"<img width='{int(display_px)}' height='{int(display_px)}' "
         f"src='data:image/png;base64,{png_b64}'/>"
         "</div>"
         "<div style='text-align:center;'>"
-        f"<div style='font: 12px sans-serif; margin-bottom:0.35rem;'>{right_title}</div>"
+        f"{_panel_heading_html(orbit_heading)}"
+        f"{_panel_caption_html(right_title)}"
         f"<img width='{int(display_px)}' height='{int(display_px)}' "
         f"src='data:image/gif;base64,{gif_b64}'/>"
         "</div>"
@@ -241,6 +269,8 @@ def display_anomaly_still_vs_orbit(
     fps: float = DEFAULT_FPS,
     still_caption: str | None = None,
     orbit_caption: str | None = None,
+    still_heading: str | None = None,
+    orbit_heading: str | None = None,
 ) -> HTML:
     """Build and ``display`` the still-vs-orbit anomaly HTML preview.
 
@@ -259,6 +289,8 @@ def display_anomaly_still_vs_orbit(
         fps=fps,
         still_caption=still_caption,
         orbit_caption=orbit_caption,
+        still_heading=still_heading,
+        orbit_heading=orbit_heading,
     )
     display(html)
     return html
@@ -347,10 +379,20 @@ def anomaly_camera_light_grid_html(
     display_px: int = DEFAULT_DISPLAY_PX,
     fps: float = DEFAULT_CAMERA_LIGHT_GRID_FPS,
     include_still: bool = True,
+    heading: str | None = None,
+    caption: str | None = None,
+    still_heading: str | None = None,
+    still_caption: str | None = None,
 ) -> HTML:
     """GIF over the full ``[I, V]`` grid (canonical M10 sample); optional still.
 
     Display-only fixed mean/std greyscale; not ML per-view z-score.
+
+    Args:
+        heading / caption: GIF-panel large heading and 12px technical title.
+            Pass from the notebook for report figures. If ``caption`` is
+            omitted, a shape/layout string is generated.
+        still_heading / still_caption: Same for the optional still panel.
     """
     grid = _as_illum_view_hw(grid_iv)
     n_light, n_cam = int(grid.shape[0]), int(grid.shape[1])
@@ -368,11 +410,14 @@ def anomaly_camera_light_grid_html(
         fps=fps,
     )
     gif_b64 = b64encode(gif_bytes).decode("ascii")
+    gif_caption = caption or (
+        f"M10 sample [{n_light},{n_cam},1,{h},{w}] = [I,V,C,H,W]  "
+        f"GIF sweeps {n_frames} frames @ {float(fps):g} fps"
+    )
     gif_panel = (
         "<div style='text-align:center;'>"
-        "<div style='font: 12px sans-serif; margin-bottom:0.35rem;'>"
-        f"M10 sample [{n_light},{n_cam},1,{h},{w}] = [I,V,C,H,W]  "
-        f"GIF sweeps {n_frames} frames @ {float(fps):g} fps</div>"
+        f"{_panel_heading_html(heading)}"
+        f"{_panel_caption_html(gif_caption)}"
         f"<img width='{int(display_px)}' height='{int(display_px)}' "
         f"src='data:image/gif;base64,{gif_b64}'/>"
         "</div>"
@@ -395,11 +440,14 @@ def anomaly_camera_light_grid_html(
             still_hw, label=still_label, mean=mean, std=std, display_px=display_px
         )
         png_b64 = b64encode(png_bytes).decode("ascii")
+        still_cap = still_caption or (
+            f"Still [1,1,{h},{w}]  cam={float(still_camera_deg):.0f}°  "
+            f"light={float(still_light_deg):.0f}°"
+        )
         still_panel = (
             "<div style='text-align:center;'>"
-            "<div style='font: 12px sans-serif; margin-bottom:0.35rem;'>"
-            f"Still [1,1,{h},{w}]  cam={float(still_camera_deg):.0f}°  "
-            f"light={float(still_light_deg):.0f}°</div>"
+            f"{_panel_heading_html(still_heading)}"
+            f"{_panel_caption_html(still_cap)}"
             f"<img width='{int(display_px)}' height='{int(display_px)}' "
             f"src='data:image/png;base64,{png_b64}'/>"
             "</div>"
@@ -436,6 +484,10 @@ def display_anomaly_camera_light_grid(
     display_px: int = DEFAULT_DISPLAY_PX,
     fps: float = DEFAULT_CAMERA_LIGHT_GRID_FPS,
     include_still: bool = True,
+    heading: str | None = None,
+    caption: str | None = None,
+    still_heading: str | None = None,
+    still_caption: str | None = None,
 ) -> HTML:
     """Build and ``display`` an ``[I, V]`` grid GIF (optional still)."""
     html = anomaly_camera_light_grid_html(
@@ -451,6 +503,10 @@ def display_anomaly_camera_light_grid(
         display_px=display_px,
         fps=fps,
         include_still=include_still,
+        heading=heading,
+        caption=caption,
+        still_heading=still_heading,
+        still_caption=still_caption,
     )
     display(html)
     return html

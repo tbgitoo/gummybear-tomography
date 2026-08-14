@@ -47,11 +47,19 @@ def test_anomaly_still_vs_orbit_html_contains_both_media():
         still_angle_deg=0.0,
         orbit_angles_deg=(0.0, 180.0),
         display_px=32,
+        still_heading="M8 single view",
+        orbit_heading="M9 multiple views",
+        still_caption="M8 [1,1,4,4]; V=1(still), C=1(greyscale)",
+        orbit_caption="M9 [2,1,4,4]; V=2(orbit), C=1(greyscale)",
     )
     text = str(html.data)
     assert "data:image/png;base64," in text
     assert "data:image/gif;base64," in text
     assert "Display only" in text
+    assert "M8 single view" in text
+    assert "M9 multiple views" in text
+    assert "V=1(still)" in text
+    assert "V=2(orbit)" in text
 
 
 def test_anomaly_camera_light_grid_html():
@@ -78,6 +86,8 @@ def test_anomaly_camera_light_grid_html():
         light_angles_deg=(0.0, 120.0, 240.0),
         fps=2.0,
         display_px=32,
+        heading="M10 multi-view, multi-illumination",
+        caption="M10 sample [3,2,1,4,4] = [I,V,C,H,W]  GIF sweeps 6 frames @ 2 fps",
     )
     text = str(html.data)
     assert "[3,2,1,4,4]" in text
@@ -85,6 +95,7 @@ def test_anomaly_camera_light_grid_html():
     assert text.count("data:image/gif;base64,") == 1
     assert text.count("data:image/png;base64,") == 1
     assert "2 fps" in text
+    assert "M10 multi-view, multi-illumination" in text
 
     gif_only = anomaly_camera_light_grid_html(
         None,

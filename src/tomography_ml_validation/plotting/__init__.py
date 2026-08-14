@@ -33,6 +33,7 @@ from .m9_e2e_geometry_fusion import (
     plot_m9_e2e_rmse_fourier_vs_pooled,
     plot_m9_e2e_rmse_ladder,
 )
+from .report_titles import apply_report_titles
 from .single_view_studies import (
     plot_error_histograms,
     plot_learning_rate_study,
@@ -47,6 +48,7 @@ __all__ = [
     "PLOT_CONFIG_10_1A",
     "PLOT_CONFIG_10_1B",
     "anomaly_still_vs_orbit_html",
+    "apply_report_titles",
     "combine_m9_comparisons",
     "display_anomaly_camera_light_grid",
     "display_anomaly_still_vs_orbit",
