@@ -2,9 +2,11 @@
 
 # Gummybear Tomography: Particle Localization in Translucent Simulated Phantoms
 
-# 0. Huggingface repository
+# 0. Huggingface repository and runnable notebook
 
 The checkpoints and the integral optical data from a full run is on Huggingface, at https://huggingface.co/datasets/tbhugging/gummybear-tomography/tree/main
+
+The runnable notebook providing reproducibility is here: [GummyBearTomography_Final_Report.ipynb](GummyBearTomography_Final_Report.ipynb).
 
 
 
