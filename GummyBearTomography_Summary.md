@@ -219,7 +219,7 @@ Consequently, conclusions drawn from this study should be interpreted in the con
 
 ## Project Implementation
 
-Given the complexity of the combined task of optical simulation, dataset generation, and dataset consumption for testing the project hypothesis in machine learning, the project was planned and implemented as a series of practical progression steps.
+Given the complexity of the combined task of optical simulation, dataset generation, and dataset consumption for testing the project hypothesis in machine learning, the project was planned and implemented as a series of practical progression steps. See [00_architecture.md](plans/00_architecture.md) for details.
 
 | Project Step | Milestone | Dataset | Python Package |
 |---|---|---|---|
