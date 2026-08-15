@@ -52,7 +52,7 @@ In Table 1, one can see a broad correlation between model size (parameter count)
 
 With the advent of transformers, explicit efforts were made to encode positional information without substantially increasing model size. In their seminal transformer paper, Vaswani et al. (2017, https://arxiv.org/abs/1706.03762) introduced sinusoidal positional encodings, in which sine and cosine functions of different frequencies are added to token embeddings to provide position information while introducing no additional trainable parameters. Rotary Positional Embeddings (RoPE) are a later approach that similarly exploits sinusoidal structure, but encodes position through rotations in embedding space rather than additive positional vectors (Su et al., 2021, https://arxiv.org/abs/2104.09864). In RoPE-based transformers, the dot product between query and key vectors converts these rotations into relative positional information, causing attention scores to depend on the relative displacement between tokens rather than their absolute positions. These works illustrate the broader usefulness of Fourier-inspired basis functions for compact positional and spatial representations, and provide examples of both additive and multiplicative uses of Fourier terms.
 
-Beyond spatial encoding, Fourier-based approaches offer an interesting opportunity for frequency modulation. This has explicitly been advocated by Tancik et al. (2020, https://arxiv.org/abs/2006.10739). By applying Fourier feature mappings to the network input, they succesfully modulate the spectral response towards higher frequencies otherwise difficult to fit in image treatment, with succesful application for instance in image sharpening.
+Beyond spatial encoding, Fourier-based approaches offer an interesting opportunity for frequency modulation. This has explicitly been advocated by Tancik et al. (2020, https://arxiv.org/abs/2006.10739). By applying Fourier feature mappings to the network input, they successfully modulate the spectral response towards higher frequencies otherwise difficult to fit in image treatment, with successful application for instance in image sharpening.
 
 The present work adopts a different strategy. Rather than applying Fourier transformations to the network input, Fourier basis functions are introduced after CNN feature extraction and immediately before spatial aggregation. The objective is therefore not to alter the representation available to the entire network, but to preserve spatial information at the pooling bottleneck while maintaining a compact embedding.
 
@@ -64,13 +64,13 @@ I therefore anticipate that intentionally including a limited number of non-zero
 **Fourier-based low-spatial-frequency representations are most useful for tomographic particle localization when spatial information diversity is limited.**
 ***
 
-Exploration of the low-spatial frequeny domain, as opposed to high spatial frequencies as explored by Tancik et al., is further physically motivated: In diffuse optical systems, scattering tends to attenuate higher spatial frequencies, making low-frequency spatial representations particularly relevant for localization from indirect optical observations.
+Exploration of the low-spatial frequency domain, as opposed to high spatial frequencies as explored by Tancik et al., is further physically motivated: In diffuse optical systems, scattering tends to attenuate higher spatial frequencies, making low-frequency spatial representations particularly relevant for localization from indirect optical observations.
 
 ## Relative and Absolute Positional Encoding with Fourier cosine and sine terms
 
 Summarizing, Fourier representations have been incorporated into various neural networks. Two fundamentally different objectives relevant to this project are:
-- Vaswani et al. (https://arxiv.org/pdf/1706.03762) employ sinusoidal functions as addittions to encodings for relative positional self-attention; this is a specific case of use of Fourier-inspired terms for positional encoding.
-- Tancik et al. (https://arxiv.org/abs/2006.10739) transform coordinates into a Fourier feature representation for enhanced high-frequency processing. 
+- Vaswani et al. (https://arxiv.org/pdf/1706.03762) employ sinusoidal functions as additions to encodings for relative positional self-attention; this is a specific case of use of Fourier-inspired terms for positional encoding.
+- Tancik et al. (https://arxiv.org/abs/2006.10739) apply Fouriert mappings to the network input  for enhanced high-frequency processing. 
 
 While these approaches are both key conceptual inspirations for this project, they facilitate learning of **relative positional relationships** or **high-frequency functions**. The goal of the present work is different: preserving **absolute spatial information** during feature aggregation for particle localization tasks, at **low spatial frequencies** as appropriate for light diffusion in partially opaque phantoms.
 
@@ -149,11 +149,11 @@ B_c(x,y)=
 ```
 
 For the first channel $c=0$, $B_c(x,y) \equiv 1$ such that the 0-th order Fourier channel reduces to the corresponding GAP value. Note that 0-based indexing is used in accordance with Python conventions.
- 
+
 In terms of implementation, only the Fourier Pooling layer was implemented specifically for this project. The CNN backbone, Global Average Pooling (GAP), Flatten operation, and MLP head were implemented using standard PyTorch modules. Also note that as defined, the output dimensionality remains identical to GAP (one pooled value per channel, yielding C values for C channels), while introducing spatial sensitivity. Retention of multiple Fourier terms per channel was not pursued here in order to maintain a compact embedding and correspondingly small downstream MLP. Such richer spectral representations could constitute an interesting direction for future work.
 
 
-# 3. Gummybear phantom: A simplifed, high throughput optical simulation
+# 3. Gummybear phantom: A simplified, high throughput optical simulation
 
 ## Optical Simulation Pipeline
 
@@ -170,11 +170,11 @@ The optics pipeline is as follows:
    - Netgen-derived volumetric mesh from known surface mesh.
    - Ray intersection with volumetric mesh tetrahedrons (Trimesh)
    - attenuation on these mesh intersection trajectories and the geometric (analytical) particle intersection (Lambert-Beer attenuation, scattering for deposition)
-   - Deposition as source term for volumetric diffusion simulation (i.e. energy lost from ray segments per tetrehedron volume)
+   - Deposition as source term for volumetric diffusion simulation (i.e. energy lost from ray segments per tetrahedron volume)
 - Step 3: Energy diffusion
    - finite element simulation variational formulation handled by NGSolve.
    - extraction of optical energy flow from NGSolve solution at surface triangle barycenters
-- Step 4: Use camera raybundle to collect image intensites (pinhole-camera). 
+- Step 4: Use camera raybundle to collect image intensities (pinhole-camera). 
    - Visibility is simplified to first surface mesh hit.
    - Optical energy flow at hit points is calculated from encompassing or nearby volumetric tetrahedron (inter- or slight extrapolation from node intensities).
 
@@ -182,7 +182,7 @@ The optics pipeline is as follows:
 
 Left: Step 1 illustrated on a gummybear phantom mesh (`cad/proto_bear_head.stl`). Rays generated from a point light (random sampling), with one analytic spherical particle. Orange segments are exterior rays (source→mesh); blue segments are Snell-refracted in-object chords. Green / cyan markers are particle entry / exit (mesh entry hits are not marked).
 
-Right: Step 2 illustred as **net particle-induced source delta** on the coarse diffusion mesh derived from the same surface mesh. Active (affected) tet centroids colored by $\Delta E_{\mathrm{transport}}$ (calculated as Lambert-Beer particle - background depostion plus specific local particle scatter). Interpret energy scale as relative: inverse square law and Lambert-Beer attenuate rays, lowering absolute magnitude of particle-attributable signal concomittantly.
+Right: Step 2 illustrated as **net particle-induced source delta** on the coarse diffusion mesh derived from the same surface mesh. Active (affected) tet centroids colored by $\Delta E_{\mathrm{transport}}$ (calculated as Lambert-Beer particle - background deposition plus specific local particle scatter). Interpret energy scale as relative: inverse square law and Lambert-Beer attenuate rays, lowering absolute magnitude of particle-attributable signal concomitantly.
 
 ![Optical simulation steps 1–2: ray optics and energy deposition](figures/optical_steps_1_2_ray_optics_energy_deposition.png)
 
@@ -199,12 +199,12 @@ Right: Step 4 — Image collection. The pipeline simulates a pinhole camera by i
 The optics pipeline is a compromise between realism and simplification for speed and development feasibility. Major limitations are:
 - Single refraction: At most 1 refraction event is taken into account per light source ray
 - Diffuse imaging only: Although the gummybear optics python package handles both diffusive and direct ray-based energy transport to the camera, only diffuse parts are considered here for particle localization. The diffuse part is the major contribution in translucent, highly scattering media of interests here.
-- Single particle only: Already mentioned above, the simulation itself handles multipe, non-overlapping particles. For the scientific question of the utility of a Fourier aggregation layer for particle localization, the simpler single-particle scenario offers a clearer hypothesis testing path. 
+- Single particle only: Already mentioned above, the simulation itself handles multiple, non-overlapping particles. For the scientific question of the utility of a Fourier aggregation layer for particle localization, the simpler single-particle scenario offers a clearer hypothesis testing path. 
 - Optical simplifications. The major technical simplication at the level of the physics are:
-  - Ballistic transport vs. Isotropic diffusion only (e.g. scalar representatio of diffuse intensity, not angle-resolved). Partial anisotropic transport, secondary reflected or scattered rays are not considered. 
-  - Stationnary solution of the diffusion equation (no time-of-flight analysis)
+  - Ballistic transport vs. Isotropic diffusion only (e.g. scalar representation of diffuse intensity, not angle-resolved). Partial anisotropic transport, secondary reflected or scattered rays are not considered. 
+  - Stationary solution of the diffusion equation (no time-of-flight analysis)
   - Refraction only: This simulation is based on non-coherent optics, no constructive / destructive interference, Fresnel, Newton rings etc.
-  - Pinhole camera without explicit lense effects.
+  - Pinhole camera without explicit lens effects.
 
 Summarizing, a series of deliberate optical and design limitations were made. These simplify optical simulation considerably, enabling the generation of a clearly structured data body with:
 - key label: particle position; 
@@ -219,7 +219,7 @@ Consequently, conclusions drawn from this study should be interpreted in the con
 
 ## Project Implementation
 
-Given the complexity of the combined task of optical simulation, dataset generation, and dataset consumption for testing the project hypothesis in machine learning, the project was planned an implemented as a series of practical progression steps.
+Given the complexity of the combined task of optical simulation, dataset generation, and dataset consumption for testing the project hypothesis in machine learning, the project was planned and implemented as a series of practical progression steps.
 
 | Project Step | Milestone | Dataset | Python Package |
 |---|---|---|---|
@@ -277,14 +277,14 @@ Note that configuring Optical Simulation in Excel is a specific architectural ch
 
 As outlined already above, two datasets are produced:
 - **M8 fixed illumination** Dataset: Fixed illumination, variable camera, random particle positions. Also contains 3 different gummybear optical property sets.
-- **M10 variable illumination** Datset: Variable illumination, variable camera, random particle position, fixed gummybear properties.
+- **M10 variable illumination** Dataset: Variable illumination, variable camera, random particle position, fixed gummybear properties.
 
 The different datasets are obtained using the same four-step pipeline. The primary differences are the experiment configuration defined in Step 1 and the task-specific dataset and tensor representations used in Step 4.
 
 
 ### M8 - Fixed Illumination Dataset
 
-For reproducible execution, see the notebook [Open the main notebook](GummyBearTomography_Final_Report.ipynb). Here, in this summary document, onle the figures are reported.
+For reproducible execution, see the notebook [Open the main notebook](GummyBearTomography_Final_Report.ipynb). Here, in this summary document, only the figures are reported.
 
 The dataset are made available as PyTorch compatible objects respecting the indexation contract 
 ```python
@@ -382,7 +382,7 @@ This section shows the bare-minimum prediction pass in direct PyTorch. Packaged 
 
 In the main [GummyBearTomography_Final_Report.ipynb](GummyBearTomography_Final_Report.ipynb), a hard-coded minimal example of the architecture can found, including optimizer setup (Adam) and an example training step. 
 
-The loss function used throughout this porject is mean squared error MSE as this reflects the nature of Euclidian geometry when trying to localize particles in 3D space. Parameter count is discussed as fit as an additional measure with possible mobile or embedded deployment in mind.
+The loss function used throughout this project is mean squared error MSE as this reflects the nature of Euclidian geometry when trying to localize particles in 3D space. Parameter count is discussed as fit as an additional measure with possible mobile or embedded deployment in mind.
 
 ## M8. Milestone M8: Single-view localization studies
 
@@ -438,12 +438,12 @@ In terms of study design, step 2 and 3 are authoritative because the use the mai
 
 ![M8 xyz split-sensitivity: pooled / Fourier / flatten across split seeds](figures/m8_xyz_split_sensitivity_rmse.png)
 
-### Concusions from M8
+### Conclusions from M8
 
 - Average pooling performs worse than the other architectures, in z-localization and in 3D localization. Fourier performs substantially better, and usually (dependent on experimental fluctuations from run to run), Flatten performs best.
 - This is interpreted to be related to Fourier-coded pooling and Flatten both preserving spatial information and achieving much lower validation / test error on both z and on xyz. Although not proof of the project hypothesis (you can never prove exactly a hypothesis) the result is consistent the project hypothesis.
 - It is also noteworthy that Fourier achieves comparable held-out performance with orders of magnitude fewer learned parameters (32k vs. 134M, e.g. a factor of about 4000).
-- The split-sensitivity panel reports how those xyz conclusions hold under `N_SENSITIVITY` independent particle-level train/val/test partitions (one training seed each - only the partition is independent, the datast is the same).
+- The split-sensitivity panel reports how those xyz conclusions hold under `N_SENSITIVITY` independent particle-level train/val/test partitions (one training seed each - only the partition is independent, the dataset is the same).
 
 The split sensitivity analysis merits particular discussion.
 
@@ -586,8 +586,8 @@ Note that the architectures here use the historical Stage-B learning-rate defaul
 ### Interpretation of M9 Step 1
 
 - For the 2-step approach with a trained, then frozen encoder and a separately trained fusion head, the advantage of the Fourier embeddings persist across view fusion.
-- However, the advantage decreases with incrasing fusion head complexity. Apparently, a more complex fusion head permits to at least partially compensate for relative lack of spatial information in the embeddings.
-- Note that the ladder confirms an advantage of the learned DeepSet-inspired fusion layer over simple pooling, in line with literature expections. Fourier-encoding, in the particular setting of two-stage learning, provides an additional more minor advantage in the DeepSet setting.
+- However, the advantage decreases with increasing fusion head complexity. Apparently, a more complex fusion head permits to at least partially compensate for relative lack of spatial information in the embeddings.
+- Note that the ladder confirms an advantage of the learned DeepSet-inspired fusion layer over simple pooling, in line with literature expectations. Fourier-encoding, in the particular setting of two-stage learning, provides an additional more minor advantage in the DeepSet setting.
 
 ### M9 Step 2: end-to-end geometry fusion
 
@@ -630,7 +630,7 @@ Comparison of Fourier vs. Pooling on validation and test split loss after end to
 
 M10 adds illumination as a source of physical information variation.
 
-Compared to the addition of views, the addition of various illumination angles adds a major source of physical information: while camera views essentially complete the "hidden face" of a given gummybear physics, revolving the illumination source around the bear permits the particle to cast a revoving shadow and scatter halo in the gummybear.
+Compared to the addition of views, the addition of various illumination angles adds a major source of physical information: while camera views essentially complete the "hidden face" of a given gummybear physics, revolving the illumination source around the bear permits the particle to cast a revolving shadow and scatter halo in the gummybear.
 
 The question for M10 is however the same as for M9: Does the advantage of Fourier embedding pooling survive through fusion of information from different views?
 
@@ -658,7 +658,7 @@ The models compared are:
 - C Illumination fusion head (per illumination: CNN -> Fourier/GAP -> 64 -> Linear -> 128 concat I illumination embedding -> MLP (Linear 128*I -> 128, Relu, then Linear to xyz) -> 3), no illumination angle input
 - D Same compact capacity as C, but with explicit light-angle conditioning (FiLM on the 128-d latents after encode, using cos(angle) and sin(angle))
 
-Fourier vs. Pooled indicates utility of Four layer in each of these architectures. The reason for including explicit angle as learned feature-wise linear transformation (FiLM) is to understand whether the model needs explicit angular information or whether illumination cues and ordering are sufficient. 
+Fourier vs. Pooled indicates utility of Fourier layer in each of these architectures. The reason for including explicit angle as learned feature-wise linear transformation (FiLM) is to understand whether the model needs explicit angular information or whether illumination cues and ordering are sufficient. 
 
 Also note that while A is evaluated on a single view (illumination 0°, camera 180° per sample), training is on all illumination samples concatenated, that is the physical instruction offered by the multi-illumination setting enters the model training.
 
@@ -668,7 +668,7 @@ Also note that while A is evaluated on a single view (illumination 0°, camera 1
 
 - Fourier encoding remains useful, by a small margin, on single view evaluation (Model A).
 - The fact that the margin is much smaller than in M8 or M9 with separate training is very interesting.
-- For the more more complex fusion heads, and in fact even for simple xyz averaging, Fourier performs less well than the other models.
+- For the more complex fusion heads, and in fact even for simple xyz averaging, Fourier performs less well than the other models.
 - In terms of fusion heads, the angle-aware head D seems slightly more performant than the angle-unaware head C at the same compact capacity.
 - The conclusion is that Fourier is clearly not uniformly better: it remains a useful augmentation in the information-scarce single-view setting (Model A), but not when richer multi-illumination information is available for fusion.
 
@@ -706,7 +706,7 @@ The results show that preserving spatial information is critical for accurate lo
 
 At the same time, the benefit of Fourier representations was not universal. In multi-view (M9) and multi-illumination (M10) experiments, their advantage decreased as additional observations and more expressive fusion models became available. Under end-to-end training, Fourier pooling often became neutral or slightly detrimental, suggesting that sufficiently powerful networks can learn alternative spatial encodings directly from the data.
 
-The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A learning was also that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation bias.
+The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A further find was that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation bias.
 
 Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work should investigate more realistic optical conditions, multi-particle scenarios, hierarchical fusion methods, and possibly transfer learning from simulation to experimental data. Hierarchical light-then-camera fusion (M10 Step 3) could also eventually be completed but a priori, no fundamentally new result is anticipated.
 
