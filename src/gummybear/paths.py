@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import tempfile
 from pathlib import Path
 
@@ -93,3 +94,22 @@ def display_path(path: str | Path | None) -> str:
         return f"<temp>/{resolved.relative_to(tmp_root).as_posix()}"
     except ValueError:
         return text
+
+
+_ABS_POSIX_PATH = re.compile(r"(?:/(?:\.?[\w+.-]+))+")
+
+
+def display_text_paths(text: str) -> str:
+    """Rewrite absolute POSIX paths in ``text`` with :func:`display_path`.
+
+    Used for subprocess logs (e.g. POV-Ray) so notebook output does not leak
+    home-directory or temp roots. Tokens that are not absolute paths are
+    left unchanged.
+    """
+    if not text:
+        return text
+
+    def _replace(match: re.Match[str]) -> str:
+        return display_path(match.group(0))
+
+    return _ABS_POSIX_PATH.sub(_replace, text)

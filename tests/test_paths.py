@@ -5,7 +5,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from gummybear.paths import checkpoint_dir, display_path, repo_relative_path
+from gummybear.paths import checkpoint_dir, display_path, display_text_paths, repo_relative_path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -63,3 +63,18 @@ def test_display_path_temp_uses_prefix():
         assert rendered.startswith("<temp>/")
         assert rendered.endswith("m8_demo.xlsx")
         assert str(Path(tempfile.gettempdir()).resolve()) not in rendered
+
+
+def test_display_text_paths_rewrites_home_in_log(tmp_path, monkeypatch):
+    home = tmp_path / "home"
+    conf = home / ".povray" / "3.7" / "povray.conf"
+    conf.parent.mkdir(parents=True)
+    conf.write_text("", encoding="utf-8")
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
+    log = (
+        f"povray: cannot open the user configuration file {conf}: "
+        "No such file or directory\n"
+    )
+    filtered = display_text_paths(log)
+    assert str(home) not in filtered
+    assert "~/.povray/3.7/povray.conf" in filtered

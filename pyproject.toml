@@ -37,6 +37,7 @@ dev = [
 where = ["src"]
 include = [
     "gummybear*",
+    "gummybear_illustration*",
     "gummybear_validation*",
     "tomography_ml*",
     "validation_notebook_tools*",
