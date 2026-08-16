@@ -27,7 +27,7 @@ Deep learning is used to compare architectures with and without a Fourier repres
   <img
     src="figures/design_figures/m8_network_scene.png"
     alt="3D Localization via CNN, Pooling with and without Fourier, and MLP"
-    width="75%"
+    width="100%"
   >
 </p>
 
