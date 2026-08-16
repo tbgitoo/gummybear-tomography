@@ -358,15 +358,13 @@ def test_anomaly_zscore_plates_on_camera_back(tmp_path: Path):
     assert "localization task" in text
     assert "Localization xy plate" in text
     assert "shadowless" in text
-    assert "single or multiple views" in text
-    assert "scale <1, 3.35, 3.35>" in text
-    assert "Deep Learning" in text
-    assert (out.parent / "scene_caption_deep_learning.png").is_file()
-    assert (out.parent / "scene_caption_views.png").is_file()
-    assert (out.parent / "scene_caption_localization.png").is_file()
-    assert "scale <1, 5.025, 5.025>" in text
-    assert "filter all 1.0 } }" in text
-    assert "filter all 1.0 }} }}" not in text
+    assert "single-view or multi-view input" not in text
+    assert "single or multiple views" not in text
+    assert "Deep Learning" not in text
+    assert "3D localization" not in text
+    assert not (out.parent / "scene_caption_deep_learning.png").is_file()
+    assert not (out.parent / "scene_caption_views.png").is_file()
+    assert not (out.parent / "scene_caption_localization.png").is_file()
     assert (out.parent / "scene_zscore_180.00deg.png").is_file()
     assert (out.parent / "scene_zscore_210.00deg.png").is_file()
     assert "uv_vectors { 4, <1,0>, <0,0>, <0,1>, <1,1> }" in text
@@ -601,3 +599,43 @@ def test_discover_sample_index(tmp_path: Path):
             camera_angle_deg=180,
         )
     assert setup.sequence_id == "seq_m8_000"
+
+
+def test_overlay_workflow_captions(tmp_path: Path):
+    from PIL import Image
+
+    from gummybear_illustration.caption_overlay import (
+        DEEP_LEARNING_XY,
+        LOCALIZATION_XY,
+        VIEWS_XY,
+        overlay_workflow_captions,
+    )
+
+    path = tmp_path / "scene.png"
+    Image.new("RGB", (1280, 960), (255, 255, 255)).save(path)
+    overlay_workflow_captions(path)
+    pixels = np.asarray(Image.open(path))
+    dark = pixels.min(axis=2) < 40
+    assert dark.any()
+    h, w = pixels.shape[:2]
+
+    def _window(frac, box=40):
+        x = int(frac[0] * w)
+        y = int(frac[1] * h)
+        return dark[max(0, y - box) : y + box, max(0, x - box) : x + box].any()
+
+    assert _window(VIEWS_XY)
+    assert _window(LOCALIZATION_XY)
+    assert _window(DEEP_LEARNING_XY)
+    custom = tmp_path / "custom.png"
+    Image.new("RGB", (1280, 960), (255, 255, 255)).save(custom)
+    overlay_workflow_captions(
+        custom,
+        views_xy=(0.12, 0.20),
+        deep_learning_xy=(0.50, 0.30),
+        localization_xy=(0.88, 0.20),
+    )
+    pixels = np.asarray(Image.open(custom))
+    dark = pixels.min(axis=2) < 40
+    h, w = pixels.shape[:2]
+    assert dark[int(0.20 * h) - 40 : int(0.20 * h) + 40, int(0.12 * w) - 40 : int(0.12 * w) + 40].any()

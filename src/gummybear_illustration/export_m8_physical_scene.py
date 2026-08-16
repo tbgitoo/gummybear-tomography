@@ -8,84 +8,13 @@ import sys
 from pathlib import Path
 
 from gummybear.paths import display_text_paths
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.figure import Figure
 
 from .anomaly_zscore import DEFAULT_ZSCORE_CLIP, write_anomaly_zscore_plates
+from .caption_overlay import overlay_workflow_captions
 from .load_sample import PhysicalSetup, load_m8_physical_setup
 from .paths import default_output_pov, repo_root
 from .pov_scene import IllustrationCameraParams, build_pov_scene
 from .stl_to_mesh2 import write_stl_mesh2_inc
-
-
-def write_scene_label_png(
-    directory: str | Path,
-    *,
-    stem: str,
-    text: str,
-    suffix: str,
-    fontsize: float = 36,
-) -> str:
-    """White PNG with black label; POV ``filter all 1.0`` hides the paper."""
-    name = f"{stem}_{suffix}.png"
-    path = Path(directory) / name
-    fig = Figure(figsize=(8.8, 2.9), dpi=220, facecolor="white")
-    FigureCanvasAgg(fig)
-    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
-    ax.set_facecolor("white")
-    ax.set_axis_off()
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.text(
-        0.5,
-        0.50,
-        text,
-        ha="center",
-        va="center",
-        fontsize=fontsize,
-        color="black",
-        fontfamily="sans-serif",
-        clip_on=False,
-        linespacing=0.95,
-    )
-    fig.savefig(
-        path,
-        facecolor="white",
-        dpi=220,
-        bbox_inches="tight",
-        pad_inches=0.08,
-    )
-    return name
-
-
-def write_views_caption_png(directory: str | Path, *, stem: str) -> str:
-    return write_scene_label_png(
-        directory,
-        stem=stem,
-        text="single or multiple views",
-        suffix="caption_views",
-        fontsize=36,
-    )
-
-
-def write_localization_caption_png(directory: str | Path, *, stem: str) -> str:
-    return write_scene_label_png(
-        directory,
-        stem=stem,
-        text="localization",
-        suffix="caption_localization",
-        fontsize=36,
-    )
-
-
-def write_deep_learning_caption_png(directory: str | Path, *, stem: str) -> str:
-    return write_scene_label_png(
-        directory,
-        stem=stem,
-        text="Deep\nLearning",
-        suffix="caption_deep_learning",
-        fontsize=36,
-    )
 
 
 def povray_command(
@@ -185,6 +114,9 @@ def export_m8_physical_scene(
     illustration_orbit_fade: bool | None = None,
     illustration_inset_plate: bool | None = None,
     illustration_inset_stack: int | None = None,
+    illustration_caption_views_xy: tuple[float, float] | None = None,
+    illustration_caption_deep_learning_xy: tuple[float, float] | None = None,
+    illustration_caption_localization_xy: tuple[float, float] | None = None,
 ) -> dict[str, Path]:
     """Write a POV-Ray 3.7 scene for one M8 sample's physical setup.
 
@@ -242,9 +174,14 @@ def export_m8_physical_scene(
             back-plate appears largest; further plates are consecutive orbit
             views on thin camera-body blocks. ``None``/True when plates exist.
         illustration_inset_stack: Number of blocks in that stack (``None`` = 3).
+        illustration_caption_views_xy: PNG overlay ``(x, y)`` as fractions of
+            width/height (y from the top) for "single-view or multi-view input".
+            ``None`` = package default.
+        illustration_caption_deep_learning_xy: Same for two-line "Deep Learning".
+        illustration_caption_localization_xy: Same for "3D localization".
 
     Returns:
-        Dict with ``pov``, ``inc``, and optionally ``png`` paths.
+        Dict with ``pov``, ``inc``, and optionally ``png`` / ``png_plain`` paths.
     """
     repo = repo_root(repo_root_path) if repo_root_path is not None else repo_root()
     if setup is None:
@@ -285,17 +222,6 @@ def export_m8_physical_scene(
                 else float(illustration_zscore_clip)
             ),
         )
-    caption_png = None
-    arrow_label_png = None
-    loc_label_png = None
-    if plates:
-        caption_png = write_views_caption_png(pov_path.parent, stem=pov_path.stem)
-        arrow_label_png = write_deep_learning_caption_png(
-            pov_path.parent, stem=pov_path.stem
-        )
-        loc_label_png = write_localization_caption_png(
-            pov_path.parent, stem=pov_path.stem
-        )
     scene = build_pov_scene(
         setup,
         bear_inc_name=inc_path.name,
@@ -313,14 +239,22 @@ def export_m8_physical_scene(
         orbit_fade=illustration_orbit_fade,
         inset_plate=illustration_inset_plate,
         inset_stack=illustration_inset_stack,
-        caption_png=caption_png,
-        arrow_label_png=arrow_label_png,
-        loc_label_png=loc_label_png,
     )
     pov_path.write_text(scene, encoding="utf-8")
     out: dict[str, Path] = {"pov": pov_path, "inc": inc_path}
     if render:
         png = render_pov_file(pov_path)
         if png is not None:
+            if illustration_inset_plate is not False and plates:
+                plain = png.with_name(f"{png.stem}_plain{png.suffix}")
+                shutil.copy2(png, plain)
+                overlay_workflow_captions(
+                    png,
+                    source=plain,
+                    views_xy=illustration_caption_views_xy,
+                    deep_learning_xy=illustration_caption_deep_learning_xy,
+                    localization_xy=illustration_caption_localization_xy,
+                )
+                out["png_plain"] = plain
             out["png"] = png
     return out

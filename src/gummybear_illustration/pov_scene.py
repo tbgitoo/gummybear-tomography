@@ -640,9 +640,6 @@ def inset_plate_stack(
     fov_deg: float,
     *,
     aspect: float = 1280.0 / 960.0,
-    caption_png: str | None = None,
-    arrow_label_png: str | None = None,
-    loc_label_png: str | None = None,
 ) -> str:
     """Thin upright camera-style blocks, lower-left of the illustration frame.
 
@@ -731,60 +728,6 @@ def inset_plate_stack(
             "}\n"
         )
     n = len(png_names)
-    label_w = 0.95 * half
-    label_h = 0.20 * half
-    label_scale = 3.35
-
-    def _label_quad(
-        png: str,
-        center: np.ndarray,
-        half_w: float,
-        half_h: float,
-        scale: float,
-        note: str,
-    ) -> None:
-        bits.append(comment_block(note))
-        bits.append(
-            "mesh2 {\n"
-            "  vertex_vectors { 4,\n"
-            f"    <-0.008, {-half_w:.6g}, {-half_h:.6g}>,\n"
-            f"    <-0.008, {-half_w:.6g}, {half_h:.6g}>,\n"
-            f"    <-0.008, {half_w:.6g}, {half_h:.6g}>,\n"
-            f"    <-0.008, {half_w:.6g}, {-half_h:.6g}>\n"
-            "  }\n"
-            "  uv_vectors { 4, <1,0>, <1,1>, <0,1>, <0,0> }\n"
-            "  face_indices { 2, <0,1,2>, <0,2,3> }\n"
-            "  uv_indices { 2, <0,1,2>, <0,2,3> }\n"
-            "  double_illuminate\n"
-            "  no_shadow\n"
-            "  texture {\n"
-            "    uv_mapping\n"
-            f'    pigment {{ image_map {{ png "{png}" once interpolate 2 filter all 1.0 }} }}\n'
-            "    finish { ambient 1.0 diffuse 0.0 }\n"
-            "  }\n"
-            f"  scale <1, {scale:.4g}, {scale:.4g}>\n"
-            f"  matrix < {plate_fwd[0]:.6g}, {plate_right[0]:.6g}, {plate_up[0]:.6g},\n"
-            f"           {plate_fwd[1]:.6g}, {plate_right[1]:.6g}, {plate_up[1]:.6g},\n"
-            f"           {plate_fwd[2]:.6g}, {plate_right[2]:.6g}, {plate_up[2]:.6g},\n"
-            f"           {center[0]:.6g}, {center[1]:.6g}, {center[2]:.6g} >\n"
-            "}\n"
-        )
-
-    if caption_png:
-        cap_center = (
-            anchor
-            + 0.5 * (n - 1) * slide * screen_right
-            - (half - 0.38 * half + label_h * label_scale) * plate_up
-        )
-        _label_quad(
-            caption_png,
-            cap_center,
-            label_w,
-            label_h,
-            label_scale,
-            'Caption under the plate stack, coplanar with the front plate: '
-            '"single or multiple views".',
-        )
     stack_mid = (
         anchor
         + 0.5 * (n - 1) * depth_step * plate_fwd
@@ -830,22 +773,6 @@ def inset_plate_stack(
             extra="no_shadow",
         )
     )
-    if arrow_label_png:
-        two_line_h = 2.15 * label_h
-        arrow_scale = 2.95
-        arrow_label_center = (
-            0.5 * (tail + tip)
-            + (r_head + two_line_h * arrow_scale * 0.32) * plate_up
-        )
-        _label_quad(
-            arrow_label_png,
-            arrow_label_center,
-            label_w,
-            two_line_h,
-            arrow_scale,
-            'Caption over the stack-to-localization arrow, same text pipeline '
-            'as the views caption: two-line "Deep Learning".',
-        )
     # Mini world triad + particle, lower-right of the frame, right of the arrow.
     axis_len = 1.45 * half
     plate_s = 0.95 * axis_len
@@ -942,22 +869,6 @@ def inset_plate_stack(
             ),
         )
     )
-    if loc_label_png:
-        loc_scale = 1.5 * label_scale
-        loc_center = (
-            origin
-            + 0.08 * plate_s * screen_right
-            - (0.32 * plate_s + 0.02 * half + label_h * loc_scale) * plate_up
-        )
-        _label_quad(
-            loc_label_png,
-            loc_center,
-            0.58 * label_w,
-            label_h,
-            loc_scale,
-            'Caption below the coordinate inset, same text pipeline as the '
-            'views caption: "localization".',
-        )
     return "".join(bits)
 
 
@@ -1169,9 +1080,6 @@ def build_pov_scene(
     orbit_fade: bool | None = None,
     inset_plate: bool | None = None,
     inset_stack: int | None = None,
-    caption_png: str | None = None,
-    arrow_label_png: str | None = None,
-    loc_label_png: str | None = None,
 ) -> str:
     mesh = trimesh.load(setup.stl_path, force="mesh")
     bounds = np.asarray(mesh.bounds, dtype=float)
@@ -1368,9 +1276,6 @@ def build_pov_scene(
                 view_loc,
                 view_look,
                 view_fov,
-                caption_png=caption_png,
-                arrow_label_png=arrow_label_png,
-                loc_label_png=loc_label_png,
             )
 
     bg = sky_and_horizon()
