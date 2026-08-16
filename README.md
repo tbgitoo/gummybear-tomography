@@ -13,9 +13,27 @@ The physical problem underlying the gummybear tomography project is the reconstr
   >
 </p>
 
-
-
 The figure illustrates the complete workflow: synthetic optical acquisition of a meshed phantom, generation of one or multiple projection images, deep learning-based inference, and 3D localization of embedded particles. 
+
+## Deep Learning Architecture
+
+Deep learning is used to compare architectures with and without a Fourier representation layer:
+- Single or multiple image views form the input of a Convoluted Neural Network CNN
+- The CNN consists of three consecutive layers with increasing channel depth and constant image size
+- The CNN is read out in different ways. The main theme of the project is the impact of applying Fourier wave terms before pooling after the CNN. The main, but not the only, comparison arm is pooling without such Fourier terms.
+- After pooling, a small MLP head projects to 3D xyz positions; the readout is precision of the xyz prediction as compared with the known xyz position used for simulation.
+
+<p align="center">
+  <img
+    src="figures/design_figures/m8_network_scene.png"
+    alt="3D Localization via CNN, Pooling with and without Fourier, and MLP"
+    width="75%"
+  >
+</p>
+
+The figure illustrates the deep learning problem and approach: From a synthetic gummybear image, a deep machine learning model is trained on the synthetic data in order to be able to predict positions from single or multiple views of the Gummybear. The figure shows activations acquired during predictio operations and comparitive prediction of positions on the two branches (Fourier and Average Pooling).
+
+
 
 
 

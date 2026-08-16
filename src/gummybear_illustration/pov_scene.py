@@ -897,20 +897,28 @@ def bear_triangle_edge_cylinders(
     mesh: trimesh.Trimesh,
     *,
     radius: float,
+    transmit: float = 0.0,
 ) -> str:
-    """Dark opaque cylinders along unique STL triangle edges (illustration)."""
+    """Dark cylinders along unique STL triangle edges (illustration)."""
     r = float(radius)
     if r < 0.0:
         raise ValueError(f"mesh edge radius must be >= 0, got {r}")
     if r == 0.0:
         return comment_block("Bear triangle edges omitted (radius 0).")
+    t = min(max(float(transmit), 0.0), 1.0)
     bits = [
         comment_block(
             "Bear triangle edges: unique STL edges as cylinders. "
-            "Opaque dark grey (not transmissive). Illustration overlay."
+            + (
+                f"Transmissive dark grey (transmit={t:g}). Illustration overlay."
+                if t > 0.0
+                else "Opaque dark grey (not transmissive). Illustration overlay."
+            )
         )
     ]
-    pigment = "rgb <0.10, 0.10, 0.11>"
+    pigment = (
+        f"rgbt <0.10, 0.10, 0.11, {t:.4g}>" if t > 0.0 else "rgb <0.10, 0.10, 0.11>"
+    )
     finish = "finish { ambient 0.05 diffuse 0.35 specular 0 }"
     for a, b in unique_triangle_edge_segments(mesh):
         bits.append(
