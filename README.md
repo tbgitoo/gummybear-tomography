@@ -5,9 +5,17 @@ Position localiser for gummy bears
 
 The physical problem underlying the gummybear tomography project is the reconstruction of 3D localization from single or multiple views of a translucent gummybear phantom containing localized particles.
 
-figures/design_figures/m8_physical_scene.png
+<p align="center">
+  <img
+    src="figures/design_figures/m8_physical_scene.png"
+    alt="3D Localization from Optical Imaging"
+    width="75%"
+  >
+</p>
 
-The figure illustrates the complete workflow: synthetic optical acquisition of a meshed phantom, generation of one or multiple projection images, deep learning-based inference, and 3D localization of embedded particles.
+
+
+The figure illustrates the complete workflow: synthetic optical acquisition of a meshed phantom, generation of one or multiple projection images, deep learning-based inference, and 3D localization of embedded particles. 
 
 
 
