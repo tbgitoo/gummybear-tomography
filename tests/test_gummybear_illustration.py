@@ -581,6 +581,20 @@ def test_povray_command_is_unix_style(tmp_path: Path):
     assert f"+I{pov}" in cmd
 
 
+def test_povray_command_work_threads(tmp_path: Path):
+    pov = tmp_path / "scene.pov"
+    png = tmp_path / "renders" / "scene.png"
+    cmd = povray_command(
+        "/opt/homebrew/bin/povray",
+        pov,
+        png,
+        width=128,
+        height=96,
+        work_threads=1,
+    )
+    assert "+WT1" in cmd
+
+
 def test_discover_sample_index(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()

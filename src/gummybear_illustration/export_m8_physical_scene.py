@@ -24,9 +24,10 @@ def povray_command(
     *,
     width: int,
     height: int,
+    work_threads: int | None = None,
 ) -> list[str]:
     """Unix POV-Ray 3.7 argv (Homebrew/macOS). Do not pass Windows ``/EXIT``."""
-    return [
+    cmd = [
         exe,
         f"+I{pov_path}",
         f"+O{png_path.name}",
@@ -36,6 +37,9 @@ def povray_command(
         "+FN",
         "-D",
     ]
+    if work_threads is not None:
+        cmd.append(f"+WT{max(int(work_threads), 1)}")
+    return cmd
 
 
 def render_pov_file(
@@ -45,6 +49,7 @@ def render_pov_file(
     povray_bin: str = "povray",
     width: int = 1280,
     height: int = 960,
+    work_threads: int | None = None,
 ) -> Path | None:
     """Render ``.pov`` to PNG when POV-Ray is on PATH. Return None if missing.
 
@@ -65,7 +70,14 @@ def render_pov_file(
             png_path = pov_path.parent.parent / "renders" / (pov_path.stem + ".png")
     png_path = Path(png_path)
     png_path.parent.mkdir(parents=True, exist_ok=True)
-    cmd = povray_command(exe, pov_path, png_path, width=width, height=height)
+    cmd = povray_command(
+        exe,
+        pov_path,
+        png_path,
+        width=width,
+        height=height,
+        work_threads=work_threads,
+    )
     proc = subprocess.run(
         cmd,
         cwd=str(png_path.parent),

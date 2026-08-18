@@ -230,6 +230,9 @@ notebooks
 !figures/notebooks/
 !figures/notebooks/**
 
+# Leftover Figure 3 artifacts if an older notebook wrote under figures/
+figures/figure3_learning_convergence/
+
 # Large ML study checkpoints (local / external publish; not in git)
 checkpoints/
 
