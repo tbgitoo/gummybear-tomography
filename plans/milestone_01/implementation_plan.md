@@ -12,7 +12,7 @@
 | `validate_mesh` | Named `validate_mesh_for_projection` (+ `require_projection_ready`); same essential checks |
 | Optional `read_mesh_summary` | `inspect_stl(path)` → `{mesh, summary, validation}` |
 | Summary fields + `stl_sha256` / `units` | Present; `source_path` is repo-relative when supplied |
-| Notebook | `notebooks/milestone_00/01_inspect_stl.ipynb` (thin; uses `display_path`) |
+| Notebook | `notebooks/milestone_01/01_inspect_stl.ipynb` (M1 trust gate; M0 keeps a thinner install smoke notebook) |
 | Units note in `docs/physics_model.md` | **Deferred** |
 | Essential invariant tests | **Not present**. Visual inspection and downstream milestone validation were considered sufficient for this research project. |
 
