@@ -4,7 +4,7 @@
 > Written before implementation of Milestone 0.
 > Preserved for provenance and project history.
 
-**Architecture:** [`00_architecture.md`](00_architecture.md) §5 (M0 = package scaffold, install, smoke tests)  
+**Architecture:** [`00_architecture.md`](../00_architecture.md) §5 (M0 = package scaffold, install, smoke tests)  
 **Companion notebook:** `notebooks/01_inspect_stl.ipynb` (thin; imports separately in simplified form)  
 **Audience:** Future implementors / agents recreating or auditing M0
 
