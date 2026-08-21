@@ -31,7 +31,7 @@ Historical note:
 Editable installs (-e) were intentionally forbidden during development
 to ensure notebooks exercised the package exactly as a fresh user would.
 
--e = -evil :)
+-e = -evil 😄
 
 ---
 
