@@ -86,6 +86,30 @@ def load_m8_catalog_rows(
     return build_catalog_rows(jobs)
 
 
+def select_tracked_split_rows(
+    catalog_rows: Sequence[CatalogRow],
+    *,
+    split: str,
+    n_tracked: int | None,
+    seed: int,
+    task: DatasetTaskSpec | None = None,
+) -> list[CatalogRow]:
+    """Deterministic subset for one catalog split (``None`` / non-positive → all)."""
+    task = m8_xyz_task(split=split) if task is None else task
+    split_task = _split_task(task, name=f"figure3_{split}", split=split)
+    ds = build_task_dataset(list(catalog_rows), split_task)
+    rows = list(ds.rows)
+    if not rows:
+        return []
+    if n_tracked is None or int(n_tracked) <= 0 or int(n_tracked) >= len(rows):
+        return rows
+    n = int(n_tracked)
+    rng = np.random.default_rng(int(seed))
+    idx = rng.choice(len(rows), size=n, replace=False)
+    idx = np.sort(np.asarray(idx, dtype=int))
+    return [rows[int(i)] for i in idx]
+
+
 def select_tracked_validation_rows(
     catalog_rows: Sequence[CatalogRow],
     *,
@@ -94,19 +118,16 @@ def select_tracked_validation_rows(
     task: DatasetTaskSpec | None = None,
 ) -> list[CatalogRow]:
     """Deterministic validation subset (``None`` / non-positive → all val rows)."""
-    task = m8_xyz_task(split="validation") if task is None else task
-    val_task = _split_task(task, name="figure3_val", split="validation")
-    ds = build_task_dataset(list(catalog_rows), val_task)
-    rows = list(ds.rows)
+    rows = select_tracked_split_rows(
+        catalog_rows,
+        split="validation",
+        n_tracked=n_tracked,
+        seed=seed,
+        task=task,
+    )
     if not rows:
         raise ValueError("no validation rows match the M8 figure-3 task filter")
-    if n_tracked is None or int(n_tracked) <= 0 or int(n_tracked) >= len(rows):
-        return rows
-    n = int(n_tracked)
-    rng = np.random.default_rng(int(seed))
-    idx = rng.choice(len(rows), size=n, replace=False)
-    idx = np.sort(np.asarray(idx, dtype=int))
-    return [rows[int(i)] for i in idx]
+    return rows
 
 
 def _tracked_meta(rows: Sequence[CatalogRow]) -> list[dict[str, Any]]:
@@ -139,7 +160,6 @@ def _predict_tracked(
     model,
     tracked_rows: Sequence[CatalogRow],
     *,
-    task: DatasetTaskSpec,
     device,
 ) -> list[tuple[str, np.ndarray, np.ndarray, float]]:
     import torch
@@ -151,7 +171,8 @@ def _predict_tracked(
     out: list[tuple[str, np.ndarray, np.ndarray, float]] = []
     with torch.no_grad():
         for row in tracked_rows:
-            ds = build_task_dataset([row], task)
+            row_task = m8_xyz_task(split=str(row.split))
+            ds = build_task_dataset([row], row_task)
             x, y = ds[0]
             images = {
                 X_FIELD: torch.as_tensor(np.asarray(x[X_FIELD])).unsqueeze(0)
@@ -226,9 +247,30 @@ def train_figure3_convergence(
             f"need non-empty train/val; got train={len(train_ds)} val={len(val_ds)}"
         )
 
-    tracked_rows = select_tracked_validation_rows(
-        catalog_rows, n_tracked=n_tracked, seed=seed, task=val_task
+    tracked_train = select_tracked_split_rows(
+        catalog_rows,
+        split="train",
+        n_tracked=n_tracked,
+        seed=int(seed) + 104729,
+        task=train_task,
     )
+    tracked_val = select_tracked_split_rows(
+        catalog_rows,
+        split="validation",
+        n_tracked=n_tracked,
+        seed=seed,
+        task=train_task,
+    )
+    tracked_test = select_tracked_split_rows(
+        catalog_rows,
+        split="test",
+        n_tracked=n_tracked,
+        seed=int(seed) + 7919,
+        task=train_task,
+    )
+    if not tracked_val:
+        raise ValueError("no validation rows match the M8 figure-3 task filter")
+    tracked_rows = tuple(tracked_train + tracked_val + tracked_test)
     tracked_meta = _tracked_meta(tracked_rows)
     # Attach STL from sequence manifest when available (for POV later).
     for meta, row in zip(tracked_meta, tracked_rows):
@@ -273,7 +315,9 @@ def train_figure3_convergence(
                 f"=== Figure 3 train {model_type} arch={arch} lr={lr:g} "
                 f"epochs={num_epochs} seed={seed} "
                 f"train={len(train_ds)} val={len(val_ds)} "
-                f"tracked={len(tracked_rows)} device={torch_device} ===",
+                f"tracked_train={len(tracked_train)} "
+                f"tracked_val={len(tracked_val)} tracked_test={len(tracked_test)} "
+                f"device={torch_device} ===",
                 flush=True,
             )
         torch.manual_seed(int(seed))
@@ -299,6 +343,9 @@ def train_figure3_convergence(
             extra={
                 "train_size": len(train_ds),
                 "val_size": len(val_ds),
+                "tracked_train_size": len(tracked_train),
+                "tracked_val_size": len(tracked_val),
+                "tracked_test_size": len(tracked_test),
                 "optical_setup_id": OPTICAL_SETUP_ID,
                 "keep_angles_deg": KEEP_ANGLE_DEG,
                 "image_normalize": "per_image_zscore",
@@ -313,7 +360,7 @@ def train_figure3_convergence(
 
         def _log_epoch(epoch: int, train_loss: float | None, val_loss: float | None) -> None:
             for sid, y_true, y_pred, err in _predict_tracked(
-                model, tracked_rows, task=val_task, device=torch_device
+                model, tracked_rows, device=torch_device
             ):
                 append_record(
                     hist,
@@ -327,8 +374,15 @@ def train_figure3_convergence(
                 )
 
         # Epoch 0: initialization (before any optimizer step).
+        train0 = _epoch_loader_mse(model, train_loader, batch_xy)
         val0 = _epoch_loader_mse(model, val_loader, batch_xy)
-        _log_epoch(0, train_loss=None, val_loss=val0)
+        _log_epoch(0, train_loss=train0, val_loss=val0)
+        if verbose:
+            print(
+                f"  {model_type} epoch 0/{num_epochs}  "
+                f"train_MSE={train0:.4f}  val_MSE={val0:.4f}  (init)",
+                flush=True,
+            )
 
         for epoch in range(1, int(num_epochs) + 1):
             model.train()

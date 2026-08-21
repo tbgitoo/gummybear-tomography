@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -151,13 +152,63 @@ def combine_histories(
     }
 
 
+@dataclass(frozen=True)
+class Figure3RecordIndex:
+    """Combined-history records keyed by ``(sample_id, model_type)``."""
+
+    by_sample_model: Mapping[tuple[str, str], tuple[dict[str, Any], ...]]
+
+    @classmethod
+    def from_combined(cls, combined: Mapping[str, Any]) -> Figure3RecordIndex:
+        buckets: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for rec in combined.get("records") or []:
+            sid = str(rec.get("sample_id", ""))
+            mt = str(rec.get("model_type", ""))
+            if not sid or not mt:
+                continue
+            buckets.setdefault((sid, mt), []).append(dict(rec))
+        frozen = {
+            key: tuple(
+                sorted(
+                    recs,
+                    key=lambda r: (int(r["epoch"]), str(r.get("model_type", ""))),
+                )
+            )
+            for key, recs in buckets.items()
+        }
+        return cls(by_sample_model=frozen)
+
+    def records_for_sample(
+        self,
+        sample_id: str,
+        *,
+        model_type: str,
+    ) -> list[dict[str, Any]]:
+        recs = self.by_sample_model.get((str(sample_id), str(model_type)))
+        return list(recs) if recs else []
+
+
+def build_figure3_record_index(combined: Mapping[str, Any]) -> Figure3RecordIndex:
+    """Build a lookup table for ``records_for_sample`` on a combined history."""
+    return Figure3RecordIndex.from_combined(combined)
+
+
 def records_for_sample(
     history: Mapping[str, Any],
     sample_id: str,
     *,
     model_type: str | None = None,
+    record_index: Figure3RecordIndex | None = None,
 ) -> list[dict[str, Any]]:
     sid = str(sample_id)
+    if record_index is not None:
+        if model_type is None:
+            out: list[dict[str, Any]] = []
+            for mt in (MODEL_POOLING, MODEL_FOURIER):
+                out.extend(record_index.records_for_sample(sid, model_type=mt))
+            out.sort(key=lambda r: (int(r["epoch"]), str(r.get("model_type", ""))))
+            return out
+        return record_index.records_for_sample(sid, model_type=str(model_type))
     out: list[dict[str, Any]] = []
     for rec in history.get("records") or []:
         if str(rec.get("sample_id")) != sid:
