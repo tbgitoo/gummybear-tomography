@@ -226,7 +226,6 @@ data
 configs/m8/~$m8_demo.xlsx
 configs/m10/m10_demo.xlsx
 configs/m10/~m10_demo.xlsx
-notebooks
 !figures/notebooks/
 !figures/notebooks/**
 
@@ -241,3 +240,4 @@ outputs/pov/
 outputs/renders/
 prompts/
 outputs/
+oldnotebooks/
