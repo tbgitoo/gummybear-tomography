@@ -1,6 +1,10 @@
 # gummybear-tomography
 Position localiser for gummy bears
 
+Dataset and Checkpoints available from
+
+https://huggingface.co/datasets/tbhugging/gummybear-tomographyhttps://huggingface.co/datasets/tbhugging/gummybear-tomography
+
 ## Physical Setting
 
 The physical problem underlying the gummybear tomography project is the reconstruction of 3D localization from single or multiple views of a translucent gummybear phantom containing localized particles.
@@ -33,9 +37,15 @@ Deep learning is used to compare architectures with and without a Fourier repres
 
 The figure illustrates the deep learning problem and approach: From a synthetic gummybear image, a deep machine learning model is trained on the synthetic data in order to be able to predict positions from single or multiple views of the Gummybear. The figure shows activations acquired during predictio operations and comparitive prediction of positions on the two branches (Fourier and Average Pooling).
 
+The following animated figure illustrates progressively improved model predictions for single-view-based predictiion of single particle positions, once with a global Average Pooling (red) and once with a Fourier Pooling approach.
 
-
-
+<p align="center">
+  <img
+    src="figures/design_figures/figure3_m8_vs_fourier_convergence.gif"
+    alt="3D Localization via CNN, Pooling with and without Fourier, and MLP"
+    width="100%"
+  >
+</p>
 
 
 The final report is at [GummyBearTomography_Summary.md](GummyBearTomography_Summary.md)
