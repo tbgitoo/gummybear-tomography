@@ -4,13 +4,13 @@
 **Role:** **Debugging / wiring milestone** — not the canonical forward model for datasets or ML.  
 **Split:** M2B.1 directional (constant `b_f`) then M2B.2 point source — same API, different light config.  
 **Core (package):** `gummybear.optics` — see [§ Durable vs transient](#durable-vs-transient).  
-**Evidence (import target):** three notebooks under `notebooks/milestone_02/` — **implemented**
+**Evidence:** three notebooks under `notebooks/milestone_02/` — **implemented**
 
-| Upstream | Target here |
-|----------|-------------|
-| `02b_1_illumination_basics.ipynb` | `02b_1_illumination_basics.ipynb` |
-| `02b_2_lambert_beer.ipynb` | `02b_2_lambert_beer.ipynb` |
-| `02b_3_end_to_end.ipynb` | `02b_3_end_to_end.ipynb` |
+| Notebook | Role |
+|----------|------|
+| `02b_1_illumination_basics.ipynb` | directional / constant `b_f` |
+| `02b_2_lambert_beer.ipynb` | point light, `L_proxy` / Beer–Lambert |
+| `02b_3_end_to_end.ipynb` | full compose pipeline |
 
 **Read order:** `02b_1` → `02b_2_lambert_beer` → `02b_3_end_to_end` (last is the clean full-pipeline reference).
 

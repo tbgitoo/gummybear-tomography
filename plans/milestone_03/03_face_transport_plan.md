@@ -1,7 +1,6 @@
 # Milestone 3 — Face Energy and Mean Beam Direction
 
-**Source:** `plans/00_architecture.md` §5.1  
-**Upstream:** `GummyBearTomography/plans/milestone_03/implementation_plan.md` (shortened)  
+**Source:** `plans/00_architecture.md` §5.1   
 **Role:** First **durable** face-level transport — source rays, Snell refraction, exit-face deposition. Replaces M2B Beer–Lambert proxies; not diffusion (M4) or full sequence compose (M5+).  
 **Core:** `gummybear.rays.source`, `gummybear.optics.face_transport`, `refraction`, `source_sampling`, `material`  
 **Evidence:** `notebooks/milestone_03/` — **Done** (`03_0` → `03_1` → `03_2`). **Status:** M3 Stage 3 shipped; M6 hybrid direct path **Later** (M4–M6).
@@ -46,7 +45,7 @@ Ray weights `w_i` from `SourceRayBundle.weights` (`make_source_ray_bundle`; no m
 
 ## Experimental conclusions
 
-From M3 evidence on `proto_bear.stl` (upstream [`milestone_03_experimental_results.md`](../../GummyBearTomography/docs/results/milestone_03_experimental_results.md); reproduced in `notebooks/milestone_03/`):
+From M3 evidence on `proto_bear.stl` (documented in [`docs/milestone_03_face_transport.md`](../docs/milestone_03_face_transport.md) § Experimental conclusions; reproduced in `notebooks/milestone_03/`):
 
 1. **Area-normalize for interpretation** — raw `face_energy` is triangulation-dependent; **energy density** is the mesh-stable diagnostic (Stage 3 notebook plots log density).
 2. **Transport dominates cost** — `propagate_entry_exit_transport` / optical-field formation is expensive; camera sampling of an existing `FaceOpticalState` is cheap. **Future:** cache one optical field, many camera poses (architecture supports this; M6 sequence-gen still recomputes direct transport per view today).

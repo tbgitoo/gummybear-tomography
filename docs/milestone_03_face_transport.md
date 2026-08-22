@@ -65,7 +65,7 @@ valid[f]         = hit_count[f] > 0
 
 ## Experimental conclusions
 
-From M3 evidence on `cad/proto_bear.stl` (imported from upstream experimental write-up):
+From M3 evidence on `cad/proto_bear.stl` (`notebooks/milestone_03/`):
 
 ### Refractive lensing
 
