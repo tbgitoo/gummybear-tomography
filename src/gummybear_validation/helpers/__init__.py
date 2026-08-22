@@ -2,6 +2,7 @@
 
 These utilities normalize dataclass / dict / attribute objects and print
 PASS/FAIL diagnostics used across particle-transport and sequence checks.
+Pinhole camera helpers align validation plots with ``gummybear.rays.camera``.
 """
 
 from .access_helpers import (
@@ -18,6 +19,11 @@ from .access_helpers import (
     require_any,
     summarize_array,
 )
+from .camera_helpers import (
+    pinhole_camera_basis,
+    pinhole_camera_framing_mesh,
+    trimesh_camera_transform,
+)
 
 __all__ = [
     "as_mapping",
@@ -32,4 +38,7 @@ __all__ = [
     "event_segment_index",
     "event_exit_t",
     "event_entry_t",
+    "pinhole_camera_basis",
+    "pinhole_camera_framing_mesh",
+    "trimesh_camera_transform",
 ]

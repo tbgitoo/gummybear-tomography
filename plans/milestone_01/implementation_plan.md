@@ -13,7 +13,7 @@
 | Optional `read_mesh_summary` | `inspect_stl(path)` → `{mesh, summary, validation}` |
 | Summary fields + `stl_sha256` / `units` | Present; `source_path` is repo-relative when supplied |
 | Notebook | `notebooks/milestone_01/01_inspect_stl.ipynb` (M1 trust gate; M0 keeps a thinner install smoke notebook) |
-| Units note in `docs/physics_model.md` | **Deferred** |
+| Units note in `docs/physics_model.md` | Present (`docs/physics_model.md` — millimetres) |
 | Essential invariant tests | **Not present**. Visual inspection and downstream milestone validation were considered sufficient for this research project. |
 
 Extra helpers beyond the plan (`face_centroids`, vector normalize) exist for later milestones; not in scope but useful for later milestones.

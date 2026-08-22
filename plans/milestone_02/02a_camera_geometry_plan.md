@@ -15,7 +15,7 @@
 | Re-exports | `gummybear.rays` |
 | Evidence notebook | `notebooks/milestone_02/02a_camera_view.ipynb` perspective smoke path (install + `display_path`, inspect, pinhole rays, first-hit → intensity plot, optional bounds / `mesh.show()`). Ortho / side-by-side / normal RGB panels omitted. |
 | Dedicated M2A pytest module | **No**; rays exercised via later tests (e.g. M3A face-transport) + smoke import |
-| `docs/physics_model.md` M2A notes | In `docs/`  |
+| `docs/physics_model.md` M2A notes | Present — camera vs face-centered illumination invariants |
 
 API shapes below match the code in `src/gummybear/rays/`.
 

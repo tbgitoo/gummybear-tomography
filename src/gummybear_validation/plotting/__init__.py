@@ -21,6 +21,8 @@ from .refractive_transport_3d import (
     plot_refractive_illumination_scene,
 )
 
+from .pinhole_camera import plot_pinhole_wireframe
+
 
 __all__ = [
     "plot_sphere", 
@@ -37,4 +39,5 @@ __all__ = [
     "add_transparent_surface_mesh",
     "plot_point_light",
     "plot_refractive_illumination_scene",
+    "plot_pinhole_wireframe",
 ]
