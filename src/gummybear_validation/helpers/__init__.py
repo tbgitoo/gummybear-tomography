@@ -32,6 +32,19 @@ from .m3_transport import (
     print_face_state_summary,
     print_source_hit_summary,
 )
+from .m4_diffusion import (
+    assert_deposition_conservation,
+    assert_deposition_sanity,
+    assert_live_netgen_mesh,
+    assert_m4e_hybrid_checks,
+    build_diffusion_ray_subset,
+    make_centroid_axis_ray,
+    m4e_metadata_template,
+    print_deposition_summary,
+    print_diffusion_mesh_summary,
+    print_m4e_metadata,
+    write_m4e_artifacts,
+)
 
 __all__ = [
     "as_mapping",
@@ -57,4 +70,15 @@ __all__ = [
     "assert_source_hit_contract",
     "print_entry_refraction_summary",
     "print_face_state_summary",
+    "assert_live_netgen_mesh",
+    "print_diffusion_mesh_summary",
+    "make_centroid_axis_ray",
+    "print_deposition_summary",
+    "assert_deposition_conservation",
+    "assert_deposition_sanity",
+    "build_diffusion_ray_subset",
+    "write_m4e_artifacts",
+    "print_m4e_metadata",
+    "m4e_metadata_template",
+    "assert_m4e_hybrid_checks",
 ]

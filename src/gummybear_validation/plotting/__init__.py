@@ -39,6 +39,15 @@ from .m3_face_transport import (
     plot_source_rays_with_bbox,
     sample_face_state_camera_images,
 )
+from .m4_diffusion import (
+    plot_camera_scalar,
+    plot_deposition_scene,
+    plot_diffusion_centroids_3d,
+    plot_hybrid_panels,
+    plot_phi_on_nodes,
+    plot_profile_along_ray,
+    plot_surface_with_diffusion_centroids,
+)
 
 
 __all__ = [
@@ -68,4 +77,11 @@ __all__ = [
     "sample_face_state_camera_images",
     "plot_face_state_camera_panel",
     "plot_entry_internal_directions_3d",
+    "plot_diffusion_centroids_3d",
+    "plot_surface_with_diffusion_centroids",
+    "plot_phi_on_nodes",
+    "plot_profile_along_ray",
+    "plot_deposition_scene",
+    "plot_camera_scalar",
+    "plot_hybrid_panels",
 ]

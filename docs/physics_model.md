@@ -92,6 +92,7 @@ M4E  I_total = α I_direct + I_diffuse
 - Exact ray–tet intervals are the mainline deposition; projected-centroid deposition is historical only. It adds more noise and does not offer gains in execution speed.
 - Particles / camera poses must **not** invalidate mesh or diffusion-operator caches by default.
 - `interpolate=True` vs `False` changes only how scalar fluence maps to camera hits — not deposition, FEM solve, or transport physics.
+- At typical coarse tet budgets (~10³ elements), **`I_direct`** and ray–tet deposition look relatively coarse vs smooth **`I_diffuse`**; first ML proof-of-principle runs should prefer **`alpha = 0`** (diffusion-only). Detail: [`plans/milestone_04/04_diffusion_plan.md`](../plans/milestone_04/04_diffusion_plan.md) § Experimental conclusions.
 
 ### M5 — Particle-aware source correction
 

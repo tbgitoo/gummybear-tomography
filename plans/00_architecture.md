@@ -113,7 +113,7 @@ Milestones are **capabilities**. Numbers match the published code and Final Repo
 | **M1** | STL load / mesh trust |
 | **M2** | Camera rays + approximate translucent appearance |
 | **M3** | Refractive direct transport — [detail §5.1](#51-m3--refractive-direct-transport) |
-| **M4** | Coarse tet mesh, source deposition, diffusion solve, diffuse camera sampling (`fem` extra / NGSolve) |
+| **M4** | Coarse tet mesh, source deposition, diffusion solve, diffuse camera sampling (`fem` extra / NGSolve) — [detail §5.2](#52-m4--volumetric-diffusion) |
 | **M5** | Analytic particles; clean vs particle source correction |
 | **M6** | Multi-role sequence generation from Excel workbooks |
 | **M7** | Catalog rows + lazy task datasets |
@@ -133,6 +133,19 @@ CameraRayBundle → first_visible_hits → sample_face_state_to_camera / I_direc
 M2B `L_proxy` / `I_proxy` are debug scaffolding only — M3 replaces them for production forward-model paths. M3 was implemented in three **implementation stages** (coverage → entry Snell → exit transport); detail and API guardrails: [`plans/milestone_03/03_face_transport_plan.md`](milestone_03/03_face_transport_plan.md). Physics summary: [`docs/milestone_03_face_transport.md`](../docs/milestone_03_face_transport.md).
 
 **Not in M3:** source-to-camera path solving in one pass, scattering, Monte Carlo rendering, gap-filled “from-face” backtracking refinements, or a generic ray framework.
+
+#### 5.2 M4 — Volumetric diffusion
+
+M4 adds bulk translucency: M3 internal losses → volumetric scatter source `S(x)` on a **coarse Netgen tet mesh** → NGSolve FEM fluence `Φ(x)` → diffuse camera sampling → hybrid compose with M3 direct. **NGSolve is the production solver**; early structured-grid NumPy FD prototypes were abandoned (wrong geometry, uncompetitive vs FEM speed). Detail: [`plans/milestone_04/04_diffusion_plan.md`](milestone_04/04_diffusion_plan.md).
+
+```text
+M3 segments → deposit_ray_source → solve_diffusion → sample_diffuse_image
+I_direct (M3) + I_diffuse → I_total = alpha * I_direct + I_diffuse
+```
+
+**Not in M4:** particles (M5), sequence generation (M6), monolithic renderer, replacing `I_direct` with diffusion.
+
+**Empirical default for ML PoP:** at practical coarse tet counts, the direct channel is relatively coarse vs bulk diffuse; first localization experiments should prefer **`alpha = 0`** (diffusion-only) unless denser mesh / hybrid lensing is required — see M4 plan § Experimental conclusions.
 
 ### Localisation ladder (M8–M10)
 
