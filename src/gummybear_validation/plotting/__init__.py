@@ -22,6 +22,16 @@ from .refractive_transport_3d import (
 )
 
 from .pinhole_camera import plot_pinhole_wireframe
+from .face_sampling import (
+    face_centroid_channels,
+    plot_face_sampled_row,
+    sample_face_scalars_to_images,
+)
+from .m2b_proxy import (
+    collect_m2b_proxy_diagnostics,
+    plot_beam_direction_components,
+    plot_m2b_proxy_diagnostics,
+)
 
 
 __all__ = [
@@ -40,4 +50,10 @@ __all__ = [
     "plot_point_light",
     "plot_refractive_illumination_scene",
     "plot_pinhole_wireframe",
+    "face_centroid_channels",
+    "sample_face_scalars_to_images",
+    "plot_face_sampled_row",
+    "collect_m2b_proxy_diagnostics",
+    "plot_m2b_proxy_diagnostics",
+    "plot_beam_direction_components",
 ]

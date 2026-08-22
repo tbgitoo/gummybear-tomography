@@ -93,10 +93,12 @@ Pipeline: STL → rays → first hit → mask, first-surface depth, optional nor
 
 M2B **reuses** M2A camera pass: `make_camera_rays` → `first_visible_hits` → **`hit_faces`** (pixel→face map). `simple_camera_intensity` is a non-physical placeholder.
 
-M2B **adds** face-centered illumination (sampling space = faces, not pixels):
+M2B **adds** a **transient debug** face→pixel wiring check (see [`02b_translucent_camera_proxy_plan.md`](02b_translucent_camera_proxy_plan.md)):
 
-1. Per face: thickness `L_proxy[f]` along beam `b` through centroid → `T_face = exp(-μ L_proxy)`.
-2. Camera sample: `I ≈ I_bg · T_face[hit_faces[pixel]] · g(b·v)` with global `g`.
+- **Durable:** illumination and camera stay separate passes; sample face fields via `hit_faces`.
+- **Transient (not repo forward model):** `L_proxy` / `T_face` / Beer–Lambert compose — superseded by M3+ refraction and M4+ volume physics; **not** used in sequence generation.
+
+Do not read M2B as classical tomography (line integrals along camera rays / sinograms).
 
 Illumination and camera stay separate passes. Detail: `02b` plan / `plans/00_architecture.md`.
 

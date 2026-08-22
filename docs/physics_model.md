@@ -45,15 +45,17 @@ camera sampling space       = camera pixels
 
 First-surface visibility: `hit_faces`, mask, depth, optional normals. Intensity may be constant on the object or documented `g(b·v)`. Trust the pipeline; photorealism is not required.
 
-### M2B — Face-centered translucent proxy
+### M2B — Face-centered translucent proxy (**debug / wiring only**)
 
 ```text
 P_f = centroid(face f)
-L_proxy[f] = mesh thickness along line(P_f, b_illumination)
-T_face[f] = exp(-μ L_proxy[f])
+L_proxy[f] = upstream half-ray material length (illumination direction)   # TRANSIENT — not canonical physics
+T_face[f] = exp(-μ L_proxy[f])                                            # TRANSIENT — not used in sequence gen
 ```
 
-Prefer split composition: sample beam/observation fields + `hit_faces` first, then form intensity from `T_face` and `g(b·v)`. Spatial variation should come mainly from `T_face`; `g(b·v)` is angular coupling. `L_proxy` is **not** the canonical ML observation. Documented limits: straight-line proxy, no Snell, no multiple paths, no caustics.
+**Not the ML observation, not the production forward model.** M2B proves face→pixel sampling via `hit_faces` and a quick translucent-looking image. M3+ replaces `L_proxy`/`T_face` with refractive transport and volume models. **Do not** interpret this as CT-style integration along camera rays or sinogram physics.
+
+Prefer split composition: sample beam/observation fields + `hit_faces` first, then form intensity from face lookups. Spatial variation in the debug proxy comes mainly from `T_face`; `g(b·v)` is angular coupling. Documented limits: straight-line proxy, no Snell, no multiple paths, no caustics.
 
 ### M3 — Refractive direct transport
 

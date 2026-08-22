@@ -24,6 +24,7 @@ from .camera_helpers import (
     pinhole_camera_framing_mesh,
     trimesh_camera_transform,
 )
+from .m2b_debug import M2BDebugProxyResult, compute_m2b_debug_proxy, print_m2b_face_fields
 
 __all__ = [
     "as_mapping",
@@ -41,4 +42,7 @@ __all__ = [
     "pinhole_camera_basis",
     "pinhole_camera_framing_mesh",
     "trimesh_camera_transform",
+    "M2BDebugProxyResult",
+    "compute_m2b_debug_proxy",
+    "print_m2b_face_fields",
 ]
