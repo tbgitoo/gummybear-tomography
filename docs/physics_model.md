@@ -59,14 +59,17 @@ Prefer split composition: sample beam/observation fields + `hit_faces` first, th
 
 ### M3 — Refractive direct transport
 
+Detail: [`milestone_03_face_transport.md`](milestone_03_face_transport.md) (per-face accounting, experimental conclusions, repo mapping).
+
 Refines the **illumination** pass (camera sampling/visibility unchanged):
 
 ```text
 source rays → entry (point/normal) → refract (constant n) → propagate
-           → exit (point/normal) → outgoing bookkeeping (I_direct / face_energy / b_out)
+           → exit (point/normal) → FaceOpticalState (face_energy / hit_count / b_out)
+           → optional I_direct via compute_refractive_direct_image + view coupling
 ```
 
-Internal beam direction before exit is generally **not** the external beam. Exit normals transform that direction into an outgoing contribution — they are **not** a license for Lambertian `n·b` / `n·v` shading. M3 alone is lensing / direct refractive contribution, **not** bulk translucent glow.
+Per-face fields accumulate ray weights on entry (Stage 1 baseline) or exit (Stage 3) faces; `b_out` is a normalized mean direction per face. Prefer **energy density** over raw `face_energy` when interpreting or plotting. Internal beam direction before exit is generally **not** the external beam. Exit normals transform that direction into an outgoing contribution — they are **not** a license for Lambertian `n·b` / `n·v` shading. M3 alone is lensing / direct refractive contribution, **not** bulk translucent glow.
 
 ### M4 — Volumetric deposition + diffusion (FEM)
 

@@ -4,7 +4,7 @@
 **Upstream:** `GummyBearTomography/plans/milestone_03/implementation_plan.md` (shortened)  
 **Role:** First **durable** face-level transport — source rays, Snell refraction, exit-face deposition. Replaces M2B Beer–Lambert proxies; not diffusion (M4) or full sequence compose (M5+).  
 **Core:** `gummybear.rays.source`, `gummybear.optics.face_transport`, `refraction`, `source_sampling`, `material`  
-**Evidence:** `notebooks/milestone_03/` — **Done** (`03_0` Stage 1 → `03_1` Stage 2 → `03_2` Stage 3)
+**Evidence:** `notebooks/milestone_03/` — **Done** (`03_0` → `03_1` → `03_2`). **Status:** M3 Stage 3 shipped; M6 hybrid direct path **Later** (M4–M6).
 
 ---
 
@@ -25,6 +25,33 @@ CameraRayBundle → first_visible_hits → hit_faces → sample state to image
 ```
 
 Camera and source rays share structure (`origins`, `directions`, `sample_shape`) but **different semantics**. `first_visible_hits` is reused **unchanged** (3-tuple return). Join passes only via `hit_faces` + `sample_face_values_to_image`. M2B `L_proxy` / `I_proxy` are debug-only; **`FaceOpticalState`** is what M4+ builds on.
+
+**Docs:** [`docs/milestone_03_face_transport.md`](../docs/milestone_03_face_transport.md).
+
+---
+
+## Per-face ray accounting
+
+Ray weights `w_i` from `SourceRayBundle.weights` (`make_source_ray_bundle`; no material). Each contributing ray scatter-adds on face `f`: `face_energy[f] += w_i`, `hit_count[f] += 1`, `direction_sum[f] += w_i · d_i`; then `b_out[f] = unit(direction_sum[f] / hit_count[f])`; zero hits ⇒ `valid=False`.
+
+**Stage 1** (`accumulate_source_coverage`): first-surface **entry** hits; `d_i` = **incident source** direction (no Snell).
+
+**Stage 3** (`propagate_entry_exit_transport`): entry Snell → internal trace → exit Snell; deposit on **exit** face; `d_i` = **outgoing** direction. Optional Beer–Lambert on internal chord only: `w_i ← w_i · exp(−μ_total · exit_depth)` when `apply_attenuation=True` (default **False** on transport; **True** in `compute_refractive_direct_image`).
+
+**`b_out` note:** divisor is **hit count**, not `face_energy`. Equal weights ⇒ unweighted mean direction after normalization; varying weights (inverse-square point light) are not strictly `Σ w_i d_i / Σ w_i`.
+
+**Density (diagnostic):** `energy_density[f] = face_energy[f] / area_faces[f]` — see experimental conclusions.
+
+---
+
+## Experimental conclusions
+
+From M3 evidence on `proto_bear.stl` (upstream [`milestone_03_experimental_results.md`](../../GummyBearTomography/docs/results/milestone_03_experimental_results.md); reproduced in `notebooks/milestone_03/`):
+
+1. **Area-normalize for interpretation** — raw `face_energy` is triangulation-dependent; **energy density** is the mesh-stable diagnostic (Stage 3 notebook plots log density).
+2. **Transport dominates cost** — `propagate_entry_exit_transport` / optical-field formation is expensive; camera sampling of an existing `FaceOpticalState` is cheap. **Future:** cache one optical field, many camera poses (architecture supports this; M6 sequence-gen still recomputes direct transport per view today).
+3. **M3 alone is refractive lensing** — only restricted exit regions contribute; bulk translucent appearance needs M4 diffusion + scatter deposition.
+4. **Central representation** — `FaceOpticalState` links illumination physics to image formation; camera pass samples it through `hit_faces` only.
 
 ---
 
@@ -49,54 +76,24 @@ CameraConfig ──► CameraRayBundle ──► first_visible_hits ──► hi
                               sample_face_state_to_camera (diagnostics)
 ```
 
-| Phase | Owns |
-|-------|------|
-| Ray generation | `LightConfig`, bbox, `SourceSamplingParams` → parallel rays + weights |
-| Transport | `OpticalMaterialConfig` → entry Snell, internal trace, exit deposit; optional Beer–Lambert on **internal** path only |
-| Camera | M2A/M2B visibility — **no changes** |
+**Phase ownership:** ray generation — `LightConfig`, bbox, `SourceSamplingParams` → parallel rays + weights; transport — `OpticalMaterialConfig` → entry Snell, internal trace, exit deposit, optional Beer–Lambert on **internal** path only; camera — M2A/M2B visibility, **no changes**.
 
 ---
 
-## Core types
+## Core types and production API
 
 **`FaceOpticalState`** — `face_energy [n_faces]` (raw weight, not area-normalized by default), `b_out [n_faces,3]` (unit where valid), `hit_count`, `valid`. Zero hits ⇒ zero energy, zero `b_out`, `valid=False`. Optional: `energy_density(face_areas)`.
 
-**`OpticalMaterialConfig`** — `n_refractive` (default 1.33) drives Snell refraction in M3; `mu_total = mu_absorption + mu_scatter` for attenuation **after** geometry is stable.
+**`OpticalMaterialConfig`** — `n_refractive` (default 1.33) drives Snell; `mu_total = mu_absorption + mu_scatter` for attenuation **after** geometry is stable.
 
 **`SourceRayBundle`** — frozen: `origins`, `directions` (unit), `weights ≥ 0`, optional `sample_shape`. **Do not merge with `CameraRayBundle`.** Satisfies `RayBundleProtocol`; `first_visible_hits_with_points` when positions needed — do not extend default 3-tuple return.
-
-**Production (full M3 stack — Stage 3):**
 
 ```python
 source_rays = make_source_ray_bundle(light, mesh_bbox=mesh.bounds, sampling=...)  # no material
 state = propagate_source_rays(source_rays, mesh, material)  # alias: compute_refracted_face_field
 ```
 
----
-
-## Implementation stages
-
-These are **build order / evidence checkpoints**, not separate milestones. The shipped M3 capability is the full Stage 3 pipeline.
-
-### Stage 1 — Source coverage (no refraction)
-
-**API:** `accumulate_source_coverage`, `make_source_ray_bundle`, `first_visible_hits` on `SourceRayBundle`.
-
-`SourceRayBundle → first_visible_hits → accumulate weights on entry faces`. `b_out` = mean **incident** direction (label as non-refracted baseline). Sample `face_energy` / `hit_count` / `b_out` through camera `hit_faces`.
-
-### Stage 2 — Entry Snell
-
-**API:** `refract_direction`, `refract_ray_bundle`.
-
-`refract_direction(b_in, normal, n_from=1.0, n_to=n_refractive)` — directions are physical propagation; helper orients normals internally (**no caller double-negation** without synthetic proof). Mandatory synthetic tests: normal bend, grazing, TIR ⇒ `ok=False`.
-
-### Stage 3 — Exit trace, outgoing `b_out`, direct image
-
-**API:** `propagate_entry_exit_transport`, `propagate_source_rays`, `compute_refractive_direct_image`, `sample_face_state_to_camera`, `refractive_exit_view_coupling`.
-
-`entry + ε·d_internal → first_visible_hits → exit Snell (n_to=1.0) → deposit on exit_faces`. Prefer raw weights; attenuation uses **internal** `exit_depth` only (not source-to-entry). Final `b_out` is energy-weighted mean **outgoing** direction; should differ from M2B geometric `b_f`. `compute_refractive_direct_image` adds exit–view coupling on the camera grid.
-
-**Fallback:** Stage 1–2 alone still yield useful diagnostics; M4 can overlay coverage if Stage 3 is unstable.
+**Build order (evidence checkpoints, not separate milestones):** Stage 1 — `accumulate_source_coverage`, `make_source_ray_bundle`, `first_visible_hits`; Stage 2 — `refract_direction`, `refract_ray_bundle` (synthetic normal/grazing/TIR before mesh; **no caller double-negation** on normals); Stage 3 — `propagate_entry_exit_transport`, `propagate_source_rays`, `compute_refractive_direct_image`, `sample_face_state_to_camera`, `refractive_exit_view_coupling` (`entry + ε·d_internal → exit Snell → exit_faces`; raw weights default; internal `exit_depth` attenuation only; `b_out` ≠ M2B `b_f`; exit–view coupling on camera grid). Stage 1–2 alone remain useful diagnostics if Stage 3 is unstable.
 
 ---
 
@@ -123,48 +120,13 @@ Synthetic refract_direction tests before mesh use.
 
 ---
 
-## Implementation status
-
-| Item | Stage | Status |
-|------|-------|--------|
-| `SourceRayBundle`, `RayBundleProtocol`, `OpticalMaterialConfig` | 1–3 | **Done** |
-| `make_source_ray_bundle`, `accumulate_source_coverage` | 1 | **Done** |
-| `refract_direction`, `refract_ray_bundle` | 2 | **Done** |
-| `FaceOpticalState`, `propagate_entry_exit_transport`, `propagate_source_rays` | 3 | **Done** |
-| `sample_face_state_to_camera`, `compute_refractive_direct_image` | 3 | **Done** |
-| `tests/test_m3_face_transport.py`, `tests/test_m3_validation_helpers.py` | 1–3 | **Done** |
-| Evidence notebooks `03_0` / `03_1` / `03_2` | 1–3 | **Done** |
-
-Files: `rays/source.py`, `optics/{material,source_sampling,refraction,face_transport}.py`.
-
----
-
-## Validation (summary)
-
-| Stage | Must pass |
-|-------|-----------|
-| 1 | Bundle invariants; entry hits; `face_energy > 0`; M2B regression-free |
-| 2 | Synthetic Snell/TIR; unit internal dirs; internal ≠ incident on oblique faces |
-| 3 | Some exit faces; unit outgoing dirs; internal-length attenuation only; `b_out` ≠ M2B proxy |
-
----
-
 ## Handoffs
 
 **From M2B — discard:** `L_proxy`, `T_face`, Beer–Lambert `I_proxy` as physics truth. **Keep:** `hit_faces`, face→pixel sampling, light configs.
 
 **To M4+ — keep:** `FaceOpticalState`, `SourceRayBundle`, sampling bridge. **Add:** diffusion mesh, deposition, `Phi`, hybrid compose.
 
----
-
-## Success criteria
-
-| Criterion | Status |
-|-----------|--------|
-| Package implements full M3 transport (Stage 3) | **Yes** |
-| Camera pass contract unchanged | **Yes** |
-| Evidence notebooks | **Done** |
-| Sequence-gen on full M3+ hybrid path | **Later** (M4–M6) |
+**Implementation:** `rays/source.py`, `optics/{material,source_sampling,refraction,face_transport}.py`; tests `test_m3_face_transport.py`, `test_m3_validation_helpers.py`; docs [`docs/milestone_03_face_transport.md`](../docs/milestone_03_face_transport.md). All listed APIs and evidence notebooks **Done**.
 
 ---
 

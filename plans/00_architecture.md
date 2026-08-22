@@ -130,7 +130,7 @@ LightConfig → SourceRayBundle (geometry only)
 CameraRayBundle → first_visible_hits → sample_face_state_to_camera / I_direct
 ```
 
-M2B `L_proxy` / `I_proxy` are debug scaffolding only — M3 replaces them for production forward-model paths. M3 was implemented in three **implementation stages** (coverage → entry Snell → exit transport); detail and API guardrails: [`plans/milestone_03/03_face_transport_plan.md`](milestone_03/03_face_transport_plan.md).
+M2B `L_proxy` / `I_proxy` are debug scaffolding only — M3 replaces them for production forward-model paths. M3 was implemented in three **implementation stages** (coverage → entry Snell → exit transport); detail and API guardrails: [`plans/milestone_03/03_face_transport_plan.md`](milestone_03/03_face_transport_plan.md). Physics summary: [`docs/milestone_03_face_transport.md`](../docs/milestone_03_face_transport.md).
 
 **Not in M3:** source-to-camera path solving in one pass, scattering, Monte Carlo rendering, gap-filled “from-face” backtracking refinements, or a generic ray framework.
 
