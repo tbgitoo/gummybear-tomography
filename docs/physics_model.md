@@ -96,10 +96,10 @@ M4E  I_total = α I_direct + I_diffuse
 
 ### M5 — Particle-aware source correction
 
-Particles come **after** M3+M4. Clean vs dirty transport pairs yield:
+Particles come **after** M3+M4. The impact lives on **affected ray trajectories** (clean/dirty pairs), not on particle geometry records alone:
 
 ```text
-ΔE_background = deposit(dirty) − deposit(clean)   # background tets
+ΔE_background = deposit(dirty) − deposit(clean)   # background tets; may be negative
 ΔE_particle   = scatter deposited along dirty particle chord
 E_particle    = E_clean + ΔE_background + ΔE_particle
 ```
@@ -112,6 +112,7 @@ E_particle    = E_clean + ΔE_background + ΔE_particle
 - Anomaly roles are `I_particle − I_clean` in the documented composition domain.
 - Plausibility checks (entry enhancement, downstream dirty ≤ clean, …) are **not** a claim of full physical realism.
 - `run_m5d_simulation` is an inspectable reference path, not a production M6 generator.
+- Detail / experimental conclusions: [`plans/milestone_05/05_particle_plan.md`](../plans/milestone_05/05_particle_plan.md), [`milestone_05_particle_guidelines.md`](milestone_05_particle_guidelines.md).
 
 ## What `b·v` is (and is not)
 

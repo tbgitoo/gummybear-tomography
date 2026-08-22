@@ -48,6 +48,11 @@ from .m4_diffusion import (
     plot_profile_along_ray,
     plot_surface_with_diffusion_centroids,
 )
+from .m5_particle import (
+    plot_m5d_final_images,
+    plot_m5d_propagation,
+    plot_source_delta_triptych,
+)
 
 
 __all__ = [
@@ -84,4 +89,7 @@ __all__ = [
     "plot_deposition_scene",
     "plot_camera_scalar",
     "plot_hybrid_panels",
+    "plot_source_delta_triptych",
+    "plot_m5d_propagation",
+    "plot_m5d_final_images",
 ]

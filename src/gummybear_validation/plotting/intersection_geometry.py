@@ -11,10 +11,7 @@ from trimesh import Trimesh
 
 from ..helpers import event_entry_t, event_exit_t, event_segment_index, get_field, pair_path_id
 
-from gummybear.particles import ParticleSphere
-
-from gummybear.particles import ParticleIntersectionEvent
-
+from gummybear.particles import ParticleIntersectionEvent, ParticleSet, ParticleSphere
 
 
 from typing import Optional, Sequence, Any
@@ -812,6 +809,7 @@ def plot_particle_intersections_in_mesh(
     mesh_linewidth: float = 0.08,
     mesh_alpha: float = 0.10,
     particle_color: str = "darkgrey",
+    particle_colors: Optional[Sequence[str]] = None,
     particle_alpha: float = 0.55,
     particle_linewidth: float = 1.0,
     full_segment_color: str = "black",
@@ -848,7 +846,8 @@ def plot_particle_intersections_in_mesh(
         Surface mesh object with ``triangles`` and ``vertices`` attributes.
 
     particle
-        Particle sphere to draw. May be a ParticleSphere-like object or a dict,
+        One particle, a sequence of particles, or a ``ParticleSet``.
+        Each entry may be a ParticleSphere-like object or a dict,
         provided ``plot_sphere`` supports both.
 
     segments
@@ -875,7 +874,11 @@ def plot_particle_intersections_in_mesh(
         Mesh transparency.
 
     particle_color
-        Particle sphere wireframe color.
+        Default sphere wireframe color (also first color when
+        ``particle_colors`` is omitted for multi-particle plots).
+
+    particle_colors
+        Optional per-particle colors. Must cover every particle when given.
 
     particle_alpha
         Particle sphere transparency.
@@ -938,6 +941,36 @@ def plot_particle_intersections_in_mesh(
 
     events = tuple(events)
 
+    if isinstance(particle, ParticleSet):
+        particle_list = list(particle.particles)
+    elif isinstance(particle, (list, tuple)):
+        particle_list = list(particle)
+    else:
+        particle_list = [particle]
+
+    if not particle_list:
+        raise ValueError("particle list is empty")
+
+    default_multi_colors = (
+        particle_color,
+        "tab:purple",
+        "tab:brown",
+        "tab:olive",
+        "tab:cyan",
+    )
+    if particle_colors is None:
+        colors = [
+            default_multi_colors[i % len(default_multi_colors)]
+            for i in range(len(particle_list))
+        ]
+    else:
+        colors = list(particle_colors)
+        if len(colors) < len(particle_list):
+            raise ValueError(
+                "particle_colors must cover every particle "
+                f"(got {len(colors)}, need {len(particle_list)})"
+            )
+
     if max_events_to_draw is None:
         events_to_draw = events
     else:
@@ -977,17 +1010,18 @@ def plot_particle_intersections_in_mesh(
     )
 
     # ------------------------------------------------------------------
-    # Particle sphere
+    # Particle sphere(s)
     # ------------------------------------------------------------------
 
-    plot_sphere(
-        ax,
-        particle,
-        color=particle_color,
-        alpha=particle_alpha,
-        linewidth=particle_linewidth,
-        label=None,
-    )
+    for item, color in zip(particle_list, colors, strict=True):
+        plot_sphere(
+            ax,
+            item,
+            color=color,
+            alpha=particle_alpha,
+            linewidth=particle_linewidth,
+            label=None,
+        )
 
     # ------------------------------------------------------------------
     # Full intersecting ray segments

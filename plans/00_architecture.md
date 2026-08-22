@@ -114,7 +114,7 @@ Milestones are **capabilities**. Numbers match the published code and Final Repo
 | **M2** | Camera rays + approximate translucent appearance |
 | **M3** | Refractive direct transport — [detail §5.1](#51-m3--refractive-direct-transport) |
 | **M4** | Coarse tet mesh, source deposition, diffusion solve, diffuse camera sampling (`fem` extra / NGSolve) — [detail §5.2](#52-m4--volumetric-diffusion) |
-| **M5** | Analytic particles; clean vs particle source correction |
+| **M5** | Analytic particles; clean/dirty transport pairs → source delta — [detail §5.3](#53-m5--analytic-particle-artifacts) |
 | **M6** | Multi-role sequence generation from Excel workbooks |
 | **M7** | Catalog rows + lazy task datasets |
 
@@ -146,6 +146,21 @@ I_direct (M3) + I_diffuse → I_total = alpha * I_direct + I_diffuse
 **Not in M4:** particles (M5), sequence generation (M6), monolithic renderer, replacing `I_direct` with diffusion.
 
 **Empirical default for ML PoP:** at practical coarse tet counts, the direct channel is relatively coarse vs bulk diffuse; first localization experiments should prefer **`alpha = 0`** (diffusion-only) unless denser mesh / hybrid lensing is required — see M4 plan § Experimental conclusions.
+
+#### 5.3 M5 — Analytic particle artifacts
+
+M5 adds analytic spherical inclusions on the M4 backbone. Particles perturb **ray transport and source deposition only** — they do **not** remesh or change the diffusion operator. The durable ledger is the **clean/dirty transport pair** (`AffectedTransportPair`): **one per affected transport path** (`path_id`), not one per intersection event and not particle records alone:
+
+```text
+segments + particles → one AffectedTransportPair per hit path_id
+  → ΔE_background + ΔE_particle_scat → S_particle
+  → same A, new RHS → Φ_particle → I_particle
+I_anomaly = I_particle − I_clean
+```
+
+Validated particle-scatter assignment is Beer–Lambert **attenuated chord** with exact ray–tet distribution (not midpoint/uniform chord). Detail: [`plans/milestone_05/05_particle_plan.md`](milestone_05/05_particle_plan.md). Guidelines: [`docs/milestone_05_particle_guidelines.md`](../docs/milestone_05_particle_guidelines.md). Physics: [`docs/physics_model.md`](../docs/physics_model.md) § M5.
+
+**Not in M5:** refractive particle deflection, sequence generation (M6), production-scale `run_m5d_simulation`.
 
 ### Localisation ladder (M8–M10)
 
