@@ -112,13 +112,27 @@ Milestones are **capabilities**. Numbers match the published code and Final Repo
 | **M0** | Package scaffold, install, smoke tests |
 | **M1** | STL load / mesh trust |
 | **M2** | Camera rays + approximate translucent appearance |
-| **M3** | Refractive direct transport |
+| **M3** | Refractive direct transport — [detail §5.1](#51-m3--refractive-direct-transport) |
 | **M4** | Coarse tet mesh, source deposition, diffusion solve, diffuse camera sampling (`fem` extra / NGSolve) |
 | **M5** | Analytic particles; clean vs particle source correction |
 | **M6** | Multi-role sequence generation from Excel workbooks |
 | **M7** | Catalog rows + lazy task datasets |
 
 NGSolve is required only for diffusion (M4+) generation. Catalog / ML code imports without FEM.
+
+#### 5.1 M3 — Refractive direct transport
+
+M3 refines the **illumination pass** (not the camera pass): source rays enter the mesh, refract under a constant index, traverse to exit faces, and accumulate **`FaceOpticalState`** (`face_energy[f]`, `b_out[f]`, `hit_count`, `valid`). The camera pass from M2A is unchanged; diagnostics sample face state through `hit_faces` only.
+
+```text
+LightConfig → SourceRayBundle (geometry only)
+           → entry/exit Snell + internal trace → FaceOpticalState
+CameraRayBundle → first_visible_hits → sample_face_state_to_camera / I_direct
+```
+
+M2B `L_proxy` / `I_proxy` are debug scaffolding only — M3 replaces them for production forward-model paths. M3 was implemented in three **implementation stages** (coverage → entry Snell → exit transport); detail and API guardrails: [`plans/milestone_03/03_face_transport_plan.md`](milestone_03/03_face_transport_plan.md).
+
+**Not in M3:** source-to-camera path solving in one pass, scattering, Monte Carlo rendering, gap-filled “from-face” backtracking refinements, or a generic ray framework.
 
 ### Localisation ladder (M8–M10)
 

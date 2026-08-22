@@ -111,7 +111,7 @@ def accumulate_source_coverage(
         Entry-face coverage; ``valid`` marks faces with at least one hit.
 
     Notebook / protocol:
-        M3A.0 non-refracted coverage baseline.
+        M3 Stage 1 — non-refracted source coverage baseline.
     """
     n_faces = len(mesh.faces)
     source_valid, _source_depth, source_entry_faces = first_visible_hits(mesh, source_rays)
@@ -316,7 +316,7 @@ def compute_refractive_direct_image(
     RefractiveDirectImageResult
 
     Notebook / protocol:
-        M3A.2 / M4E direct channel; pairs with diffuse sampling for hybrid compose.
+        M3 Stage 3 direct channel; pairs with M4 diffuse sampling for hybrid compose.
     """
     face_state = propagate_entry_exit_transport(
         mesh,
@@ -342,7 +342,7 @@ def compute_refractive_direct_image(
         coupling=coupling,
         face_valid=face_valid_img,
         metadata={
-            "pipeline": "m3a2_entry_exit_refraction_sample_to_camera",
+            "pipeline": "m3_entry_exit_refraction_sample_to_camera",
             "direct_scale": float(direct_scale),
             "apply_attenuation": bool(apply_attenuation),
             "used_ray_weight_override": ray_weights is not None,
@@ -406,7 +406,7 @@ def propagate_entry_exit_transport(
         Exit-face energy and ``b_out`` after refraction.
 
     Notebook / protocol:
-        M3A.2 entry/exit transport; alias :data:`compute_refracted_face_field`.
+        M3 Stage 3 entry/exit transport; alias :data:`compute_refracted_face_field`.
     """
     n_faces = len(mesh.faces)
     source_valid, _source_depth, source_entry_faces, entry_points = (
@@ -551,5 +551,5 @@ def propagate_source_rays(
     )
 
 
-# Alias used in the M3A plan.
+# Alias used in the M3 plan.
 compute_refracted_face_field = propagate_entry_exit_transport

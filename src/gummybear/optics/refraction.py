@@ -204,7 +204,7 @@ def refract_ray_bundle(
         Compact refracted bundle plus full-length hit and validity arrays.
 
     Notebook / protocol:
-        M3A entry/exit refraction before internal transport or M4B deposition.
+        M3 entry/exit refraction (Stage 2–3) before internal transport or M4 deposition.
     """
     origins = np.asarray(rays.origins, dtype=float)
     directions = np.asarray(rays.directions, dtype=float)

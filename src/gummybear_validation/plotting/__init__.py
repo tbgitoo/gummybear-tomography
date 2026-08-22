@@ -32,6 +32,13 @@ from .m2b_proxy import (
     plot_beam_direction_components,
     plot_m2b_proxy_diagnostics,
 )
+from .m3_face_transport import (
+    plot_entry_internal_directions_3d,
+    plot_face_state_camera_panel,
+    plot_face_state_on_mesh_3d,
+    plot_source_rays_with_bbox,
+    sample_face_state_camera_images,
+)
 
 
 __all__ = [
@@ -56,4 +63,9 @@ __all__ = [
     "collect_m2b_proxy_diagnostics",
     "plot_m2b_proxy_diagnostics",
     "plot_beam_direction_components",
+    "plot_source_rays_with_bbox",
+    "plot_face_state_on_mesh_3d",
+    "sample_face_state_camera_images",
+    "plot_face_state_camera_panel",
+    "plot_entry_internal_directions_3d",
 ]

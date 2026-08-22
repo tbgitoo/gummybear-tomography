@@ -1,4 +1,4 @@
-"""Tests for Milestone 3A source rays, refraction, and face transport."""
+"""Tests for Milestone 3 source rays, refraction, and face transport."""
 
 from __future__ import annotations
 
@@ -122,7 +122,7 @@ def test_first_visible_hits_accepts_source_rays(sphere_mesh):
     assert np.any(v2)
 
 
-def test_accumulate_source_coverage_m3a0(sphere_mesh):
+def test_accumulate_source_coverage_stage1(sphere_mesh):
     light = DirectionalLightConfig(propagation_direction=(0.0, 0.0, -1.0), intensity=2.0)
     rays = make_source_ray_bundle(
         light=light,
@@ -246,7 +246,7 @@ def test_in_object_segments_from_refracted_rays(sphere_mesh):
     assert np.all(lengths < 11.0)
 
 
-def test_propagate_entry_exit_transport_m3a2(sphere_mesh):
+def test_propagate_entry_exit_transport_stage3(sphere_mesh):
     light = DirectionalLightConfig(propagation_direction=(0.0, 0.0, -1.0), intensity=1.0)
     rays = make_source_ray_bundle(
         light=light,

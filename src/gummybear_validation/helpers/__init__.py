@@ -25,6 +25,13 @@ from .camera_helpers import (
     trimesh_camera_transform,
 )
 from .m2b_debug import M2BDebugProxyResult, compute_m2b_debug_proxy, print_m2b_face_fields
+from .m3_transport import (
+    assert_source_hit_contract,
+    assert_source_ray_bundle_invariants,
+    print_entry_refraction_summary,
+    print_face_state_summary,
+    print_source_hit_summary,
+)
 
 __all__ = [
     "as_mapping",
@@ -45,4 +52,9 @@ __all__ = [
     "M2BDebugProxyResult",
     "compute_m2b_debug_proxy",
     "print_m2b_face_fields",
+    "assert_source_ray_bundle_invariants",
+    "print_source_hit_summary",
+    "assert_source_hit_contract",
+    "print_entry_refraction_summary",
+    "print_face_state_summary",
 ]
