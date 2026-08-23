@@ -1,6 +1,6 @@
 # Milestone 6 — Factorized sequence generation
 
-**Source:** `plans/00_architecture.md` §5.4 · upstream `docs/M6_execution_planning.md`  
+**Source:** `plans/00_architecture.md` §5.4 · [`docs/milestone_06_execution_planning.md`](../../docs/milestone_06_execution_planning.md)  
 **Role:** Workbook-driven, cache-aware, **output-idempotent** multi-role sequences around M5D. **Not** new physics, remeshing, or FEM-operator persistence.  
 **Core:** `gummybear.datasets.{generation_workbook,generation_plan,cache_keys,source_cache,output_plan,sequence_generation,sequence_writer,role_images,manifest_writer}` · `gummybear_validation.milestone_06`  
 **Install:** `pip install ".[fem,dev]" -c requirements.txt`  
@@ -44,7 +44,7 @@ workbook → SequenceJobs → reconcile outputs (skip complete; fail stale)
 | Camera capture | ~35% (~23 s) | Hits / Phi localization **yes**; role frames **no** |
 | Diffusion | ≪1% (~0.3 s) | **No** operator cache |
 
-Apriori FEM looks expensive; measured, it is the cheapest stage (consumes ~0.3s, e.g. <1% of runtime). Optimize deposition reuse + geometry caches, not operator persistence, precisely because diffusion is cheap.
+Apriori FEM would look expensive; measured, it is the cheapest stage (consumes ~0.3s, e.g. <1% of runtime). Optimize deposition reuse + geometry caches, not operator persistence, precisely because diffusion is cheap.
 
 ---
 

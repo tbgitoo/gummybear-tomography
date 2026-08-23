@@ -116,7 +116,7 @@ Milestones are **capabilities**. Numbers match the published code and Final Repo
 | **M4** | Coarse tet mesh, source deposition, diffusion solve, diffuse camera sampling (`fem` extra / NGSolve) — [detail §5.2](#52-m4--volumetric-diffusion) |
 | **M5** | Analytic particles; clean/dirty transport pairs → source delta — [detail §5.3](#53-m5--analytic-particle-artifacts) |
 | **M6** | Multi-role sequence generation from Excel workbooks — [detail §5.4](#54-m6--factorized-sequence-generation) |
-| **M7** | Catalog rows + lazy task datasets |
+| **M7** | Catalog rows + lazy task datasets — [detail §5.5](#55-m7--sample-catalog-and-lazy-task-datasets) |
 
 NGSolve is required only for diffusion (M4+) generation. Catalog / ML code imports without FEM.
 
@@ -167,6 +167,12 @@ Validated particle-scatter assignment is Beer–Lambert **attenuated chord** wit
 M6 turns the M5D path into a **workbook-driven, cache-aware, output-idempotent** generator. Motto: do expensive physics once; vary particles, then diffusion boundaries, then cameras; record everything. Three layers stay separate: **output delta** (`resolved_job_hash` / manifest) → **source-cache** plan → physics. Persist clean/particle `.npz`+`.json` sources; re-solve diffusion at runtime (no FEM-operator cache); reuse camera×mesh visibility and Phi localization, not finished role frames. Detail: [`plans/milestone_06/06_sequence_generation_plan.md`](milestone_06/06_sequence_generation_plan.md).
 
 **Not in M6:** M5 physics redesign, silent overwrite of changed `sequence_id`, workbook-SHA-only identity, committed `data/generated/` corpora.
+
+#### 5.5 M7 — Sample catalog and lazy task datasets
+
+M7 joins workbook `SequenceJob`s to on-disk M6 manifests into catalog **rows** (a sample is a row, not a tensor). Tasks select fields into a pure-Python lazy dataset: **`x, y = dataset[i]`** (dicts; no `torch.utils.data.Dataset`). Role images load on demand to **`numpy.ndarray` `(V, C, H, W)`** (HWC is loader-internal only). Schedule-consistent subsets fix `V`/angles/resolution before multi-view ML. Detail: [`plans/milestone_07/07_catalog_task_dataset_plan.md`](milestone_07/07_catalog_task_dataset_plan.md).
+
+**Not in M7:** training, global `x_train`/`y_train`, directory-scan membership, public HWC stacks.
 
 ### Localisation ladder (M8–M10)
 
