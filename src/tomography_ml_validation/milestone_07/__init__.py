@@ -1,6 +1,23 @@
-"""Installed pytest contracts for catalog membership and task-dataset extraction."""
+"""Installed pytest contracts and notebook helpers for Milestone 7."""
 
-from .validation import (
+from tomography_ml_validation.milestone_07.notebook_helpers import (
+    CATALOG_JOB_DISPLAY_COLUMNS,
+    FLAT_CATALOG_DISPLAY_COLUMNS,
+    RECONCILIATION_DISPLAY_COLUMNS,
+    SCHEDULE_IDENTITY_DISPLAY_COLUMNS,
+    assert_single_particle_corpus,
+    assert_single_particle_flat_labels,
+    build_catalog_status_table,
+    build_demo_multi_particle_catalog_rows,
+    catalog_rows_dataframe,
+    particle_labels_dataframe,
+    probe_observed_image_shapes,
+    select_columns,
+    summarize_task_sample,
+    validation_fixture_paths,
+    write_demo_multi_particle_workbook,
+)
+from tomography_ml_validation.milestone_07.validation import (
     test_m7_1_catalog_membership_contract,
     test_m7_2_manifest_reconciliation_reports_artifact_readiness_without_changing_catalog_membership,
     test_m7_3_schedule_consistent_subset_rejects_mixed_acquisition_shapes,
@@ -10,10 +27,25 @@ from .validation import (
 )
 
 __all__ = [
+    "CATALOG_JOB_DISPLAY_COLUMNS",
+    "FLAT_CATALOG_DISPLAY_COLUMNS",
+    "RECONCILIATION_DISPLAY_COLUMNS",
+    "SCHEDULE_IDENTITY_DISPLAY_COLUMNS",
+    "assert_single_particle_corpus",
+    "assert_single_particle_flat_labels",
+    "build_catalog_status_table",
+    "build_demo_multi_particle_catalog_rows",
+    "catalog_rows_dataframe",
+    "particle_labels_dataframe",
+    "probe_observed_image_shapes",
+    "select_columns",
+    "summarize_task_sample",
     "test_m7_1_catalog_membership_contract",
     "test_m7_2_manifest_reconciliation_reports_artifact_readiness_without_changing_catalog_membership",
     "test_m7_3_schedule_consistent_subset_rejects_mixed_acquisition_shapes",
     "test_m7_4_flat_catalog_joins_jobs_and_manifests_without_loading_tensors",
     "test_m7_5_task_dataset_returns_lazy_xy_without_redefining_sample_as_tensor",
     "test_m7_6_workbook_catalog_and_subset_support_dual_task_views",
+    "validation_fixture_paths",
+    "write_demo_multi_particle_workbook",
 ]

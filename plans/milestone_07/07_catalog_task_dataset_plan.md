@@ -4,7 +4,7 @@
 **Role:** Workbook-defined **sample catalog** over M6 sequence artifacts + minimal **task-dataset** extraction: `catalog → schedule-consistent subset → field selection → lazy x, y = dataset[i]`. **Not** training, not physics, not global `x_train`/`y_train`.  
 **Core:** `tomography_ml.gummybear_data_catalog` · installable tests `tomography_ml_validation.milestone_07`  
 **Install:** `pip install ".[dl,dev]" -c requirements.txt` (catalog/ML path; FEM not required for catalog contracts). Generation artifacts come from M6 (`.[fem]`).  
-**Evidence:** upstream notebooks `07_1`–`07_6` (import target `notebooks/milestone_07/` when ported). **Status:** package APIs shipped in-repo.
+**Evidence:** `notebooks/milestone_07/` — **Done** (`07_1_workbook_loading` → `07_6_catalog_subset_validation`). **Status:** package APIs + validation helpers shipped.
 
 **Labeling:** unmarked = planned design. **Conclusion** = hardened API / contract.
 
@@ -123,14 +123,14 @@ Same catalog → different tasks (e.g. `observed_ref`→`clean_ref` inpainting; 
 
 ## Phases (evidence spine)
 
-| Phase | Proves |
-|-------|--------|
-| **M7.1** | Enabled workbook jobs → catalog skeleton (no dir scan) |
-| **M7.2** | Lightweight manifest reconcile; status fields, membership unchanged |
-| **M7.3** | Schedule-consistent subset → common V / angles / resolution |
-| **M7.4** | Full field join + `RoleRef`s; still no image arrays |
-| **M7.5** | `x, y = dataset[i]`; only index `i` loads `(V,C,H,W)` |
-| **M7.6** | Dual task views + validation; installable pytest battery |
+| Phase | Proves | Notebook |
+|-------|--------|----------|
+| **M7.1** | Enabled workbook jobs → catalog skeleton (no dir scan) | `07_1_workbook_loading.ipynb` |
+| **M7.2** | Lightweight manifest reconcile; membership unchanged | `07_2_acquisition_shape_consistency.ipynb` |
+| **M7.3** | Schedule-consistent subset → common V / angles / resolution | `07_3_files_and_manifest_consistency.ipynb` |
+| **M7.4** | Full field join + `RoleRef`s; still no image arrays | `07_4_flat_catalog.ipynb` |
+| **M7.5** | `x, y = dataset[i]`; only index `i` loads `(V,C,H,W)` | `07_5_task_dataset.ipynb` |
+| **M7.6** | Status view + dual task views; installable pytest | `07_6_catalog_subset_validation.ipynb` |
 
 ---
 
