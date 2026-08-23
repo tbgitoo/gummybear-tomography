@@ -190,3 +190,22 @@ def run_installed_pytest_test(
             f"Installed pytest test failed: {test_module.__name__}.{test_name} "
             f"(exit code {result.returncode})"
         )
+
+
+def run_installed_pytest_tests(
+    test_module: ModuleType,
+    test_names: tuple[str, ...] | list[str],
+    *,
+    show_paths: bool = False,
+    show_full_pytest_output: bool = False,
+    traceback_style: str = "short",
+) -> None:
+    """Run several installed validation tests sequentially (notebook-friendly)."""
+    for test_name in test_names:
+        run_installed_pytest_test(
+            test_module,
+            test_name,
+            show_paths=show_paths,
+            show_full_pytest_output=show_full_pytest_output,
+            traceback_style=traceback_style,
+        )

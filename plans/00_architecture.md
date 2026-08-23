@@ -115,7 +115,7 @@ Milestones are **capabilities**. Numbers match the published code and Final Repo
 | **M3** | Refractive direct transport — [detail §5.1](#51-m3--refractive-direct-transport) |
 | **M4** | Coarse tet mesh, source deposition, diffusion solve, diffuse camera sampling (`fem` extra / NGSolve) — [detail §5.2](#52-m4--volumetric-diffusion) |
 | **M5** | Analytic particles; clean/dirty transport pairs → source delta — [detail §5.3](#53-m5--analytic-particle-artifacts) |
-| **M6** | Multi-role sequence generation from Excel workbooks |
+| **M6** | Multi-role sequence generation from Excel workbooks — [detail §5.4](#54-m6--factorized-sequence-generation) |
 | **M7** | Catalog rows + lazy task datasets |
 
 NGSolve is required only for diffusion (M4+) generation. Catalog / ML code imports without FEM.
@@ -161,6 +161,12 @@ I_anomaly = I_particle − I_clean
 Validated particle-scatter assignment is Beer–Lambert **attenuated chord** with exact ray–tet distribution (not midpoint/uniform chord). Detail: [`plans/milestone_05/05_particle_plan.md`](milestone_05/05_particle_plan.md). Guidelines: [`docs/milestone_05_particle_guidelines.md`](../docs/milestone_05_particle_guidelines.md). Physics: [`docs/physics_model.md`](../docs/physics_model.md) § M5.
 
 **Not in M5:** refractive particle deflection, sequence generation (M6), production-scale `run_m5d_simulation`.
+
+#### 5.4 M6 — Factorized sequence generation
+
+M6 turns the M5D path into a **workbook-driven, cache-aware, output-idempotent** generator. Motto: do expensive physics once; vary particles, then diffusion boundaries, then cameras; record everything. Three layers stay separate: **output delta** (`resolved_job_hash` / manifest) → **source-cache** plan → physics. Persist clean/particle `.npz`+`.json` sources; re-solve diffusion at runtime (no FEM-operator cache); reuse camera×mesh visibility and Phi localization, not finished role frames. Detail: [`plans/milestone_06/06_sequence_generation_plan.md`](milestone_06/06_sequence_generation_plan.md).
+
+**Not in M6:** M5 physics redesign, silent overwrite of changed `sequence_id`, workbook-SHA-only identity, committed `data/generated/` corpora.
 
 ### Localisation ladder (M8–M10)
 
