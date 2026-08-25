@@ -1,9 +1,7 @@
 """M9 end-to-end geometry-aware fusion (09_2A Fourier + 09_2B pooled).
 
 Stage A warm-starts a single-view trunk; Stage B jointly trains trunk +
-camera sin/cos fusion (compact 09_2 and large 09_3 heads). Matches
-``notebooks/09_2A_e2e_fourier_geometry_fusion.ipynb`` /
-``notebooks/09_2B_e2e_pooled_geometry_fusion.ipynb``.
+camera sin/cos fusion (compact 09_2 and large 09_3 heads).
 """
 
 from __future__ import annotations

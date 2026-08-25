@@ -19,6 +19,11 @@ from .illumination_fusion import (
     plot_m10_param_counts_fourier_vs_pooled,
     plot_stage_b_lr_study,
 )
+from .m9_expert_xyz_mean import (
+    collect_m9_0_bias_vs_std,
+    plot_m9_0_bias_vs_expert_std,
+    plot_m9_0_per_angle_experts,
+)
 from .m9_frozen_fusion import (
     combine_m9_comparisons,
     ensure_display_label,
@@ -61,6 +66,9 @@ __all__ = [
     "plot_m10_hierarchical_lr_study",
     "plot_m10_hierarchical_rmse_fourier_vs_pooled",
     "plot_m10_param_counts_fourier_vs_pooled",
+    "plot_m9_0_bias_vs_expert_std",
+    "plot_m9_0_per_angle_experts",
+    "collect_m9_0_bias_vs_std",
     "plot_m9_e2e_param_counts_fourier_vs_pooled",
     "plot_m9_e2e_rmse_fourier_vs_pooled",
     "plot_m9_e2e_rmse_ladder",

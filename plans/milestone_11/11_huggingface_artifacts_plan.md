@@ -24,7 +24,7 @@ M6/M8/M10 on-disk sequences (authoritative float .raw.tif)
 | Rule | Meaning |
 |------|---------|
 | Float TIFF authoritative | Parquet stores **paths** to `.raw.tif`; does not embed float pixels |
-| Preview for the Viewer | `observed` / `clean` / `particle` / `anomaly` are Image structs with **JPEG/PNG bytes**; `path` is the unzipped layout pointer |
+| Preview for the Viewer | Image structs with **JPEG/PNG bytes**; `path` is the **filename** only (not a `data/generated/...` tree path, which is missing on the Hub) |
 | Zip corpora on the Hub | Publish `data/generated/m8_1.zip` and `data/generated/m10_illumination.zip` — not extracted directories |
 | Layout parity | After unzip, paths = repo-relative (`data/generated/...`); parquet lives at `data/huggingface_metadata/` |
 | Configs, not one blob | Hub subsets `m8_1` and `m10_illumination` with train / validation / test shards |

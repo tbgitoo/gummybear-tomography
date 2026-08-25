@@ -165,7 +165,7 @@ Delta is oracle/capability path at 3J; observed remains operational target for r
 ```
 
 **From M7:** `CatalogTaskDataset`, `field_status`, schedule-consistent subsets, lazy `(V,C,H,W)` numpy roles.  
-**To M9:** import `m8_single_view_block_freeze()` / per-view experts; camera orbit on **same** M8 corpus; fusion ladder `09_0`–`09_3` — [`plans/milestone_09/`](../milestone_09/) (when present).  
+**To M9:** import `m8_single_view_block_freeze()` / per-view experts; camera orbit on **same** M8 corpus; fusion ladder `09_0`–`09_3` — [`plans/milestone_09/09_camera_view_fusion_plan.md`](../milestone_09/09_camera_view_fusion_plan.md).  
 **To M10:** multi-illumination corpora + lighting fusion — [`plans/milestone_10/`](../milestone_10/) (when present).
 
 *Bump `schema_version` / experiment IDs when freeze semantics change — do not silently rewrite WIN 3J meaning.*

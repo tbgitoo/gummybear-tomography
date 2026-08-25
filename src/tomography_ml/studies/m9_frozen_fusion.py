@@ -2,8 +2,6 @@
 
 Stage A trains a single-view trunk; Stage B freezes it and trains fusion heads
 (mean-pool MLP, DeepSets, ordered concat) with an optional Stage-B LR sweep.
-Matches ``notebooks/09_1A_frozen_fourier_fusion.ipynb`` /
-``notebooks/09_1B_frozen_pooled_fusion.ipynb``.
 """
 
 from __future__ import annotations

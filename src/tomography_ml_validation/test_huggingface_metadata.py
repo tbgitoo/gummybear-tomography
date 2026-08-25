@@ -66,7 +66,7 @@ def test_embedded_preview_includes_file_bytes(tmp_path: Path):
     value = _embedded_preview(repo, rel)
     assert value == {
         "bytes": b"\xff\xd8fake-jpeg",
-        "path": rel,
+        "path": "frame.jpg",
     }
 
 

@@ -181,6 +181,12 @@ M8 builds a **defensible single-view localiser** from Excel-specified multi-regi
 
 **Not in M8:** multi-view fusion (M9), multi-illumination fusion (M10), predicting background optics, JPEG-as-training-store.
 
+#### 5.6b M9 — Camera-view fusion
+
+M9 asks how much a **camera orbit** buys on the frozen M8 trunk: one shared xyz from ordered views `[V,C,H,W]` (fixed illumination). Primary evidence: [`GummyBearTomography_Final_Report.ipynb`](../GummyBearTomography_Final_Report.ipynb) **M9 Steps 1–2** (frozen fusion, then e2e + sinθ/cosθ; compact vs large heads; Fourier vs GAP). Thin `notebooks/milestone_09/` cells keep ablation evidence omitted or condensed in the report (per-angle expert mean, packing/LR ladders, Fourier-vs-GAP overlays, fusion-capacity slice). Detail: [`plans/milestone_09/09_camera_view_fusion_plan.md`](milestone_09/09_camera_view_fusion_plan.md).
+
+**Not in M9:** illumination diversity or joint camera×light fusion (M10); reopening WIN 3J.
+
 ### Localisation ladder (M8–M10) and publication (M11)
 
 A single scientific progression—**scarce → richer acquisition**—with a frozen single-view substrate, then Hub packaging:

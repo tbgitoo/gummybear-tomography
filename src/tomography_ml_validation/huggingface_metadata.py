@@ -68,13 +68,18 @@ def _image_value(
 ) -> dict[str, Any] | None:
     """Return a Hugging Face Image struct.
 
-    ``data`` must be the JPEG/PNG file bytes for the Hub Dataset Viewer: Hub
-    corpora are zip archives, so ``path`` is not resolvable there. ``path``
-    remains the unzipped repo-relative location for local ML loaders.
+    When ``data`` is set, ``path`` is stored as a **basename** only (plus
+    extension). A repo-relative ``data/generated/...`` path looks local to
+    the Hub viewer and can stall first-rows while it hunts inside
+    ``m8_1.zip`` / ``m10_illumination.zip``. Unzipped locations stay in
+    ``sequence_dir`` / ``*_raw_path``.
     """
     if not path and data is None:
         return None
-    return {"bytes": data, "path": path}
+    viewer_path = path
+    if data is not None and path:
+        viewer_path = Path(path).name
+    return {"bytes": data, "path": viewer_path}
 
 
 def _embedded_preview(repo_root: Path, repo_rel: str | None) -> dict[str, Any] | None:
@@ -562,7 +567,7 @@ test={m10.get("test", 0)}.
 
 | Column | Meaning |
 |--------|---------|
-| `observed` / `clean` / `particle` / `anomaly` | Preview images (JPEG/PNG bytes embedded; `path` is the unzipped location) |
+| `observed` / `clean` / `particle` / `anomaly` | Preview images (JPEG/PNG **bytes** embedded; `path` is the filename only, not a Hub tree path) |
 | `particle_x` / `particle_y` / `particle_z` | Ground-truth particle centre (mm) |
 | `optical_regime` | M8 regime label (`low` / `medium` / `high`) when applicable |
 | `illumination_angle_deg` | M10 light angle decoded from `optical_setup_id` |

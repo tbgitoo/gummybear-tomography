@@ -35,6 +35,7 @@ from .study_checkpoints import (
     M08_XYZ_SPLIT_SENSITIVITY,
     M09_E2E_FOURIER_GEOMETRY_FUSION,
     M09_E2E_POOLED_GEOMETRY_FUSION,
+    M09_EXPERT_XYZ_MEAN,
     M09_FROZEN_FOURIER_FUSION,
     M09_FROZEN_POOLED_FUSION,
     M10_E2E_ILLUMINATION_FUSION,
@@ -68,6 +69,12 @@ from .m9_e2e_geometry_fusion import (
     M9E2EFamilyResult,
     run_m9_e2e_geometry_fusion_family,
 )
+from .m9_expert_xyz_mean import (
+    M9ExpertXyzMeanConfig,
+    M9ExpertXyzMeanResult,
+    assert_affine_identity_shared_linear,
+    run_m9_expert_xyz_mean,
+)
 
 __all__ = [
     "ARCH_COLORS",
@@ -85,6 +92,7 @@ __all__ = [
     "M08_XYZ_SPLIT_SENSITIVITY",
     "M09_E2E_FOURIER_GEOMETRY_FUSION",
     "M09_E2E_POOLED_GEOMETRY_FUSION",
+    "M09_EXPERT_XYZ_MEAN",
     "M09_FROZEN_FOURIER_FUSION",
     "M09_FROZEN_POOLED_FUSION",
     "M10_E2E_ILLUMINATION_FUSION",
@@ -97,6 +105,8 @@ __all__ = [
     "M8_CANONICAL_LR_BY_ARCH",
     "M9E2EConfig",
     "M9E2EFamilyResult",
+    "M9ExpertXyzMeanConfig",
+    "M9ExpertXyzMeanResult",
     "M9FusionConfig",
     "M9FusionFamilyResult",
     "SplitSensitivityStudyResult",
@@ -115,7 +125,9 @@ __all__ = [
     "run_m10_hierarchical_fusion",
     "run_m10_illumination_fusion",
     "run_m9_e2e_geometry_fusion_family",
+    "run_m9_expert_xyz_mean",
     "run_m9_frozen_fusion_family",
+    "assert_affine_identity_shared_linear",
     "run_split_sensitivity_study",
     "run_train_val_test_study",
     "select_lr_by_arch",
