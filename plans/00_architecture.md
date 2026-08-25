@@ -36,6 +36,7 @@ STL phantom
   → multi-role camera sequences (clean / particle / observed / …)
   → catalog + task datasets
   → localisation models (M8 → M9 → M10)
+  → publish corpora / checkpoints (M11 Hugging Face artefacts)
 ```
 
 **Canonical observation:** a **camera intensity image** of a translucent object (linear float), not an attenuation projection / sinogram.
@@ -180,9 +181,9 @@ M8 builds a **defensible single-view localiser** from Excel-specified multi-regi
 
 **Not in M8:** multi-view fusion (M9), multi-illumination fusion (M10), predicting background optics, JPEG-as-training-store.
 
-### Localisation ladder (M8–M10)
+### Localisation ladder (M8–M10) and publication (M11)
 
-A single scientific progression—**scarce → richer acquisition**—with a frozen single-view substrate:
+A single scientific progression—**scarce → richer acquisition**—with a frozen single-view substrate, then Hub packaging:
 
 ```text
 M8  Single-view foundation
@@ -199,6 +200,10 @@ M10 Lighting fusion
       10_1: lights at fixed camera [I,C,H,W]
       10_2: hierarchical light-then-camera fusion on the full grid
       (optional flat light×camera baselines)
+
+M11 Publish artefacts
+      Hugging Face dataset card + parquet indexes
+      corpora / checkpoints downloadable without regenerating
 ```
 
 | Milestone | Question in one line |
@@ -206,8 +211,19 @@ M10 Lighting fusion
 | **M8** | Does Fourier pooling beat GAP for localisation from a **single** diffuse view? |
 | **M9** | How much does a **camera orbit** buy on top of the frozen M8 trunk? |
 | **M10** | How much does **structured illumination diversity** buy beyond camera fusion? |
+| **M11** | How do we **publish** corpora + checkpoints so others can browse and reproduce without regenerating? |
 
-Optional later work (not required for this release): portable export of trained artefacts.
+#### 5.7 M11 — Hugging Face repository artefacts
+
+M11 is **publication plumbing**, not new science: turn on-disk M6/M8/M10 corpora and ML checkpoints into a Hub dataset that mirrors the repo layout and shows something reasonable in the Dataset Viewer. Detail: [`plans/milestone_11/11_huggingface_artifacts_plan.md`](milestone_11/11_huggingface_artifacts_plan.md). Notebook: [`notebooks/milestone_11/11_0_huggingface_export.ipynb`](../notebooks/milestone_11/11_0_huggingface_export.ipynb).
+
+```text
+data/generated/{m8_1,m10_illumination}.zip  +  checkpoints/
+  → parquet indexes (JPEG/PNG preview bytes embedded) + dataset-card README
+  → Hub Dataset Viewer works without extracted trees
+```
+
+**Not in M11:** regenerating optics, retraining, changing catalog schemas, embedding float `.raw.tif` in parquet.
 
 ---
 
@@ -221,6 +237,10 @@ gummybear-tomography/
 ├── requirements.txt
 ├── cad/                    # phantom STL (+ FreeCAD source if included)
 ├── configs/                # Excel generation / localisation workbooks
+├── data/                   # local / Hub (not in git except metadata indexes)
+│   ├── generated/          # optical corpora (m8_1, m10_illumination, …)
+│   └── huggingface_metadata/  # M11 parquet + dataset card (git-tracked)
+├── checkpoints/            # ML weights (local / Hub; not in git)
 ├── src/
 │   ├── gummybear/          # geometry, rays, optics, particles, datasets
 │   ├── gummybear_validation/
@@ -231,7 +251,7 @@ gummybear-tomography/
     └── 00_architecture.md  # this file
 ```
 
-Full generated corpora and large checkpoints are **not** stored in git; publish them externally (e.g. Hugging Face) and link from the README.
+Full generated corpora and large checkpoints are **not** stored in git; publish them externally (Hugging Face, M11) and link from the README.
 
 ---
 
@@ -242,6 +262,7 @@ Full generated corpora and large checkpoints are **not** stored in git; publish 
 | (core) | NumPy, SciPy, trimesh, Pillow, matplotlib, pandas, openpyxl |
 | `dl` | PyTorch / torchvision (M8+) |
 | `fem` | NGSolve / Netgen (M4+ generation) |
+| `hf` | PyArrow (M11 parquet metadata export) |
 | `dev` | pytest, ruff, mypy |
 
 Python **3.12**. Prefer non-editable install:
@@ -250,6 +271,7 @@ Python **3.12**. Prefer non-editable install:
 python3.12 -m venv .venv && source .venv/bin/activate
 # pip install ".[dl,dev]" -c requirements.txt   # ML without FEM (fallback)
 pip install ".[fem,dl,dev]" -c requirements.txt   # full generation
+# pip install ".[hf]" -c requirements.txt         # M11 Hub metadata only
 ```
 
 ---
@@ -272,6 +294,7 @@ pip install ".[fem,dl,dev]" -c requirements.txt   # full generation
 | Optical simulation pipeline | §2, §5 (M0–M7) |
 | M8 / M9 datasets and single- vs multi-view tasks | §3, §5 (M8–M9) |
 | M10 multi-illumination | §3, §5 (M10) |
+| External corpora / checkpoints download | §5 (M11), §6 |
 | Fourier pooling maths | §4 (summary); full derivation in the report |
 
 Use this file for **structure and contracts**; use the Final Report for **motivation, equations, figures, and experimental protocol**.

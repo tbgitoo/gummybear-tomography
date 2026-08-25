@@ -1,0 +1,86 @@
+{
+  "algorithm_version": "m6-camera-visibility-v1",
+  "arrays": {
+    "hit_depth": {
+      "dtype": "float64",
+      "shape": [
+        16384
+      ]
+    },
+    "hit_faces": {
+      "dtype": "int64",
+      "shape": [
+        16384
+      ]
+    },
+    "hit_points": {
+      "dtype": "float64",
+      "shape": [
+        16384,
+        3
+      ]
+    },
+    "sample_shape": {
+      "dtype": "int64",
+      "shape": [
+        2
+      ]
+    },
+    "valid_mask": {
+      "dtype": "bool",
+      "shape": [
+        16384
+      ]
+    }
+  },
+  "cache_id": "02c111d9f4f88975e38a665137267da0f887a4d7d397bb3b98e213d353cd3b69",
+  "cache_kind": "camera_visibility",
+  "completion_status": "complete",
+  "created_utc": "2026-08-09T17:02:39.553016+00:00",
+  "diffusion_mesh_identity": {
+    "identity_kind": "camera_visibility_surface",
+    "look_at_policy": "mesh_bounds_centroid",
+    "stl_sha256": "93dd75a4b3b535f9d0194592d2970885d3e9e9fd1d86d19365390cb2965fb88a"
+  },
+  "key_payload": {
+    "algorithm_version": "m6-camera-visibility-v1",
+    "camera": {
+      "fov_deg": 35.0,
+      "kind": "orbit",
+      "resolution_x": 128,
+      "resolution_y": 128
+    },
+    "key_kind": "camera_visibility",
+    "look_at_policy": "mesh_bounds_centroid",
+    "package_version": "0.0.1.dev0",
+    "pose": {
+      "angle_deg": 180.0,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "distance": 80.0,
+      "elevation_deg": 0.0,
+      "frame_index": 2,
+      "lateral_offset": null,
+      "up_variant": null,
+      "z_offset": null
+    },
+    "stl_sha256": "93dd75a4b3b535f9d0194592d2970885d3e9e9fd1d86d19365390cb2965fb88a",
+    "surface_mesh_processing_version": "m6-surface-mesh-v1"
+  },
+  "package_version": "0.0.1.dev0",
+  "payload_metadata": {
+    "angle_deg": 180.0,
+    "frame_index": 2,
+    "look_at_policy": "mesh_bounds_centroid"
+  },
+  "payload_schema_version": "m6-camera-visibility-payload-v1",
+  "workbook_provenance": {
+    "sequence_excel_row": 2,
+    "sequence_sheet": "sequences",
+    "workbook_name": "m10_demo.xlsx",
+    "workbook_sha256": "16f1ac1f1e8be6023651e71f49421fbea4972acad3b9a4fd06b19d01840b0515"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "algorithm_version": "m6-phi-sampling-localization-v1",
+  "arrays": {
+    "barycentric": {
+      "dtype": "float64",
+      "shape": [
+        16384,
+        4
+      ]
+    },
+    "sample_mode": {
+      "dtype": "int8",
+      "shape": [
+        16384
+      ]
+    },
+    "sample_shape": {
+      "dtype": "int64",
+      "shape": [
+        2
+      ]
+    },
+    "tet_id": {
+      "dtype": "int64",
+      "shape": [
+        16384
+      ]
+    }
+  },
+  "cache_id": "a349966d4fdea7f4853e9ceea4fc3ff1908b75d62346056294a4acdd00ceede4",
+  "cache_kind": "phi_sampling_localization",
+  "completion_status": "complete",
+  "created_utc": "2026-08-09T16:54:23.850836+00:00",
+  "diffusion_mesh_identity": {
+    "content_hash": "be83311f67dc49ad442955222a638ab2e4130162fd1d681ba88899051962bff8",
+    "num_nodes": 728,
+    "num_tets": 2547
+  },
+  "key_payload": {
+    "algorithm_version": "m6-phi-sampling-localization-v1",
+    "camera_visibility_cache_id": "09940bc273576b055bf8bd598d6955b4f3980d5030c2c27bb467725f766c4e8b",
+    "diffusion_mesh": {
+      "content_hash": "be83311f67dc49ad442955222a638ab2e4130162fd1d681ba88899051962bff8",
+      "num_nodes": 728,
+      "num_tets": 2547
+    },
+    "interpolation": {
+      "barycentric_tolerance": 1e-10,
+      "method": "tetrahedral_barycentric"
+    },
+    "key_kind": "phi_sampling_localization",
+    "package_version": "0.0.1.dev0"
+  },
+  "package_version": "0.0.1.dev0",
+  "payload_metadata": {
+    "barycentric_tolerance": 1e-10,
+    "interpolation_method": "tetrahedral_barycentric"
+  },
+  "payload_schema_version": "m6-phi-sampling-localization-payload-v1",
+  "workbook_provenance": {
+    "sequence_excel_row": 2,
+    "sequence_sheet": "sequences",
+    "workbook_name": "m8_demo.xlsx",
+    "workbook_sha256": "e05fd37306f17880c93e65772eae2833eb4905b42ed2534d1213330e71f89770"
+  }
+}

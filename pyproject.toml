@@ -32,6 +32,9 @@ dev = [
 "ruff",
 "mypy",
 ]
+hf = [
+"pyarrow",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

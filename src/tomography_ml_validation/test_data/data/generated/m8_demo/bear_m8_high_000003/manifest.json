@@ -1,0 +1,1086 @@
+{
+  "caches": {
+    "clean_optical_cache_id": "4dd9e095f12b30544f4dbb7ea8565dab1a1582f055c8182c43498c063c8c5bc9",
+    "diffusion_operator_cache": null,
+    "events": {
+      "camera_visibility": {
+        "cache_id": "aggregate",
+        "load_seconds": 0.0,
+        "reason": "all_hit;n_poses=10",
+        "status": "hit",
+        "write_seconds": 0.0
+      },
+      "clean_optical": {
+        "cache_id": "4dd9e095f12b30544f4dbb7ea8565dab1a1582f055c8182c43498c063c8c5bc9",
+        "load_seconds": 0.004817959386855364,
+        "reason": "hit",
+        "status": "hit",
+        "write_seconds": 0.0
+      },
+      "particle_source": {
+        "cache_id": "a98f45cf5538e6b11493a275c76a9180ad805d6bede59e990538b1422e9d2979",
+        "load_seconds": 3.137486055493355e-05,
+        "reason": "miss_not_found",
+        "status": "miss",
+        "write_seconds": 0.003294165711849928
+      },
+      "phi_sampling_localization": {
+        "cache_id": "aggregate",
+        "load_seconds": 0.0,
+        "reason": "all_hit;n_poses=10",
+        "status": "hit",
+        "write_seconds": 0.0
+      }
+    },
+    "particle_source_cache_id": "a98f45cf5538e6b11493a275c76a9180ad805d6bede59e990538b1422e9d2979",
+    "persistent_cache_used": true
+  },
+  "created_utc": "2026-08-09T16:54:44.295223+00:00",
+  "forward_model_tier": "m5_refractive_diffusion_particle_perturbation",
+  "frames": [
+    {
+      "angle_deg": 0.0,
+      "anomaly_preview_max_abs": 0.0006206245658804659,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -1.1180591583251953,
+        -79.54626846313477,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0000_angle_+0000.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0000_angle_+0000.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0000_angle_+0000.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0000_angle_+0000.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0000_angle_+0000.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0000_angle_+0000.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0000_angle_+0000.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0000_angle_+0000.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 0,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "b4dd9c4044d84d302fe86a236c5c8e7f17c0d7e3d5d559c5aa791d1b52b8c01b",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "d0e1865f243dfe280960255106bc9a84efa085e2bdb8d81b2bd17b49975c6802",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 36.0,
+      "anomaly_preview_max_abs": 0.0006181599777040853,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        45.90476102507266,
+        -64.26762801313056,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0001_angle_+0036.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0001_angle_+0036.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0001_angle_+0036.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0001_angle_+0036.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0001_angle_+0036.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0001_angle_+0036.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0001_angle_+0036.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0001_angle_+0036.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 1,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "ef1c6b14f3f44f2c7b1caaa3664ec0419940884a9a604acd4ce4368b80490933",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "d373602a757d74aa07da58738daa7c60b9bf090fa88a1b94cd04c7ca99dc27e4",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 72.0,
+      "anomaly_preview_max_abs": 0.006717558144190252,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        74.96646214528708,
+        -24.26762801313056,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0002_angle_+0072.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0002_angle_+0072.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0002_angle_+0072.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0002_angle_+0072.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0002_angle_+0072.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0002_angle_+0072.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0002_angle_+0072.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0002_angle_+0072.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 2,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "898e814dc344199548e2c750b6a21357e7688eacc116b3321e6f25cfbd7f1480",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "a6e9a97267730e703a06b1c173afae57cb561b2631b61d941b852ad2320904f5",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 108.0,
+      "anomaly_preview_max_abs": 0.0086854295928866,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        74.9664621452871,
+        25.175091086861023,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0003_angle_+0108.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0003_angle_+0108.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0003_angle_+0108.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0003_angle_+0108.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0003_angle_+0108.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0003_angle_+0108.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0003_angle_+0108.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0003_angle_+0108.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 3,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "5b231f932b772e53ed1532a9e835e32967116ecaba3671a88cc913e6cb6d5ac6",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "6465757b298e90bba7d0297b4b9ba71808e009fcb6da3f59be3a95a7edf9f147",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 144.0,
+      "anomaly_preview_max_abs": 0.008744042543942974,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        45.904761025072666,
+        65.17509108686102,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0004_angle_+0144.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0004_angle_+0144.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0004_angle_+0144.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0004_angle_+0144.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0004_angle_+0144.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0004_angle_+0144.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0004_angle_+0144.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0004_angle_+0144.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 4,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "3a7468bf7df22afdebf913e36dabcc39dcd637563519ce2a8200c98bf012293b",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "505f5916885627d82688a3dfae870665bf1bda9739e28e4662d5b91d964fee7d",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 180.0,
+      "anomaly_preview_max_abs": 0.00870395025310049,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -1.1180591583251855,
+        80.45373153686523,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0005_angle_+0180.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0005_angle_+0180.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0005_angle_+0180.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0005_angle_+0180.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0005_angle_+0180.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0005_angle_+0180.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0005_angle_+0180.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0005_angle_+0180.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 5,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "9cf34c60281c27b65a730d6df17e046599ac99c301170c2c4cf3e10919f38c2b",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "7b2afd83f67ec7c0f2297695937c11c76cb96013ab50b9d57b29a476c1b4e09b",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 216.0,
+      "anomaly_preview_max_abs": 0.008696475712387434,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -48.140879341723036,
+        65.17509108686103,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0006_angle_+0216.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0006_angle_+0216.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0006_angle_+0216.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0006_angle_+0216.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0006_angle_+0216.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0006_angle_+0216.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0006_angle_+0216.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0006_angle_+0216.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 6,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "d3b0af55200c070c5721189b512d5f718b25956ad01a3c49f1c2af9a9352ac42",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "d3f1d27bb2d329e9eb97790462fc67a08e45600c90311b46c0cf11f8e003300e",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 252.0,
+      "anomaly_preview_max_abs": 0.006559440642326764,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -77.20258046193747,
+        25.175091086861038,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0007_angle_+0252.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0007_angle_+0252.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0007_angle_+0252.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0007_angle_+0252.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0007_angle_+0252.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0007_angle_+0252.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0007_angle_+0252.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0007_angle_+0252.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 7,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "4bb753b2e19f9525d95237f9f95dff5c67c5be3ac686e8b0122e129d3dc64450",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "f8768c8ff13dc10d7c53ebdf9f4e04b0ade2a6064cf5255a032648e87bf0fbd7",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 288.0,
+      "anomaly_preview_max_abs": 0.0009406362923022916,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -77.20258046193749,
+        -24.267628013130544,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0008_angle_+0288.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0008_angle_+0288.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0008_angle_+0288.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0008_angle_+0288.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0008_angle_+0288.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0008_angle_+0288.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0008_angle_+0288.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0008_angle_+0288.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 8,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "dcf33475a30fdbaf8ac62807853e1ac3c3e5e12256b42a9a59be94c30e4f0ba8",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "a6b436417ae34b7e3d17f6a5bbd1bfcfd6b7d08fe4edbe2eb56fffe1ec2320db",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 324.0,
+      "anomaly_preview_max_abs": 0.0006159319596571605,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -48.140879341723064,
+        -64.26762801313055,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m8_high_000003_frame_0009_angle_+0324.00.png",
+        "anomaly_raw": "anomaly/bear_m8_high_000003_frame_0009_angle_+0324.00.raw.tif",
+        "clean": "clean/bear_m8_high_000003_frame_0009_angle_+0324.00.jpg",
+        "clean_raw": "clean/bear_m8_high_000003_frame_0009_angle_+0324.00.raw.tif",
+        "observed": "observed/bear_m8_high_000003_frame_0009_angle_+0324.00.jpg",
+        "observed_raw": "observed/bear_m8_high_000003_frame_0009_angle_+0324.00.raw.tif",
+        "particle": "particle/bear_m8_high_000003_frame_0009_angle_+0324.00.jpg",
+        "particle_raw": "particle/bear_m8_high_000003_frame_0009_angle_+0324.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 9,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "a349966d4fdea7f4853e9ceea4fc3ff1908b75d62346056294a4acdd00ceede4",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "09940bc273576b055bf8bd598d6955b4f3980d5030c2c27bb467725f766c4e8b",
+        "reason": "hit",
+        "status": "hit"
+      }
+    }
+  ],
+  "generation": {
+    "diagnostics": {
+      "clean_solve_residual": 3.1627639410295643e-15,
+      "n_affected_paths": 56,
+      "n_refracted_rays": 353,
+      "n_source_rays": 512,
+      "n_source_segments": 353,
+      "no_transport_intersection": false,
+      "notes": [],
+      "particle_solve_residual": 2.540553992458524e-15,
+      "source_assignment": "attenuated_chord"
+    },
+    "max_workers": 10,
+    "package_version": "0.0.1.dev0",
+    "runtime_settings": {
+      "camera_fov_deg": 35.0,
+      "exitance_scale": 10.0,
+      "n_from": 1.0,
+      "source_delta_assignment": "attenuated_chord",
+      "surface_interpolation": "tetrahedral_barycentric",
+      "target_elements": 1000
+    },
+    "stage_seconds": {
+      "camera_capture": 0.031391124706715345,
+      "clean_source": 3.948768917005509,
+      "diffusion_solves": 0.2622245829552412,
+      "particle_source": 14.331640125252306
+    }
+  },
+  "generator_version": "m6.5-draft",
+  "phantom": {
+    "phantom_id": "proto_bear",
+    "stl_path": "cad/proto_bear_head.stl",
+    "stl_sha256": "93dd75a4b3b535f9d0194592d2970885d3e9e9fd1d86d19365390cb2965fb88a"
+  },
+  "representation": {
+    "anomaly_definition": "particle_minus_clean",
+    "anomaly_preview": {
+      "authoritative": false,
+      "format": "png",
+      "mapping": "signed_per_frame_zero_centered"
+    },
+    "composition_domain": "linear_camera_intensity_before_jpeg",
+    "composition_policy": "pre_jpeg_numeric_arrays",
+    "encoding": {
+      "dtype": "uint8",
+      "intensity_max": 0.018696916609553096,
+      "intensity_min": 0.0,
+      "mapping": "shared_linear_clip"
+    },
+    "image_domain": "camera_intensity",
+    "image_format": "jpg",
+    "jpeg_quality": 95,
+    "observed_definition": "particle_no_corruption",
+    "pixel_orientation": {
+      "camera_up": "image_top",
+      "transform_from_camera_sample_grid": "flip_axis_0"
+    },
+    "raw_float_sidecar": {
+      "anomaly_definition": "particle_minus_clean",
+      "dtype": "float32",
+      "extension": "raw.tif",
+      "image_domain": "linear_camera_intensity",
+      "naming": "same_stem_as_display_image_with_raw_tif_extension",
+      "roles": [
+        "clean",
+        "particle",
+        "observed",
+        "anomaly"
+      ]
+    }
+  },
+  "resolved_job": {
+    "generator_version": "m6.5-draft",
+    "hash_algorithm_version": "m6-resolved-job-v3",
+    "manifest_schema_version": "1.6-m6-draft",
+    "representation": {
+      "anomaly_definition": "particle_minus_clean",
+      "composition_domain": "linear_camera_intensity_before_jpeg",
+      "image_domain": "camera_intensity",
+      "image_format": "jpg",
+      "jpeg_quality": 95,
+      "observed_definition": "particle_no_corruption",
+      "required_roles": [
+        "clean",
+        "particle",
+        "observed"
+      ],
+      "write_anomaly_preview": true
+    },
+    "runtime_settings": {
+      "camera_fov_deg": 35.0,
+      "exitance_scale": 10.0,
+      "n_from": 1.0,
+      "source_delta_assignment": "attenuated_chord",
+      "surface_interpolation": "tetrahedral_barycentric",
+      "target_elements": 1000
+    },
+    "sequence": {
+      "forward_model_tier": "m5_refractive_diffusion_particle_perturbation",
+      "phantom_id": "proto_bear",
+      "sequence_id": "bear_m8_high_000003",
+      "stl_sha256": "93dd75a4b3b535f9d0194592d2970885d3e9e9fd1d86d19365390cb2965fb88a"
+    },
+    "setups": {
+      "camera": {
+        "angle_start_deg": 0.0,
+        "angle_stop_deg": 324.0,
+        "axis_x": 0.0,
+        "axis_y": 0.0,
+        "axis_z": 1.0,
+        "camera_kind": "orbit",
+        "camera_schedule_id": "orbit_smoke_006",
+        "distance": 80.0,
+        "elevation_deg": 0.0,
+        "lateral_offsets": "none",
+        "num_views": 10,
+        "poses": [
+          {
+            "angle_deg": 0.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 0,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 36.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 1,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 72.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 2,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 108.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 3,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 144.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 4,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 180.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 5,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 216.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 6,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 252.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 7,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 288.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 8,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 324.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 9,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          }
+        ],
+        "resolution_x": 128,
+        "resolution_y": 128,
+        "schedule_kind": "orbit",
+        "up_variants": "none",
+        "z_offsets": "none"
+      },
+      "corruption": {
+        "amplitude": 0.0,
+        "composition_domain": "none",
+        "corruption_kind": "none",
+        "corruption_setup_id": "none",
+        "enabled": false,
+        "frames": "none",
+        "seed": 0
+      },
+      "diffusion": {
+        "alpha_direct": 0.0,
+        "diffusion_setup_id": "diff_smoke",
+        "extrapolation_length": 5.0,
+        "fem_order": 1,
+        "g": 0.0,
+        "robin_boundary_model": "effective_refractive_boundary",
+        "solver_tolerance": 1e-08
+      },
+      "diffusion_effective": {
+        "D": 2.564102564102564,
+        "D_source": "optical_material_diffusion_coefficient",
+        "alpha_direct": 0.0,
+        "diffusion_setup_id": "diff_smoke",
+        "extrapolation_length": 5.0,
+        "fem_order": 1,
+        "g": 0.0,
+        "g_source": "diffusion_setup",
+        "mu_a": 0.03,
+        "mu_a_source": "optical_setup",
+        "optical_setup_id": "opt_m8_high_001",
+        "provenance_kind": "diffusion_settings",
+        "robin_boundary_model": "effective_refractive_boundary",
+        "solver_tolerance": 1e-08
+      },
+      "optical": {
+        "cache_policy": "reuse",
+        "illumination_kind": "point",
+        "light_position_x": 0.0,
+        "light_position_y": 20.0,
+        "light_position_z": 10.0,
+        "mu_a": 0.03,
+        "mu_s": 0.1,
+        "num_source_rays": 512,
+        "optical_setup_id": "opt_m8_high_001",
+        "refractive_index": 1.33,
+        "source_deposition_method": "exact_ray_tet_intervals",
+        "source_intensity": 1.0
+      },
+      "particle": {
+        "center_x": 2.720864599394595,
+        "center_y": 6.988637818759656,
+        "center_z": 6.681254539776516,
+        "enabled": true,
+        "mu_a_particle": 0.0,
+        "mu_s_particle": 1.0,
+        "particle_kind": "sphere",
+        "particle_setup_id": "particle_000003",
+        "placement_mode": "fixed",
+        "radius": 3.0,
+        "refractive_index_particle": 1.33,
+        "seed": 42
+      },
+      "particles": {
+        "count": 1,
+        "items": [
+          {
+            "center_x": 2.720864599394595,
+            "center_y": 6.988637818759656,
+            "center_z": 6.681254539776516,
+            "enabled": true,
+            "mu_a_particle": 0.0,
+            "mu_s_particle": 1.0,
+            "particle_kind": "sphere",
+            "particle_setup_id": "particle_000003",
+            "placement_mode": "fixed",
+            "radius": 3.0,
+            "refractive_index_particle": 1.33,
+            "seed": 42
+          }
+        ],
+        "order": "workbook_row_order",
+        "particle_group_id": "particle_000003"
+      }
+    },
+    "source_cache_identity": {
+      "clean_key_algorithm_version": "m6-clean-optical-v4",
+      "clean_optical_cache_id": "4dd9e095f12b30544f4dbb7ea8565dab1a1582f055c8182c43498c063c8c5bc9",
+      "particle_key_algorithm_version": "m6-particle-source-v4",
+      "particle_source_cache_id": "a98f45cf5538e6b11493a275c76a9180ad805d6bede59e990538b1422e9d2979"
+    }
+  },
+  "resolved_job_hash": "072e72d5f6626ea1a71b1c59704e35b4490daa4214efcabe39b2a246c92f1f9f",
+  "roles": {
+    "anomaly_preview": "anomaly",
+    "clean": "clean",
+    "observed": "observed",
+    "particle": "particle"
+  },
+  "schema_version": "1.6-m6-draft",
+  "sequence_id": "bear_m8_high_000003",
+  "setups": {
+    "camera": {
+      "angle_start_deg": 0.0,
+      "angle_stop_deg": 324.0,
+      "axis_x": 0.0,
+      "axis_y": 0.0,
+      "axis_z": 1.0,
+      "camera_kind": "orbit",
+      "camera_schedule_id": "orbit_smoke_006",
+      "distance": 80.0,
+      "elevation_deg": 0.0,
+      "lateral_offsets": "none",
+      "num_views": 10,
+      "resolution_x": 128,
+      "resolution_y": 128,
+      "schedule_kind": "orbit",
+      "source_excel_row": 2,
+      "source_sheet": "camera_schedules",
+      "up_variants": "none",
+      "workbook_name": "m8_demo.xlsx",
+      "workbook_sheet": "camera_schedules",
+      "z_offsets": "none"
+    },
+    "corruption": {
+      "amplitude": 0.0,
+      "composition_domain": "none",
+      "corruption_kind": "none",
+      "corruption_setup_id": "none",
+      "enabled": false,
+      "frames": "none",
+      "seed": 0,
+      "source_excel_row": 2,
+      "source_sheet": "corruptions",
+      "workbook_name": "m8_demo.xlsx",
+      "workbook_sheet": "corruptions"
+    },
+    "diffusion": {
+      "alpha_direct": 0.0,
+      "diffusion_setup_id": "diff_smoke",
+      "effective": {
+        "D": 2.564102564102564,
+        "D_source": "optical_material_diffusion_coefficient",
+        "alpha_direct": 0.0,
+        "diffusion_setup_id": "diff_smoke",
+        "extrapolation_length": 5.0,
+        "fem_order": 1,
+        "g": 0.0,
+        "g_source": "diffusion_setup",
+        "mu_a": 0.03,
+        "mu_a_source": "optical_setup",
+        "optical_setup_id": "opt_m8_high_001",
+        "provenance_kind": "diffusion_settings",
+        "robin_boundary_model": "effective_refractive_boundary",
+        "solver_tolerance": 1e-08
+      },
+      "extrapolation_length": 5.0,
+      "fem_order": 1,
+      "g": 0.0,
+      "robin_boundary_model": "effective_refractive_boundary",
+      "solver_tolerance": 1e-08,
+      "source_excel_row": 2,
+      "source_sheet": "diffusion_setups",
+      "workbook_name": "m8_demo.xlsx",
+      "workbook_sheet": "diffusion_setups"
+    },
+    "optical": {
+      "cache_policy": "reuse",
+      "illumination_kind": "point",
+      "light_position_x": 0.0,
+      "light_position_y": 20.0,
+      "light_position_z": 10.0,
+      "mu_a": 0.03,
+      "mu_s": 0.1,
+      "num_source_rays": 512,
+      "optical_setup_id": "opt_m8_high_001",
+      "refractive_index": 1.33,
+      "source_deposition_method": "exact_ray_tet_intervals",
+      "source_excel_row": 4,
+      "source_intensity": 1.0,
+      "source_sheet": "optical_setups",
+      "workbook_name": "m8_demo.xlsx",
+      "workbook_sheet": "optical_setups"
+    },
+    "particle": {
+      "center_x": 2.720864599394595,
+      "center_y": 6.988637818759656,
+      "center_z": 6.681254539776516,
+      "compatibility": "first_of_particles",
+      "enabled": true,
+      "mu_a_particle": 0.0,
+      "mu_s_particle": 1.0,
+      "particle_kind": "sphere",
+      "particle_setup_id": "particle_000003",
+      "placement_mode": "fixed",
+      "radius": 3.0,
+      "refractive_index_particle": 1.33,
+      "seed": 42,
+      "source_excel_row": 4,
+      "source_sheet": "particles",
+      "workbook_name": "m8_demo.xlsx",
+      "workbook_sheet": "particles"
+    },
+    "particles": {
+      "count": 1,
+      "items": [
+        {
+          "center_x": 2.720864599394595,
+          "center_y": 6.988637818759656,
+          "center_z": 6.681254539776516,
+          "enabled": true,
+          "mu_a_particle": 0.0,
+          "mu_s_particle": 1.0,
+          "particle_kind": "sphere",
+          "particle_setup_id": "particle_000003",
+          "placement_mode": "fixed",
+          "radius": 3.0,
+          "refractive_index_particle": 1.33,
+          "seed": 42,
+          "source_excel_row": 4,
+          "source_sheet": "particles",
+          "workbook_name": "m8_demo.xlsx",
+          "workbook_sheet": "particles"
+        }
+      ],
+      "order": "workbook_row_order",
+      "particle_group_id": "particle_000003"
+    }
+  },
+  "validation": {
+    "anomaly_identity": "particle_minus_clean_pre_jpeg",
+    "post_jpeg_identity_checked": false,
+    "role_alignment": "checked_before_write"
+  },
+  "workbook": {
+    "sequence_excel_row": 4,
+    "sequence_sheet": "sequences",
+    "sha256": "e05fd37306f17880c93e65772eae2833eb4905b42ed2534d1213330e71f89770",
+    "workbook_path": "configs/m8/m8_demo.xlsx"
+  }
+}

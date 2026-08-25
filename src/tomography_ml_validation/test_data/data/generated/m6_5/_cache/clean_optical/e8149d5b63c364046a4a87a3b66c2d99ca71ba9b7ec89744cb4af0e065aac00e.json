@@ -1,0 +1,196 @@
+{
+  "algorithm_version": "m6-clean-optical-v3",
+  "arrays": {
+    "E_scat_elem": {
+      "dtype": "float64",
+      "shape": [
+        2080
+      ]
+    },
+    "S_clean": {
+      "dtype": "float64",
+      "shape": [
+        2080
+      ]
+    },
+    "refracted_directions": {
+      "dtype": "float64",
+      "shape": [
+        424,
+        3
+      ]
+    },
+    "refracted_full_directions": {
+      "dtype": "float64",
+      "shape": [
+        512,
+        3
+      ]
+    },
+    "refracted_hit_faces": {
+      "dtype": "int64",
+      "shape": [
+        512
+      ]
+    },
+    "refracted_hit_points": {
+      "dtype": "float64",
+      "shape": [
+        512,
+        3
+      ]
+    },
+    "refracted_origins": {
+      "dtype": "float64",
+      "shape": [
+        424,
+        3
+      ]
+    },
+    "refracted_parent_indices": {
+      "dtype": "int64",
+      "shape": [
+        424
+      ]
+    },
+    "refracted_sample_shape": {
+      "dtype": "int64",
+      "shape": [
+        0
+      ]
+    },
+    "refracted_valid_mask": {
+      "dtype": "bool",
+      "shape": [
+        512
+      ]
+    },
+    "refracted_weights": {
+      "dtype": "float64",
+      "shape": [
+        424
+      ]
+    },
+    "segment_ends": {
+      "dtype": "float64",
+      "shape": [
+        424,
+        3
+      ]
+    },
+    "segment_ids": {
+      "dtype": "int64",
+      "shape": [
+        424
+      ]
+    },
+    "segment_intensities": {
+      "dtype": "float64",
+      "shape": [
+        424
+      ]
+    },
+    "segment_path_order": {
+      "dtype": "int64",
+      "shape": [
+        424
+      ]
+    },
+    "segment_ray_ids": {
+      "dtype": "int64",
+      "shape": [
+        424
+      ]
+    },
+    "segment_starts": {
+      "dtype": "float64",
+      "shape": [
+        424,
+        3
+      ]
+    },
+    "source_directions": {
+      "dtype": "float64",
+      "shape": [
+        512,
+        3
+      ]
+    },
+    "source_origins": {
+      "dtype": "float64",
+      "shape": [
+        512,
+        3
+      ]
+    },
+    "source_sample_shape": {
+      "dtype": "int64",
+      "shape": [
+        0
+      ]
+    },
+    "source_weights": {
+      "dtype": "float64",
+      "shape": [
+        512
+      ]
+    }
+  },
+  "cache_id": "e8149d5b63c364046a4a87a3b66c2d99ca71ba9b7ec89744cb4af0e065aac00e",
+  "cache_kind": "clean_optical",
+  "completion_status": "complete",
+  "created_utc": "2026-07-19T09:51:21.572576+00:00",
+  "diffusion_mesh_identity": {
+    "content_hash": "cd27b24deecd0d99d29aeced39b9f7761b83327e79fcc4f8c04902303ef0bc5e",
+    "num_nodes": 592,
+    "num_tets": 2080
+  },
+  "key_payload": {
+    "algorithm_version": "m6-clean-optical-v3",
+    "diffusion_mesh_generation_identity": "m6-netgen-target-elements-1000-v1",
+    "illumination": {
+      "kind": "point",
+      "light_position": [
+        15.0,
+        15.0,
+        40.0
+      ],
+      "target_footprint": "derived_from_mesh_bounds"
+    },
+    "key_kind": "clean_optical",
+    "material": {
+      "mu_a": 0.1,
+      "mu_s": 0.3,
+      "refractive_index": 1.33
+    },
+    "n_from": 1.0,
+    "package_version": "0.0.1.dev0",
+    "source_deposition_method": "exact_ray_tet_intervals",
+    "source_ray_schedule": {
+      "num_source_rays": 512,
+      "sampling_mode": "point_uniform",
+      "seed": 42
+    },
+    "stl_sha256": "82d4223bb5910aac1301016e3f1fe7cf8b59c4e8188a841ead8ecdb2d3ce6f29",
+    "surface_mesh_processing_version": "m6-surface-mesh-v1"
+  },
+  "package_version": "0.0.1.dev0",
+  "payload_metadata": {
+    "deposition": {
+      "mu_a": 0.1,
+      "mu_s": 0.3,
+      "remaining_direct_energy": 0.005532225030443541,
+      "total_absorbed": 0.05486725016675462,
+      "total_ballistic_input": 0.22500122569746192,
+      "total_scattered": 0.16460175050026377
+    },
+    "refracted_eps": 3.670123712494028e-05
+  },
+  "payload_schema_version": "m6-clean-payload-v1",
+  "workbook_provenance": {
+    "sequence_excel_row": 2,
+    "sequence_sheet": "sequences",
+    "workbook_name": "m6_generation_plan.xlsx",
+    "workbook_sha256": "493803057bfc0aeb2acae554cb7510f781f7c5b45a0c346ed192d1afaff6fe87"
+  }
+}

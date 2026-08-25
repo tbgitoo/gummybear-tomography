@@ -1,0 +1,105 @@
+{
+  "algorithm_version": "m6-particle-source-v4",
+  "arrays": {
+    "E_clean_elem": {
+      "dtype": "float64",
+      "shape": [
+        2547
+      ]
+    },
+    "E_particle_elem": {
+      "dtype": "float64",
+      "shape": [
+        2547
+      ]
+    },
+    "S_particle": {
+      "dtype": "float64",
+      "shape": [
+        2547
+      ]
+    },
+    "affected_path_ids": {
+      "dtype": "int64",
+      "shape": [
+        56
+      ]
+    },
+    "affected_segment_indices": {
+      "dtype": "int64",
+      "shape": [
+        56
+      ]
+    },
+    "delta_E_background_elem": {
+      "dtype": "float64",
+      "shape": [
+        2547
+      ]
+    },
+    "delta_E_particle_scat_elem": {
+      "dtype": "float64",
+      "shape": [
+        2547
+      ]
+    },
+    "delta_E_transport_elem": {
+      "dtype": "float64",
+      "shape": [
+        2547
+      ]
+    },
+    "particle_ray_weights": {
+      "dtype": "float64",
+      "shape": [
+        512
+      ]
+    }
+  },
+  "cache_id": "a98f45cf5538e6b11493a275c76a9180ad805d6bede59e990538b1422e9d2979",
+  "cache_kind": "particle_source",
+  "completion_status": "complete",
+  "created_utc": "2026-08-09T16:54:43.997914+00:00",
+  "diffusion_mesh_identity": {
+    "content_hash": "be83311f67dc49ad442955222a638ab2e4130162fd1d681ba88899051962bff8",
+    "num_nodes": 728,
+    "num_tets": 2547
+  },
+  "key_payload": {
+    "algorithm_version": "m6-particle-source-v4",
+    "clean_optical_cache_id": "4dd9e095f12b30544f4dbb7ea8565dab1a1582f055c8182c43498c063c8c5bc9",
+    "key_kind": "particle_source",
+    "particles": [
+      {
+        "center": [
+          2.720864599394595,
+          6.988637818759656,
+          6.681254539776516
+        ],
+        "kind": "sphere",
+        "mu_a_particle": 0.0,
+        "mu_s_particle": 1.0,
+        "particle_setup_id": "particle_000003",
+        "radius": 3.0,
+        "refractive_index_particle": 1.33
+      }
+    ],
+    "placement_mode": "fixed",
+    "source_delta_assignment": "attenuated_chord"
+  },
+  "package_version": "0.0.1.dev0",
+  "parent_clean_cache_id": "4dd9e095f12b30544f4dbb7ea8565dab1a1582f055c8182c43498c063c8c5bc9",
+  "payload_metadata": {
+    "n_affected_paths": 56,
+    "no_transport_intersection": false,
+    "notes": [],
+    "source_assignment": "attenuated_chord"
+  },
+  "payload_schema_version": "m6-particle-payload-v1",
+  "workbook_provenance": {
+    "sequence_excel_row": 4,
+    "sequence_sheet": "sequences",
+    "workbook_name": "m8_demo.xlsx",
+    "workbook_sha256": "e05fd37306f17880c93e65772eae2833eb4905b42ed2534d1213330e71f89770"
+  }
+}

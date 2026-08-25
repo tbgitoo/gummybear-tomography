@@ -1,0 +1,678 @@
+{
+  "caches": {
+    "clean_optical_cache_id": "b50852bb69d9cf3cdeb24ca0fe447cae2d525488279940bc92034b5fbe467283",
+    "diffusion_operator_cache": null,
+    "events": {
+      "camera_visibility": {
+        "cache_id": "aggregate",
+        "load_seconds": 0.0,
+        "reason": "all_hit;n_poses=4",
+        "status": "hit",
+        "write_seconds": 0.0
+      },
+      "clean_optical": {
+        "cache_id": "b50852bb69d9cf3cdeb24ca0fe447cae2d525488279940bc92034b5fbe467283",
+        "load_seconds": 0.002121499739587307,
+        "reason": "hit",
+        "status": "hit",
+        "write_seconds": 0.0
+      },
+      "particle_source": {
+        "cache_id": "50fd2ef7f96aff747081645893bbf55813d33ab0c4a859f09c980914a53af663",
+        "load_seconds": 1.987488940358162e-05,
+        "reason": "miss_not_found",
+        "status": "miss",
+        "write_seconds": 0.0023032077588140965
+      },
+      "phi_sampling_localization": {
+        "cache_id": "aggregate",
+        "load_seconds": 0.0,
+        "reason": "all_hit;n_poses=4",
+        "status": "hit",
+        "write_seconds": 0.0
+      }
+    },
+    "particle_source_cache_id": "50fd2ef7f96aff747081645893bbf55813d33ab0c4a859f09c980914a53af663",
+    "persistent_cache_used": true
+  },
+  "created_utc": "2026-08-09T17:03:03.998476+00:00",
+  "forward_model_tier": "m5_refractive_diffusion_particle_perturbation",
+  "frames": [
+    {
+      "angle_deg": 0.0,
+      "anomaly_preview_max_abs": 6.752230285310672e-05,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -1.1180591583251953,
+        -79.54626846313477,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m10_000_000006_frame_0000_angle_+0000.00.png",
+        "anomaly_raw": "anomaly/bear_m10_000_000006_frame_0000_angle_+0000.00.raw.tif",
+        "clean": "clean/bear_m10_000_000006_frame_0000_angle_+0000.00.jpg",
+        "clean_raw": "clean/bear_m10_000_000006_frame_0000_angle_+0000.00.raw.tif",
+        "observed": "observed/bear_m10_000_000006_frame_0000_angle_+0000.00.jpg",
+        "observed_raw": "observed/bear_m10_000_000006_frame_0000_angle_+0000.00.raw.tif",
+        "particle": "particle/bear_m10_000_000006_frame_0000_angle_+0000.00.jpg",
+        "particle_raw": "particle/bear_m10_000_000006_frame_0000_angle_+0000.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 0,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "b4dd9c4044d84d302fe86a236c5c8e7f17c0d7e3d5d559c5aa791d1b52b8c01b",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "d0e1865f243dfe280960255106bc9a84efa085e2bdb8d81b2bd17b49975c6802",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 90.0,
+      "anomaly_preview_max_abs": 4.939423956845787e-05,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        78.8819408416748,
+        0.4537315368652295,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m10_000_000006_frame_0001_angle_+0090.00.png",
+        "anomaly_raw": "anomaly/bear_m10_000_000006_frame_0001_angle_+0090.00.raw.tif",
+        "clean": "clean/bear_m10_000_000006_frame_0001_angle_+0090.00.jpg",
+        "clean_raw": "clean/bear_m10_000_000006_frame_0001_angle_+0090.00.raw.tif",
+        "observed": "observed/bear_m10_000_000006_frame_0001_angle_+0090.00.jpg",
+        "observed_raw": "observed/bear_m10_000_000006_frame_0001_angle_+0090.00.raw.tif",
+        "particle": "particle/bear_m10_000_000006_frame_0001_angle_+0090.00.jpg",
+        "particle_raw": "particle/bear_m10_000_000006_frame_0001_angle_+0090.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 1,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "23648d307b8dfa4401eadd706cdba711de119725244468f1d9171d42c9369ac1",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "79ea5f89855a1434105bed10168a8616c06aee2b6f007023955b3eb5d27055fc",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 180.0,
+      "anomaly_preview_max_abs": 0.00018599376889485422,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -1.1180591583251855,
+        80.45373153686523,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m10_000_000006_frame_0002_angle_+0180.00.png",
+        "anomaly_raw": "anomaly/bear_m10_000_000006_frame_0002_angle_+0180.00.raw.tif",
+        "clean": "clean/bear_m10_000_000006_frame_0002_angle_+0180.00.jpg",
+        "clean_raw": "clean/bear_m10_000_000006_frame_0002_angle_+0180.00.raw.tif",
+        "observed": "observed/bear_m10_000_000006_frame_0002_angle_+0180.00.jpg",
+        "observed_raw": "observed/bear_m10_000_000006_frame_0002_angle_+0180.00.raw.tif",
+        "particle": "particle/bear_m10_000_000006_frame_0002_angle_+0180.00.jpg",
+        "particle_raw": "particle/bear_m10_000_000006_frame_0002_angle_+0180.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 2,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "77587d2c1c60f31300ada3b51380128159f615f588fa823731b952b2425ab79b",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "02c111d9f4f88975e38a665137267da0f887a4d7d397bb3b98e213d353cd3b69",
+        "reason": "hit",
+        "status": "hit"
+      }
+    },
+    {
+      "angle_deg": 270.0,
+      "anomaly_preview_max_abs": 8.478037495397868e-05,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "camera_kind": "orbit",
+      "camera_position": [
+        -81.1180591583252,
+        0.4537315368652491,
+        8.171944618225098
+      ],
+      "filenames": {
+        "anomaly": "anomaly/bear_m10_000_000006_frame_0003_angle_+0270.00.png",
+        "anomaly_raw": "anomaly/bear_m10_000_000006_frame_0003_angle_+0270.00.raw.tif",
+        "clean": "clean/bear_m10_000_000006_frame_0003_angle_+0270.00.jpg",
+        "clean_raw": "clean/bear_m10_000_000006_frame_0003_angle_+0270.00.raw.tif",
+        "observed": "observed/bear_m10_000_000006_frame_0003_angle_+0270.00.jpg",
+        "observed_raw": "observed/bear_m10_000_000006_frame_0003_angle_+0270.00.raw.tif",
+        "particle": "particle/bear_m10_000_000006_frame_0003_angle_+0270.00.jpg",
+        "particle_raw": "particle/bear_m10_000_000006_frame_0003_angle_+0270.00.raw.tif"
+      },
+      "fov_deg": 35.0,
+      "frame_index": 3,
+      "look_at": [
+        -1.1180591583251953,
+        0.4537315368652344,
+        8.171944618225098
+      ],
+      "phi_sampling_localization_cache": {
+        "cache_id": "0b265946d924a09c3f9c8eb2f92820656b8907c2155f28043e634b124e20d7f8",
+        "reason": "hit",
+        "status": "hit"
+      },
+      "resolution": [
+        128,
+        128
+      ],
+      "up": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "visibility_cache": {
+        "cache_id": "ace4f945bae72d9c80fb7d80f64500586f199257e7101458266905f5a33a3008",
+        "reason": "hit",
+        "status": "hit"
+      }
+    }
+  ],
+  "generation": {
+    "diagnostics": {
+      "clean_solve_residual": 3.2892138249422536e-15,
+      "n_affected_paths": 28,
+      "n_refracted_rays": 199,
+      "n_source_rays": 256,
+      "n_source_segments": 199,
+      "no_transport_intersection": false,
+      "notes": [],
+      "particle_solve_residual": 3.1407452020445276e-15,
+      "source_assignment": "attenuated_chord"
+    },
+    "max_workers": 10,
+    "package_version": "0.0.1.dev0",
+    "runtime_settings": {
+      "camera_fov_deg": 35.0,
+      "exitance_scale": 10.0,
+      "n_from": 1.0,
+      "source_delta_assignment": "attenuated_chord",
+      "surface_interpolation": "tetrahedral_barycentric",
+      "target_elements": 1000
+    },
+    "stage_seconds": {
+      "camera_capture": 0.018547375220805407,
+      "clean_source": 4.97221775026992,
+      "diffusion_solves": 0.3859895830973983,
+      "particle_source": 12.073883625213057
+    }
+  },
+  "generator_version": "m6.5-draft",
+  "phantom": {
+    "phantom_id": "proto_bear",
+    "stl_path": "cad/proto_bear_head.stl",
+    "stl_sha256": "93dd75a4b3b535f9d0194592d2970885d3e9e9fd1d86d19365390cb2965fb88a"
+  },
+  "representation": {
+    "anomaly_definition": "particle_minus_clean",
+    "anomaly_preview": {
+      "authoritative": false,
+      "format": "png",
+      "mapping": "signed_per_frame_zero_centered"
+    },
+    "composition_domain": "linear_camera_intensity_before_jpeg",
+    "composition_policy": "pre_jpeg_numeric_arrays",
+    "encoding": {
+      "dtype": "uint8",
+      "intensity_max": 0.009161960635823915,
+      "intensity_min": 0.0,
+      "mapping": "shared_linear_clip"
+    },
+    "image_domain": "camera_intensity",
+    "image_format": "jpg",
+    "jpeg_quality": 95,
+    "observed_definition": "particle_no_corruption",
+    "pixel_orientation": {
+      "camera_up": "image_top",
+      "transform_from_camera_sample_grid": "flip_axis_0"
+    },
+    "raw_float_sidecar": {
+      "anomaly_definition": "particle_minus_clean",
+      "dtype": "float32",
+      "extension": "raw.tif",
+      "image_domain": "linear_camera_intensity",
+      "naming": "same_stem_as_display_image_with_raw_tif_extension",
+      "roles": [
+        "clean",
+        "particle",
+        "observed",
+        "anomaly"
+      ]
+    }
+  },
+  "resolved_job": {
+    "generator_version": "m6.5-draft",
+    "hash_algorithm_version": "m6-resolved-job-v3",
+    "manifest_schema_version": "1.6-m6-draft",
+    "representation": {
+      "anomaly_definition": "particle_minus_clean",
+      "composition_domain": "linear_camera_intensity_before_jpeg",
+      "image_domain": "camera_intensity",
+      "image_format": "jpg",
+      "jpeg_quality": 95,
+      "observed_definition": "particle_no_corruption",
+      "required_roles": [
+        "clean",
+        "particle",
+        "observed"
+      ],
+      "write_anomaly_preview": true
+    },
+    "runtime_settings": {
+      "camera_fov_deg": 35.0,
+      "exitance_scale": 10.0,
+      "n_from": 1.0,
+      "source_delta_assignment": "attenuated_chord",
+      "surface_interpolation": "tetrahedral_barycentric",
+      "target_elements": 1000
+    },
+    "sequence": {
+      "forward_model_tier": "m5_refractive_diffusion_particle_perturbation",
+      "phantom_id": "proto_bear",
+      "sequence_id": "bear_m10_000_000006",
+      "stl_sha256": "93dd75a4b3b535f9d0194592d2970885d3e9e9fd1d86d19365390cb2965fb88a"
+    },
+    "setups": {
+      "camera": {
+        "angle_start_deg": 0.0,
+        "angle_stop_deg": 270.0,
+        "axis_x": 0.0,
+        "axis_y": 0.0,
+        "axis_z": 1.0,
+        "camera_kind": "orbit",
+        "camera_schedule_id": "orbit_m10_demo_003",
+        "distance": 80.0,
+        "elevation_deg": 0.0,
+        "lateral_offsets": "none",
+        "num_views": 4,
+        "poses": [
+          {
+            "angle_deg": 0.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 0,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 90.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 1,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 180.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 2,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          },
+          {
+            "angle_deg": 270.0,
+            "axis": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "camera_kind": "orbit",
+            "distance": 80.0,
+            "elevation_deg": 0.0,
+            "frame_index": 3,
+            "lateral_offset": null,
+            "resolution_x": 128,
+            "resolution_y": 128,
+            "up_variant": null,
+            "z_offset": null
+          }
+        ],
+        "resolution_x": 128,
+        "resolution_y": 128,
+        "schedule_kind": "orbit",
+        "up_variants": "none",
+        "z_offsets": "none"
+      },
+      "corruption": {
+        "amplitude": 0.0,
+        "composition_domain": "none",
+        "corruption_kind": "none",
+        "corruption_setup_id": "none",
+        "enabled": false,
+        "frames": "none",
+        "seed": 0
+      },
+      "diffusion": {
+        "alpha_direct": 0.0,
+        "diffusion_setup_id": "diff_smoke",
+        "extrapolation_length": 5.0,
+        "fem_order": 1,
+        "g": 0.0,
+        "robin_boundary_model": "effective_refractive_boundary",
+        "solver_tolerance": 1e-08
+      },
+      "diffusion_effective": {
+        "D": 2.564102564102564,
+        "D_source": "optical_material_diffusion_coefficient",
+        "alpha_direct": 0.0,
+        "diffusion_setup_id": "diff_smoke",
+        "extrapolation_length": 5.0,
+        "fem_order": 1,
+        "g": 0.0,
+        "g_source": "diffusion_setup",
+        "mu_a": 0.03,
+        "mu_a_source": "optical_setup",
+        "optical_setup_id": "opt_m10_illum_000",
+        "provenance_kind": "diffusion_settings",
+        "robin_boundary_model": "effective_refractive_boundary",
+        "solver_tolerance": 1e-08
+      },
+      "optical": {
+        "cache_policy": "reuse",
+        "illumination_kind": "point",
+        "light_position_x": 20.0,
+        "light_position_y": 0.0,
+        "light_position_z": 10.0,
+        "mu_a": 0.03,
+        "mu_s": 0.1,
+        "num_source_rays": 256,
+        "optical_setup_id": "opt_m10_illum_000",
+        "refractive_index": 1.33,
+        "source_deposition_method": "exact_ray_tet_intervals",
+        "source_intensity": 1.0
+      },
+      "particle": {
+        "center_x": -4.574736578160636,
+        "center_y": -0.1626674150571024,
+        "center_z": -0.008587502803895752,
+        "enabled": true,
+        "mu_a_particle": 0.0,
+        "mu_s_particle": 1.0,
+        "particle_kind": "sphere",
+        "particle_setup_id": "particle_m10_000006",
+        "placement_mode": "fixed",
+        "radius": 3.0,
+        "refractive_index_particle": 1.33,
+        "seed": 42
+      },
+      "particles": {
+        "count": 1,
+        "items": [
+          {
+            "center_x": -4.574736578160636,
+            "center_y": -0.1626674150571024,
+            "center_z": -0.008587502803895752,
+            "enabled": true,
+            "mu_a_particle": 0.0,
+            "mu_s_particle": 1.0,
+            "particle_kind": "sphere",
+            "particle_setup_id": "particle_m10_000006",
+            "placement_mode": "fixed",
+            "radius": 3.0,
+            "refractive_index_particle": 1.33,
+            "seed": 42
+          }
+        ],
+        "order": "workbook_row_order",
+        "particle_group_id": "particle_m10_000006"
+      }
+    },
+    "source_cache_identity": {
+      "clean_key_algorithm_version": "m6-clean-optical-v4",
+      "clean_optical_cache_id": "b50852bb69d9cf3cdeb24ca0fe447cae2d525488279940bc92034b5fbe467283",
+      "particle_key_algorithm_version": "m6-particle-source-v4",
+      "particle_source_cache_id": "50fd2ef7f96aff747081645893bbf55813d33ab0c4a859f09c980914a53af663"
+    }
+  },
+  "resolved_job_hash": "49f4d0ba41d7d4717b043135753f0e5b79e04192e6f01add5f7fb40c16bbbbe4",
+  "roles": {
+    "anomaly_preview": "anomaly",
+    "clean": "clean",
+    "observed": "observed",
+    "particle": "particle"
+  },
+  "schema_version": "1.6-m6-draft",
+  "sequence_id": "bear_m10_000_000006",
+  "setups": {
+    "camera": {
+      "angle_start_deg": 0.0,
+      "angle_stop_deg": 270.0,
+      "axis_x": 0.0,
+      "axis_y": 0.0,
+      "axis_z": 1.0,
+      "camera_kind": "orbit",
+      "camera_schedule_id": "orbit_m10_demo_003",
+      "distance": 80.0,
+      "elevation_deg": 0.0,
+      "lateral_offsets": "none",
+      "num_views": 4,
+      "resolution_x": 128,
+      "resolution_y": 128,
+      "schedule_kind": "orbit",
+      "source_excel_row": 2,
+      "source_sheet": "camera_schedules",
+      "up_variants": "none",
+      "workbook_name": "m10_demo.xlsx",
+      "workbook_sheet": "camera_schedules",
+      "z_offsets": "none"
+    },
+    "corruption": {
+      "amplitude": 0.0,
+      "composition_domain": "none",
+      "corruption_kind": "none",
+      "corruption_setup_id": "none",
+      "enabled": false,
+      "frames": "none",
+      "seed": 0,
+      "source_excel_row": 2,
+      "source_sheet": "corruptions",
+      "workbook_name": "m10_demo.xlsx",
+      "workbook_sheet": "corruptions"
+    },
+    "diffusion": {
+      "alpha_direct": 0.0,
+      "diffusion_setup_id": "diff_smoke",
+      "effective": {
+        "D": 2.564102564102564,
+        "D_source": "optical_material_diffusion_coefficient",
+        "alpha_direct": 0.0,
+        "diffusion_setup_id": "diff_smoke",
+        "extrapolation_length": 5.0,
+        "fem_order": 1,
+        "g": 0.0,
+        "g_source": "diffusion_setup",
+        "mu_a": 0.03,
+        "mu_a_source": "optical_setup",
+        "optical_setup_id": "opt_m10_illum_000",
+        "provenance_kind": "diffusion_settings",
+        "robin_boundary_model": "effective_refractive_boundary",
+        "solver_tolerance": 1e-08
+      },
+      "extrapolation_length": 5.0,
+      "fem_order": 1,
+      "g": 0.0,
+      "robin_boundary_model": "effective_refractive_boundary",
+      "solver_tolerance": 1e-08,
+      "source_excel_row": 2,
+      "source_sheet": "diffusion_setups",
+      "workbook_name": "m10_demo.xlsx",
+      "workbook_sheet": "diffusion_setups"
+    },
+    "optical": {
+      "cache_policy": "reuse",
+      "illumination_kind": "point",
+      "light_position_x": 20.0,
+      "light_position_y": 0.0,
+      "light_position_z": 10.0,
+      "mu_a": 0.03,
+      "mu_s": 0.1,
+      "num_source_rays": 256,
+      "optical_setup_id": "opt_m10_illum_000",
+      "refractive_index": 1.33,
+      "source_deposition_method": "exact_ray_tet_intervals",
+      "source_excel_row": 2,
+      "source_intensity": 1.0,
+      "source_sheet": "optical_setups",
+      "workbook_name": "m10_demo.xlsx",
+      "workbook_sheet": "optical_setups"
+    },
+    "particle": {
+      "center_x": -4.574736578160636,
+      "center_y": -0.1626674150571024,
+      "center_z": -0.008587502803895752,
+      "compatibility": "first_of_particles",
+      "enabled": true,
+      "mu_a_particle": 0.0,
+      "mu_s_particle": 1.0,
+      "particle_kind": "sphere",
+      "particle_setup_id": "particle_m10_000006",
+      "placement_mode": "fixed",
+      "radius": 3.0,
+      "refractive_index_particle": 1.33,
+      "seed": 42,
+      "source_excel_row": 7,
+      "source_sheet": "particles",
+      "workbook_name": "m10_demo.xlsx",
+      "workbook_sheet": "particles"
+    },
+    "particles": {
+      "count": 1,
+      "items": [
+        {
+          "center_x": -4.574736578160636,
+          "center_y": -0.1626674150571024,
+          "center_z": -0.008587502803895752,
+          "enabled": true,
+          "mu_a_particle": 0.0,
+          "mu_s_particle": 1.0,
+          "particle_kind": "sphere",
+          "particle_setup_id": "particle_m10_000006",
+          "placement_mode": "fixed",
+          "radius": 3.0,
+          "refractive_index_particle": 1.33,
+          "seed": 42,
+          "source_excel_row": 7,
+          "source_sheet": "particles",
+          "workbook_name": "m10_demo.xlsx",
+          "workbook_sheet": "particles"
+        }
+      ],
+      "order": "workbook_row_order",
+      "particle_group_id": "particle_m10_000006"
+    }
+  },
+  "validation": {
+    "anomaly_identity": "particle_minus_clean_pre_jpeg",
+    "post_jpeg_identity_checked": false,
+    "role_alignment": "checked_before_write"
+  },
+  "workbook": {
+    "sequence_excel_row": 7,
+    "sequence_sheet": "sequences",
+    "sha256": "16f1ac1f1e8be6023651e71f49421fbea4972acad3b9a4fd06b19d01840b0515",
+    "workbook_path": "configs/m10/m10_demo.xlsx"
+  }
+}
