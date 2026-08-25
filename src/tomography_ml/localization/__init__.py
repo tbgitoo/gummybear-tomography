@@ -58,7 +58,7 @@ from .builders import (
     win3i_key_result_sources,
     win3j_single_view_freeze,
 )
-from .encoder import Encode
+from .encoder import Encode, describe_downsample_schedule
 from .fourier_pool import FourierCodedPool2d, enumerate_fourier_modes
 from .localizer import LocalizerSingleViewFourier
 from .localize_multiview import (
@@ -190,6 +190,7 @@ __all__ = [
     "build_from_config",
     "build_shared_subsets",
     "count_parameters",
+    "describe_downsample_schedule",
     "default_mechanism_grid",
     "describe_feature_geometry",
     "enumerate_fourier_modes",

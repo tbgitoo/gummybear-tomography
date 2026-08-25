@@ -174,6 +174,12 @@ M7 joins workbook `SequenceJob`s to on-disk M6 manifests into catalog **rows** (
 
 **Not in M7:** training, global `x_train`/`y_train`, directory-scan membership, public HWC stacks.
 
+#### 5.6 M8 — Single-view localisation foundation
+
+M8 builds a **defensible single-view localiser** from Excel-specified multi-regime corpora (M6/M7): raw-float roles, lazy catalog tasks, then hypothesis-driven CNN ablations (avg-pool vs **Fourier-coded** readout vs Flatten). The release narrative and primary train/val/test evidence live in [`GummyBearTomography_Final_Report.ipynb`](../GummyBearTomography_Final_Report.ipynb) (§4 dataset, M8 Steps 1–4). Upstream `08_*` notebooks retain the full WIN 3B–3J ablation audit trail; thin `notebooks/milestone_08/` cells verify gaps not shown in the report. Detail: [`plans/milestone_08/08_single_view_localization_plan.md`](milestone_08/08_single_view_localization_plan.md).
+
+**Not in M8:** multi-view fusion (M9), multi-illumination fusion (M10), predicting background optics, JPEG-as-training-store.
+
 ### Localisation ladder (M8–M10)
 
 A single scientific progression—**scarce → richer acquisition**—with a frozen single-view substrate:

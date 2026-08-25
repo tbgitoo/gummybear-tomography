@@ -864,7 +864,7 @@ def win3h_optical_regime_grid() -> tuple[OpticalRegimeSpec, ...]:
 def win3i_key_result_sources() -> tuple[dict[str, str], ...]:
     """Relative CSV paths for key capability-study result tables.
 
-    Paths are relative to ``data/generated/m8_1/``. Confirmatory training uses
+    Paths are relative to ``checkpoints/m8/``. Confirmatory training uses
     the elevated per-view z-score standard.
 
     Protocol: WIN 3I observability result sources.
@@ -873,17 +873,17 @@ def win3i_key_result_sources() -> tuple[dict[str, str], ...]:
         {
             "win": "3F",
             "label": "representation",
-            "relative_csv": "_win3f_representation/win3f_representation_study.csv",
+            "relative_csv": "m08_3f_representation/win3f_representation_study.csv",
         },
         {
             "win": "3G",
             "label": "normalisation",
-            "relative_csv": "_win3g_normalisation/win3g_normalisation_study.csv",
+            "relative_csv": "m08_3g_normalisation/win3g_normalisation_study.csv",
         },
         {
             "win": "3H",
             "label": "optical_regime",
-            "relative_csv": "_win3h_optical_regime/win3h_optical_regime_study.csv",
+            "relative_csv": "m08_3h_optical_regime/win3h_optical_regime_study.csv",
         },
     )
 

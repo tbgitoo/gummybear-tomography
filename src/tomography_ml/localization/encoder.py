@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 import torch
 import torch.nn as nn
@@ -115,6 +115,71 @@ def spatial_size_after_encode(
             h = h // 2
             w = w // 2
     return h, w
+
+
+def describe_downsample_schedule(
+    n_blocks: int,
+    downsample: str,
+    *,
+    height: int | None = None,
+    width: int | None = None,
+) -> dict[str, Any]:
+    """Human-readable MaxPool schedule for architecture comparison tables.
+
+    The encoder applies optional ``MaxPool2d(2, stride=2)`` **after** selected
+    conv blocks (each pool halves ``H`` and ``W``). Mode ``base`` = no pools;
+    ``low`` / ``medium`` / ``high`` pool after the first one / two / all blocks.
+
+    Args:
+        n_blocks: Number of conv blocks (``len(encoder_channels)``).
+        downsample: One of :data:`DOWNSAMPLE_MODES`.
+        height: Optional input height for ``spatial_hw_path`` / ``feature_map_hw``.
+        width: Optional input width for ``spatial_hw_path`` / ``feature_map_hw``.
+
+    Returns:
+        Dict with ``downsample_mode``, ``n_conv_blocks``, ``maxpool_after_blocks``,
+        ``pool_schedule``, and when ``height``/``width`` are given also
+        ``spatial_hw_path`` and ``feature_map_hw`` ``(H_out, W_out)``.
+    """
+    n_blocks = int(n_blocks)
+    mode = _normalize_downsample(downsample)
+    pool_after = _pool_after_indices(n_blocks, downsample)
+    if not pool_after:
+        maxpool_after = "none"
+        pool_schedule = f"{n_blocks}× (Conv3×3 → ReLU), no MaxPool"
+    else:
+        block_list = ", ".join(str(i) for i in sorted(pool_after))
+        maxpool_after = block_list.replace(" ", "")
+        pool_schedule = (
+            f"{n_blocks}× (Conv3×3 → ReLU); MaxPool2×2 stride 2 after block(s) "
+            f"{block_list}"
+        )
+
+    out: dict[str, Any] = {
+        "downsample_mode": mode,
+        "n_conv_blocks": n_blocks,
+        "maxpool_after_blocks": maxpool_after,
+        "pool_schedule": pool_schedule,
+        "spatial_hw_path": None,
+        "feature_map_hw": None,
+    }
+    if height is None or width is None:
+        return out
+
+    h, w = int(height), int(width)
+    hw_steps = [f"{h}×{w}"]
+    for i in range(n_blocks):
+        if i in pool_after:
+            h, w = h // 2, w // 2
+        hw_steps.append(f"{h}×{w}")
+    out["spatial_hw_path"] = " → ".join(hw_steps)
+    out["feature_map_hw"] = spatial_size_after_encode(
+        int(height),
+        int(width),
+        n_blocks=n_blocks,
+        downsample=downsample,
+    )
+    return out
 
 
 class Encode(nn.Module):
