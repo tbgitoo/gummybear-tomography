@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import re
 import tempfile
+import warnings
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 
 def repo_relative_path(path: str | Path) -> str:
@@ -113,3 +116,55 @@ def display_text_paths(text: str) -> str:
         return display_path(match.group(0))
 
     return _ABS_POSIX_PATH.sub(_replace, text)
+
+
+def install_display_safe_warning_paths() -> None:
+    """Patch ``warnings.showwarning`` so filenames use :func:`display_path`.
+
+    Idempotent. Needed for third-party import-time warnings (e.g. tqdm's
+    ``IProgress`` notice) that fire outside a :func:`display_safe_warnings`
+    block and would otherwise print absolute venv / home paths in notebooks.
+    Only absolute filenames are rewritten (already-safe ``~/...`` / relative
+    paths are left unchanged).
+    """
+    current = warnings.showwarning
+    if getattr(current, "_gummybear_display_safe", False):
+        return
+
+    def showwarning(message, category, filename, lineno, file=None, line=None):
+        if filename and Path(str(filename)).is_absolute():
+            filename = display_path(filename)
+        return current(message, category, filename, lineno, file=file, line=line)
+
+    showwarning._gummybear_display_safe = True  # type: ignore[attr-defined]
+    warnings.showwarning = showwarning  # type: ignore[assignment]
+
+
+@contextmanager
+def display_safe_warnings() -> Iterator[None]:
+    """Re-emit warnings with filenames rewritten through :func:`display_path`.
+
+    Also installs :func:`install_display_safe_warning_paths` so any warning
+    that escapes capture (or is printed by a custom ``showwarning``) still
+    uses a display-safe filename. Captures warnings issued inside the block
+    (including third-party ones such as ``TqdmWarning``) and re-emits them
+    with rewritten locations.
+    """
+    install_display_safe_warning_paths()
+    caught: list = []
+    try:
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            yield
+    finally:
+        for item in caught:
+            raw = item.filename or ""
+            filename = (
+                display_path(raw) if raw and Path(str(raw)).is_absolute() else raw
+            )
+            warnings.warn_explicit(
+                str(item.message),
+                item.category,
+                filename,
+                int(item.lineno or 0),
+            )

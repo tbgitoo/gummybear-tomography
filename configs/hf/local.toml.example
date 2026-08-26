@@ -1,0 +1,11 @@
+# Machine-local Hugging Face staging paths.
+# Copy to configs/hf/local.toml (gitignored) and edit.
+#
+# Public Hub ids stay in plans/milestone_11/11_huggingface_artifacts_plan.md;
+# only filesystem clones that live outside this git tree belong here.
+
+[models.singleview_cnn_fourier]
+hub_id = "tbhugging/singleview_cnn_fourier"
+hub_url = "https://huggingface.co/tbhugging/singleview_cnn_fourier"
+# Absolute path to a local `git clone` of the Hub model repo:
+local_clone = "/path/to/local/clone/of/singleview_cnn_fourier"

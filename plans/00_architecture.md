@@ -36,7 +36,7 @@ STL phantom
   → multi-role camera sequences (clean / particle / observed / …)
   → catalog + task datasets
   → localisation models (M8 → M9 → M10)
-  → publish corpora / checkpoints (M11 Hugging Face artefacts)
+  → publish corpora / checkpoints / selected models (M11 Hugging Face artefacts)
 ```
 
 **Canonical observation:** a **camera intensity image** of a translucent object (linear float), not an attenuation projection / sinogram.
@@ -213,8 +213,10 @@ M10 Lighting fusion
       10_2: hierarchical light-then-camera fusion on the full grid (Step 3)
 
 M11 Publish artefacts
-      Hugging Face dataset card + parquet indexes
-      corpora / checkpoints downloadable without regenerating
+      Hugging Face **dataset** card + parquet indexes (corpora / checkpoint trees)
+      Hugging Face **model** repos for selected weights
+      (first: M8 Step 3 Fourier xyz → https://huggingface.co/tbhugging/singleview_cnn_fourier)
+      downloadable without regenerating or retraining
 ```
 
 | Milestone | Question in one line |
@@ -222,19 +224,29 @@ M11 Publish artefacts
 | **M8** | Does Fourier pooling beat GAP for localisation from a **single** diffuse view? |
 | **M9** | How much does a **camera orbit** buy on top of the frozen M8 trunk? |
 | **M10** | How much does **structured illumination diversity** buy beyond camera fusion? |
-| **M11** | How do we **publish** corpora + checkpoints so others can browse and reproduce without regenerating? |
+| **M11** | How do we **publish** corpora, checkpoints, and selected models so others can browse and reproduce without regenerating? |
 
-#### 5.7 M11 — Hugging Face repository artefacts
+#### 5.7 M11 — Hugging Face artefacts
 
-M11 is **publication plumbing**, not new science: turn on-disk M6/M8/M10 corpora and ML checkpoints into a Hub dataset that mirrors the repo layout and shows something reasonable in the Dataset Viewer. Detail: [`plans/milestone_11/11_huggingface_artifacts_plan.md`](milestone_11/11_huggingface_artifacts_plan.md). Notebook: [`notebooks/milestone_11/11_0_huggingface_export.ipynb`](../notebooks/milestone_11/11_0_huggingface_export.ipynb).
+M11 is **publication plumbing**, not new science. Two Hub surfaces:
+
+1. **Dataset** [`tbhugging/gummybear-tomography`](https://huggingface.co/datasets/tbhugging/gummybear-tomography) — on-disk M6/M8/M10 corpora + optional checkpoint trees as zips + parquet indexes for the Dataset Viewer.
+2. **Models** — extract **one** trained architecture per Hub model repo. **First ship:** Final Report **M8 Step 3** Fourier xyz weights from `checkpoints/m8/m08_train_val_test_xyz.pt` → `final_state_by_arch["fourier"]` → Hub model [`tbhugging/singleview_cnn_fourier`](https://huggingface.co/tbhugging/singleview_cnn_fourier).
+
+Detail: [`plans/milestone_11/11_huggingface_artifacts_plan.md`](milestone_11/11_huggingface_artifacts_plan.md). Dataset notebook: [`notebooks/milestone_11/11_0_huggingface_export.ipynb`](../notebooks/milestone_11/11_0_huggingface_export.ipynb). Model export notebook: [`notebooks/milestone_11/11_1_singleview_cnn_fourier_export.ipynb`](../notebooks/milestone_11/11_1_singleview_cnn_fourier_export.ipynb). Hub CLI / agent skill: [HF CLI for AI Agents](https://huggingface.co/docs/hub/en/agents-cli).
 
 ```text
-data/generated/{m8_1,m10_illumination}.zip  +  checkpoints/
+Dataset: data/generated/{m8_1,m10_illumination}.zip  +  checkpoints/
   → parquet indexes (JPEG/PNG preview bytes embedded) + dataset-card README
   → Hub Dataset Viewer works without extracted trees
+
+Model (first): m08_train_val_test_xyz.pt [fourier]
+  → https://huggingface.co/tbhugging/singleview_cnn_fourier
+  → config.json + weights + model card (preprocess + metrics + dataset link)
 ```
 
-**Not in M11:** regenerating optics, retraining, changing catalog schemas, embedding float `.raw.tif` in parquet.
+**Not in M11:** regenerating optics, retraining, changing catalog schemas, embedding float `.raw.tif` in parquet, publishing every M8–M10 variant in the first model pass.
+
 
 ---
 
@@ -305,7 +317,7 @@ pip install ".[fem,dl,dev]" -c requirements.txt   # full generation
 | Optical simulation pipeline | §2, §5 (M0–M7) |
 | M8 / M9 datasets and single- vs multi-view tasks | §3, §5 (M8–M9) |
 | M10 multi-illumination | §3, §5 (M10) |
-| External corpora / checkpoints download | §5 (M11), §6 |
+| External corpora / checkpoints / models | §5 (M11), §6 |
 | Fourier pooling maths | §4 (summary); full derivation in the report |
 
 Use this file for **structure and contracts**; use the Final Report for **motivation, equations, figures, and experimental protocol**.

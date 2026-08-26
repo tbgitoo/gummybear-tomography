@@ -157,6 +157,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Machine-local Hugging Face staging paths (copy from configs/hf/local.toml.example)
+configs/hf/local.toml
+
 # Spyder project settings
 .spyderproject
 .spyproject
