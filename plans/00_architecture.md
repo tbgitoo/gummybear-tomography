@@ -187,6 +187,12 @@ M9 asks how much a **camera orbit** buys on the frozen M8 trunk: one shared xyz 
 
 **Not in M9:** illumination diversity or joint camera×light fusion (M10); reopening WIN 3J.
 
+#### 5.6c M10 — Lighting / illumination fusion
+
+M10 asks how much **structured illumination diversity** buys beyond camera fusion, still on the frozen M8 trunk. Canonical joint sample is illumination-major `[I,V,C,H,W]` (10_1 subsamples a fixed camera → `[I,C,H,W]`). Primary evidence: [`GummyBearTomography_Final_Report.ipynb`](../GummyBearTomography_Final_Report.ipynb) §4 M10 dataset + **M10 Steps 1–3** (frozen then e2e illumination-only A–D ladders; Fourier vs GAP; hierarchical light-then-camera `10_2`). Dataset generation is already in the report — no local 10_0 notebook. Detail: [`plans/milestone_10/10_lighting_fusion_plan.md`](milestone_10/10_lighting_fusion_plan.md).
+
+**Not in M10:** reopening WIN 3J or M9 camera-orbit conclusions; Hub packaging (M11).
+
 ### Localisation ladder (M8–M10) and publication (M11)
 
 A single scientific progression—**scarce → richer acquisition**—with a frozen single-view substrate, then Hub packaging:
@@ -204,8 +210,7 @@ M9  Camera-view fusion
 M10 Lighting fusion
       vary illumination; joint unit [I,V,C,H,W]
       10_1: lights at fixed camera [I,C,H,W]
-      10_2: hierarchical light-then-camera fusion on the full grid
-      (optional flat light×camera baselines)
+      10_2: hierarchical light-then-camera fusion on the full grid (Step 3)
 
 M11 Publish artefacts
       Hugging Face dataset card + parquet indexes

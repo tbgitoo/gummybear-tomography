@@ -27,7 +27,7 @@ M8 freeze (WIN 3J)  →  per-view h_i
 
 **Conclusion — scientific story:** there is **one** particle position. Prefer `V` views → shared encoder → fusion → **one xyz**. Do not reopen CNN width, Fourier modes, downsampling, or the `h_i` cut-point. Geometry metadata is `sin(θ)/cos(θ)` only and **supplements** image evidence.
 
-**Downstream (not M9):** M10 lighting fusion (`10_0`–`10_2`). See that milestone plan when present.
+**Downstream (not M9):** M10 lighting fusion (`10_1`–`10_2`, Steps 1–3). See [`plans/milestone_10/10_lighting_fusion_plan.md`](../milestone_10/10_lighting_fusion_plan.md).
 
 ---
 

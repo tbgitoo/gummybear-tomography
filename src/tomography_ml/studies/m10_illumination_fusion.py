@@ -4,9 +4,6 @@ Stage A trains Fourier and optional pooled single-view trunks on concatenated
 single-light datasets; Stage B trains C/D fusion heads (Fourier + optional
 pooled) with optional LR sweeps; evaluation covers A/B/C/D baselines on
 train/validation/test illumination stacks.
-
-Matches ``notebooks/10_1A_illumination_only_frozen_fusion.ipynb`` and
-``notebooks/10_1B_illumination_only_e2e_fusion.ipynb``.
 """
 
 from __future__ import annotations

@@ -17,6 +17,7 @@ from tomography_ml.studies.m10_hierarchical_fusion import (
     CSV_COMPARISON,
 )
 from tomography_ml.studies.study_checkpoints import M10_HIERARCHICAL_LIGHT_THEN_CAMERA
+from tomography_ml_validation.milestone_10.notebook_helpers import m10_corpus_paths
 from tomography_ml_validation.plotting.illumination_fusion import (
     plot_m10_hierarchical_lr_study,
     plot_m10_hierarchical_rmse_fourier_vs_pooled,
@@ -74,6 +75,25 @@ def test_m10_hierarchical_plot_helpers() -> None:
                 }
             )
     assert plot_m10_hierarchical_rmse_fourier_vs_pooled(pd.DataFrame(rows)) is not None
+
+
+def test_m10_corpus_paths_keys() -> None:
+    repo = Path(__file__).resolve().parents[1]
+    demo = m10_corpus_paths(repo, data_mode="demo")
+    assert demo["workbook_path"].name == "m10_demo.xlsx"
+    assert demo["num_epochs"] == 40
+    assert demo["angle_stride_deg"] == 90.0
+    assert demo["batch_size"] == 2
+    assert demo["run_lr_study"] is True
+    assert demo["load_existing"] is False
+
+    full = m10_corpus_paths(repo, data_mode="full", read_checkpoints=True)
+    assert full["workbook_path"].name == "localization_m10_illumination.xlsx"
+    assert full["num_epochs"] == 200
+    assert full["angle_stride_deg"] == 10.0
+    assert full["batch_size"] == 1
+    assert full["run_lr_study"] is False
+    assert full["results_dir"].name == "m10"
 
 
 def test_run_m10_hierarchical_load_checkpoint(tmp_path: Path, monkeypatch) -> None:

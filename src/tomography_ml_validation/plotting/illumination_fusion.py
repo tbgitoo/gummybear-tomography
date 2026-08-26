@@ -794,7 +794,7 @@ _HIER_PAIR = (
     (
         "m10_2_hierarchical_light_then_camera",
         "m10_2_hierarchical_pooled_light_then_camera",
-        "10_2 hier.",
+        "hierarchical",
     ),
 )
 
@@ -802,7 +802,7 @@ _HIER_PAIR = (
 def plot_m10_hierarchical_lr_study(
     lr_study_df: pd.DataFrame,
     *,
-    title: str = "10_2 Stage B LR study — Fourier vs pooled",
+    title: str = "M10 Step 3 Stage B LR study — Fourier vs pooled",
     figsize: tuple[float, float] = (6.5, 4.2),
 ) -> plt.Figure | None:
     """Log-x Stage-B LR vs best val RMSE for hierarchical Fourier and pooled."""
@@ -846,10 +846,10 @@ def plot_m10_hierarchical_rmse_fourier_vs_pooled(
         short = {
             "m10_2_single_view_reference": "SV ref",
             "m10_2_shared_xyz_mean_joint": "xyz mean",
-            "m10_2_hierarchical_light_then_camera": "10_2 hier.",
+            "m10_2_hierarchical_light_then_camera": "hierarchical",
             "m10_2_single_view_pooled_reference": "SV pooled",
             "m10_2_shared_xyz_mean_pooled": "xyz mean pooled",
-            "m10_2_hierarchical_pooled_light_then_camera": "10_2 hier. pooled",
+            "m10_2_hierarchical_pooled_light_then_camera": "hierarchical pooled",
         }
         df["display_label"] = df["variant_id"].map(lambda v: short.get(v, v))
     splits = [s for s in ("validation", "test") if s in set(df["split"])]
@@ -887,6 +887,6 @@ def plot_m10_hierarchical_rmse_fourier_vs_pooled(
             ax.text(xi - w / 2, yf, f"{yf:.3f}", ha="center", va="bottom", fontsize=7)
             ax.text(xi + w / 2, yp, f"{yp:.3f}", ha="center", va="bottom", fontsize=7)
     fig.suptitle(
-        title or "10_2 hierarchical — Fourier vs pooled RMSE", fontsize=12
+        title or "M10 Step 3 hierarchical — Fourier vs pooled RMSE", fontsize=12
     )
     return fig

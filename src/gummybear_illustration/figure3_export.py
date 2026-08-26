@@ -96,15 +96,13 @@ def figure3_render_worker_count(
 def _figure3_process_pool_context() -> mp.context.BaseContext:
     """Process pool context for Figure 3 workers.
 
-    Prefer ``fork`` on Unix so Jupyter/IPython kernels and large worker state
-    (record index, mesh) work reliably. Fall back to ``spawn`` elsewhere.
+    Always use ``spawn``. Preferring ``fork`` on Unix used to help Jupyter
+    copy-on-write large mesh state, but Python 3.12+ emits
+    ``DeprecationWarning`` (and can deadlock) when the parent is
+    multi-threaded — which is typical under pytest, OpenMP, and notebook
+    kernels by the time workers start. Worker state is already passed via
+    picklable ``initargs`` / map arguments, so ``spawn`` is sufficient.
     """
-    if sys.platform != "win32":
-        for method in ("fork", "spawn"):
-            try:
-                return mp.get_context(method)
-            except ValueError:
-                continue
     return mp.get_context("spawn")
 
 

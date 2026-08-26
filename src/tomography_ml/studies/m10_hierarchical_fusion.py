@@ -4,9 +4,6 @@ Stage A warm-starts Fourier and optional pooled single-view trunks on
 concatenated single-camera-angle task datasets (all lights mixed). Stage B
 trains hierarchical e2e fusion heads with an optional LR sweep; evaluation
 covers SV reference, flat xyz-mean, and hierarchical fusion on val/test.
-
-Matches ``notebooks/10_2_hierarchical_light_then_camera_fusion.ipynb`` and
-adds a pooled GAP negative-control family.
 """
 
 from __future__ import annotations
@@ -72,7 +69,7 @@ FOURIER_VARIANTS: tuple[tuple[str, str, str], ...] = (
     ("m10_2_shared_xyz_mean_joint", "xyz mean", "shared_xyz_mean"),
     (
         "m10_2_hierarchical_light_then_camera",
-        "10_2 hier.",
+        "hierarchical",
         FUSION_PATTERN_10_2,
     ),
 )
@@ -85,7 +82,7 @@ POOLED_VARIANTS: tuple[tuple[str, str, str], ...] = (
     ("m10_2_shared_xyz_mean_pooled", "xyz mean pooled", "shared_xyz_mean"),
     (
         "m10_2_hierarchical_pooled_light_then_camera",
-        "10_2 hier. pooled",
+        "hierarchical pooled",
         FUSION_PATTERN_10_2_POOLED,
     ),
 )
