@@ -1,4 +1,4 @@
-<!-- Summary extracted from GummyBearTomography_Final_Report.ipynb: markdown text only; figures under figures/. Optical-simulation figures; M8 LR study; architecture comparisons (pooled/Fourier/flatten) and M8 split sensitivity. -->
+<!-- Summary extracted from GummyBearTomography_Final_Report.ipynb: markdown text only; figures under figures/. Optical-simulation figures; M8–M10 localisation ladders including M10 Step 3 hierarchical fusion (test). -->
 
 # Gummybear Tomography: Particle Localization in Translucent Simulated Phantoms
 
@@ -215,7 +215,7 @@ Also, the simplification and aggressive caching permitted to simulate a large bo
 
 The simplifications were explicitly made with a translucent, non-specular, non-coherent image mode that nevertheless produces interpretable optical signal for the particle localization elements. The one less intuitive element that was necessary in the simulation was the Robin boundary length to capture the fact the diffusive radiation captured transiently in the gummybear contributes significantly to the realistic aspect of a translucent object partially illuminated by the scattered energy (in the manner of a translucent lightbulb).
 
-Consequently, conclusions drawn from this study should be interpreted in the context of the simulated regime considered here: translucent media, single-particle localization, non-coherent optics, and diffusion-dominated image formation. The primary focus of the study is the utility of spatial-frequency representations for localization under information-limited conditions rather than the exact realism of the optical simulator. While transfer learning to real-world images is planned as a future development direction, doing so introduces a second set of scientific questions related to simulation fidelity, domain transfer, and model generalization. These questions are distinct from the primary hypothesis tested in this project and are therefore left for future work.
+Consequently, conclusions drawn from this study should be interpreted in the context of the simulated regime considered here: translucent media, single-particle localization, non-coherent optics, and diffusion-dominated image formation. The primary focus of the study is the utility of spatial-frequency representations for localization under information-limited conditions rather than the exact realism of the optical simulator.
 
 # 4. Dataset Generation and Quality Assurance
 
@@ -632,7 +632,7 @@ Comparison of Fourier vs. Pooling on validation and test split loss after end to
 
 M10 adds illumination as a source of physical information variation.
 
-Compared to the addition of views, the addition of various illumination angles adds a major source of physical information: while camera views essentially complete the "hidden face" of a given gummybear physics, revolving the illumination source around the bear permits the particle to cast a revolving shadow and scatter halo in the gummybear.
+Compared to the addition of views, the addition of various illumination angles adds a major source of physical information.
 
 The question for M10 is however the same as for M9: Does the advantage of Fourier embedding pooling survive through fusion of information from different views?
 
@@ -642,7 +642,7 @@ Based on the M9 results (which were not available at overall project design time
 |----------|----------|---------------------|
 | Step 1 | Frozen: CNN Encoder, Fusion MLP separately | single-illumination / mean-xyz controls; compact ordered-concat heads C (no light angle) and D (same capacity, light-angle FiLM) |
 | Step 2 | End-to-End: CNN Encoder and Fusion MLP jointly | same A–D ladder as Step 1 (C and D share compact capacity; D adds light-angle conditioning) |
-| Step 3 | Hierarchical fusion: Illumination, then camera views | One defined fusion strategy, evaluated for Fourier and pooled: CNN per view (one illumination, one camera angle) -> MLP fuses illumination, using cos/sin illumination angle token -> MLP fuses camera views -> xyz |
+| Step 3 | Hierarchical fusion | One defined fusion strategy, evaluated for Fourier and pooled: CNN per view (one illumination, one camera angle) -> MLP fuses illumination, using cos/sin illumination angle token -> MLP fuses camera views -> xyz |
 
 Reported runs use historical / default learning rates rather than per-model optimal selection from LR sweeps.
 
@@ -688,15 +688,17 @@ The A–D model ladder, but trained end-to-end was used.
 The conclusion of step 2 (end-to-end training, N=3 repeat of the training) is that Fourier embedding is not advantageous, and in fact slightly detrimental on the fusion heads, confirming M10 Step 1 for the multi-illumination setting.
 
 
-### M10 Step 3: Hierarchical light-then-camera fusion
+### M10 Step 3: Hierarchical fusion
 
-Factorized fusion was originally planned in the project but could not be completed due to long executions and lack of time.
+Steps 1–2 fixed the camera and fused illuminations only. Step 3 uses the full illumination×camera grid. The ladder compares single-view reference, shared xyz-mean, and hierarchical fusion for Fourier vs pooled (test RMSE below).
 
+![M10 hierarchical Fourier vs pooled test RMSE](figures/m10_hierarchical_fourier_vs_pooled_test_rmse.png)
 
+Hierarchical fusion yields a clear further gain in localisation precision over single-view and xyz-mean controls on the joint grid. As in Steps 1–2 fusion settings, Fourier shows at most a minor disadvantage relative to GAP on the hierarchical head (pooled slightly lower test RMSE).
 
 ### Software verification
 
-The repository unit-test suite (`pytest`) checks catalog contracts, workbook randomization, and ML dataset loading used throughout this report. The cell below runs that suite against the same installed packages and local CAD/config assets as the notebook environment.
+The repository unit-test suite (`pytest`) checks catalog contracts, workbook randomization, and ML dataset loading used throughout this report.
 
 
 
@@ -706,10 +708,10 @@ This project investigated whether physically informed Fourier-based spatial repr
 
 The results show that preserving spatial information is critical for accurate localisation. The single-view setting (M8), characterized as being relatively information-scarce due to absence of both illumination and view angle variation, Fourier pooling substantially outperformed Global Average Pooling while using orders of magnitude fewer parameters than flatten-based approaches. This effect remained valid multiple train/validation/test partitions, the exact error varied with split composition, but the overall ranking remained stable: architectures that preserved spatial information consistently performed better than aggressive spatial averaging.
 
-At the same time, the benefit of Fourier representations was not universal. In multi-view (M9) and multi-illumination (M10) experiments, their advantage decreased as additional observations and more expressive fusion models became available. Under end-to-end training, Fourier pooling often became neutral or slightly detrimental, suggesting that sufficiently powerful networks can learn alternative spatial encodings directly from the data.
+At the same time, the benefit of Fourier representations was not universal. In multi-view (M9) and multi-illumination (M10) experiments, their advantage decreased as additional observations and more expressive fusion models became available. Under end-to-end training, Fourier pooling often became neutral or slightly detrimental, suggesting that sufficiently powerful networks can learn alternative spatial encodings directly from the data. Hierarchical fusion (M10 Step 3) further lowered localisation error on the joint illumination×camera grid, again with Fourier at best neutral and slightly behind pooled on the hierarchical head.
 
 The project hypothesis is essentially supported but augmented. Fourier-inspired spatial representations provide a valuable and highly parameter-efficient way to preserve localisation information when observations are limited. Their usefulness decreases as physical information content and model capacity increase. A further find was that the Fourier terms, which were beneficial or highly beneficial at low parameter count, were also somewhat harmful for larger models with richer information access. Presumably, it is preferable for the model to shape the embedding in its own way in these richer cases, the Fourier representation may add information limits or undesirable representation bias.
 
-Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work should investigate more realistic optical conditions, multi-particle scenarios, hierarchical fusion methods, and possibly transfer learning from simulation to experimental data. Hierarchical light-then-camera fusion (M10 Step 3) could also eventually be completed but a priori, no fundamentally new result is anticipated.
+Beyond the specific machine-learning results, the project demonstrates a reproducible framework combining optical simulation, synthetic dataset generation, and deep-learning evaluation. Future work could for instance investigate multi-particle scenarios.
 
 In summary, the central finding of this work is that explicit preservation of spatial information with Fourier embedding multipliers improves localisation performance under information-constrained conditions, while richer observations progressively reduce the need for handcrafted spatial-frequency priors.

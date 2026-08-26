@@ -17,7 +17,7 @@ M10 asks whether **illumination angle diversity** adds complementary localisatio
 ```text
 10_0  multi-illumination corpus              (data; Final Report §4)
 10_1  illumination-only fusion, camera fixed ([I,C,H,W])
-10_2  hierarchical light-then-camera         (full grid; preferred joint architecture)
+10_2  hierarchical fusion        (full grid; preferred joint architecture)
 ```
 
 
