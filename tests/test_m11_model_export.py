@@ -57,6 +57,11 @@ def test_export_singleview_cnn_fourier_to_tmp(tmp_path: Path) -> None:
     assert "## What this model does" in readme
     assert "## Architecture" in readme
     assert "## Training configuration" in readme
+    assert "## Evaluation Results" in readme
+    assert "### Testing Data" in readme
+    assert "### Metrics" in readme
+    assert "### Results" in readme
+    assert "## Held-out metrics" not in readme
     assert "## Contract" not in readme
     assert "datasets:" in readme
     assert "tbhugging/gummybear-tomography" in readme
@@ -70,8 +75,19 @@ def test_export_singleview_cnn_fourier_to_tmp(tmp_path: Path) -> None:
         "checkpoints/m8/m08_train_val_test_xyz.pt"
     ) in readme
     assert "Fourier pooling in place of conventional" in readme
+    assert "# libraries from https://github.com/tbgitoo/gummybear-tomography" in readme
+    assert "## Inference" in readme
+    assert "11_1_test_singleview_cnn_fourier.ipynb" in readme
     assert "validation_MSE" not in readme
-    assert "pipeline_tag" not in readme
+    assert "pipeline_tag: image-feature-extraction" in readme
+    assert "metrics:" in readme
+    assert "- rmse" in readme
+    assert "model-index:" in readme
+    assert "RMSE_total (Euclidean xyz)" in readme
+    assert "split: validation" in readme
+    assert "split: test" in readme
+    assert "| Split | Metric | Value |" in readme
+    assert "model-cards#evaluation-results" in readme
 
     model = make_m8_single_view_model("fourier", n_outputs=3, device="cpu")
     materialize_lazy_modules(model, torch.zeros(1, 1, 128, 128))

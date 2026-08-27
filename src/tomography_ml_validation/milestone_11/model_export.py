@@ -153,6 +153,74 @@ def _metrics_from_study_blob(blob: Mapping[str, Any]) -> dict[str, float]:
     return out
 
 
+def _model_card_frontmatter(
+    *,
+    hub_id: str,
+    metrics: Mapping[str, float],
+) -> str:
+    """Build Hub-compliant YAML metadata (pipeline_tag, metrics, model-index)."""
+    try:
+        from huggingface_hub import EvalResult, ModelCardData
+    except ImportError as exc:  # pragma: no cover
+        raise ImportError(
+            "huggingface_hub is required to write the Hub model card. "
+            'Install with: pip install ".[hf]" -c requirements.txt'
+        ) from exc
+
+    source_url = (
+        "https://github.com/tbgitoo/gummybear-tomography/blob/master/"
+        "GummyBearTomography_Final_Report.ipynb"
+    )
+    source_name = "Final Report M8 Step 3"
+    task_type = "image-feature-extraction"
+    task_name = "Single-view particle localisation (xyz)"
+    dataset_type = "tbhugging/gummybear-tomography"
+    dataset_name = "GummyBear Tomography (M8)"
+    metric_type = "rmse"
+    metric_name = "RMSE_total (Euclidean xyz)"
+
+    eval_results: list[Any] = []
+    for split_key, split_name in (
+        ("validation_RMSE_total", "validation"),
+        ("test_RMSE_total", "test"),
+    ):
+        if split_key not in metrics:
+            continue
+        eval_results.append(
+            EvalResult(
+                task_type=task_type,
+                task_name=task_name,
+                dataset_type=dataset_type,
+                dataset_name=dataset_name,
+                dataset_config="m8_1",
+                dataset_split=split_name,
+                metric_type=metric_type,
+                metric_name=metric_name,
+                metric_value=round(float(metrics[split_key]), 6),
+                source_name=source_name,
+                source_url=source_url,
+            )
+        )
+
+    card_data = ModelCardData(
+        license="apache-2.0",
+        library_name="pytorch",
+        pipeline_tag=task_type,
+        tags=[
+            "tomography",
+            "particle-localization",
+            "cnn",
+            "fourier-pooling",
+        ],
+        datasets=[dataset_type],
+        metrics=[metric_type],
+        model_name=hub_id,
+        eval_results=eval_results or None,
+    )
+    yaml_body = card_data.to_yaml().rstrip() + "\n"
+    return f"---\n{yaml_body}---\n"
+
+
 def _model_card_markdown(
     *,
     hub_id: str,
@@ -166,17 +234,7 @@ def _model_card_markdown(
     y_fields = [str(y) for y in (config.get("y_fields") or ())]
     y_bullets = "\n".join(f"- {y}" for y in y_fields) if y_fields else "- particle_x\n- particle_y\n- particle_z"
     lines = [
-        "---",
-        "license: apache-2.0",
-        "library_name: pytorch",
-        "tags:",
-        "  - tomography",
-        "  - particle-localization",
-        "  - cnn",
-        "  - fourier-pooling",
-        "datasets:",
-        "  - tbhugging/gummybear-tomography",
-        "---",
+        _model_card_frontmatter(hub_id=hub_id, metrics=metrics).rstrip("\n"),
         "",
         f"# `{hub_id}`",
         "",
@@ -222,26 +280,69 @@ def _model_card_markdown(
         f"- Trainable parameters: `{config['n_params']}`",
         f"- Stage learning rate: `{config['lr']}`",
         "",
-        "## Held-out metrics (from study checkpoint)",
+        "## Evaluation Results",
+        "",
+        "Structured scores for the Hub widget are declared in the YAML "
+        "`model-index` / `metrics` metadata "
+        "([Model Cards — Evaluation Results]"
+        "(https://huggingface.co/docs/hub/model-cards#evaluation-results)).",
+        "",
+        "### Testing Data",
+        "",
+        "- Dataset: "
+        "[tbhugging/gummybear-tomography]"
+        "(https://huggingface.co/datasets/tbhugging/gummybear-tomography) "
+        "(config `m8_1`)",
+        "- Splits: `validation`, `test`",
+        "- Protocol: Final Report **M8 Step 3** "
+        "(single-view `180°`, `anomaly_ref`, `per_image_zscore`, targets "
+        "`particle_x, particle_y, particle_z`)",
+        "- Source checkpoint: "
+        "[checkpoints/m8/m08_train_val_test_xyz.pt]"
+        "(https://huggingface.co/datasets/tbhugging/gummybear-tomography/blob/main/"
+        "checkpoints/m8/m08_train_val_test_xyz.pt) (arch `fourier` only)",
+        "",
+        "### Metrics",
         "",
         "Reported error is **Euclidean RMSE** over particle `(x,y,z)`:",
         "`d_i = ||pred_i - y_i||_2`, then `RMSE_total = sqrt(mean_i d_i^2)`.",
         "This matches the Final Report M8 Step 3 bars (not element-wise MSE).",
+        "Hub metric id: `rmse` (display name `RMSE_total (Euclidean xyz)`).",
+        "",
+        "### Results",
         "",
     ]
-    for key, label in (
-        ("validation_RMSE_total", "validation RMSE_total (Euclidean)"),
-        ("test_RMSE_total", "test RMSE_total (Euclidean)"),
+    result_rows: list[str] = []
+    for key, split_name in (
+        ("validation_RMSE_total", "validation"),
+        ("test_RMSE_total", "test"),
     ):
         if key in metrics:
-            lines.append(f"- **{label}**: `{metrics[key]:.6f}`")
+            result_rows.append(
+                f"| `{split_name}` | RMSE_total (Euclidean xyz) | "
+                f"`{metrics[key]:.6f}` |"
+            )
+    if result_rows:
+        lines.extend(
+            [
+                "| Split | Metric | Value |",
+                "| --- | --- | ---: |",
+                *result_rows,
+                "",
+            ]
+        )
     lines.extend(
         [
+            "Source: "
+            "[Final Report M8 Step 3]"
+            "(https://github.com/tbgitoo/gummybear-tomography/blob/master/"
+            "GummyBearTomography_Final_Report.ipynb).",
             "",
             "## Load",
             "",
             "```python",
             "import torch",
+            "# libraries from https://github.com/tbgitoo/gummybear-tomography",
             "from tomography_ml.studies.single_view_m8 import make_m8_single_view_model",
             "from tomography_ml.localization.builders import materialize_lazy_modules",
             "",
@@ -253,6 +354,15 @@ def _model_card_markdown(
             "```",
             "",
             "Do not treat this checkpoint as multi-view (M9) or multi-illumination (M10).",
+            "",
+            "## Inference",
+            "",
+            "For an example with worked download, model instanciation and inference, see: "
+            "[11_1_test_singleview_cnn_fourier.ipynb]"
+            "(https://github.com/tbgitoo/gummybear-tomography/blob/master/"
+            "notebooks/milestone_11/11_1_test_singleview_cnn_fourier.ipynb) "
+            "in the [gummybear-tomography](https://github.com/tbgitoo/gummybear-tomography) "
+            "repository.",
             "",
         ]
     )
