@@ -15,13 +15,13 @@ from tomography_ml.localization.builders import (
     materialize_lazy_modules,
 )
 from tomography_ml.studies.single_view_m8 import make_m8_single_view_model
-from tomography_ml_validation.milestone_11.hf_local import (
+from tomography_ml_huggingface.hf_local import (
     DEFAULT_LOCAL_TOML,
     HfModelLocalPaths,
     load_hf_local_toml,
     resolve_hf_model_paths,
 )
-from tomography_ml_validation.milestone_11.hub_model_card import (
+from tomography_ml_huggingface.hub_model_card import (
     CONFIG_NAME,
     DATASET_HUB_ID,
     FINAL_REPORT_URL,

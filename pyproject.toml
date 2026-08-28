@@ -44,6 +44,7 @@ include = [
     "gummybear_illustration*",
     "gummybear_validation*",
     "tomography_ml*",
+    "tomography_ml_huggingface*",
     "validation_notebook_tools*",
 ]
 

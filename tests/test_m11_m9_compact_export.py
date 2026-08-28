@@ -10,7 +10,7 @@ import torch
 
 from tomography_ml.localization.builders import materialize_lazy_modules
 from tomography_ml.localization.localize_multiview import GeometryAwareFourierFusionLocalizer
-from tomography_ml_validation.milestone_11.m9_compact_export import (
+from tomography_ml_huggingface.m9_compact_export import (
     STATE_KEY,
     VARIANT_ID,
     export_camera_orbit_compact_09_2b,

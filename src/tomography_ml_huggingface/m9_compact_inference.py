@@ -19,19 +19,19 @@ from tomography_ml.gummybear_data_catalog.task_dataset import (
 )
 from tomography_ml.localization.builders import count_parameters, materialize_lazy_modules
 from tomography_ml.localization.localize_multiview import GeometryAwareFourierFusionLocalizer
-from tomography_ml_validation.milestone_11.hub_download import (
+from tomography_ml_huggingface.hub_download import (
     DEFAULT_HUB_DOWNLOAD_TIMEOUT_S,
     HubDownloadError,
     download_hub_model_snapshot,
 )
-from tomography_ml_validation.milestone_11.hub_model_card import CONFIG_NAME, WEIGHTS_NAME
-from tomography_ml_validation.milestone_11.m9_compact_export import (
+from tomography_ml_huggingface.hub_model_card import CONFIG_NAME, WEIGHTS_NAME
+from tomography_ml_huggingface.m9_compact_export import (
     ARCHITECTURE,
     MODEL_KEY,
     PROTOCOL,
     VARIANT_ID,
 )
-from tomography_ml_validation.milestone_11.model_inference import (
+from tomography_ml_huggingface.model_inference import (
     ExampleInferenceSample,
     InferenceResult,
     _packaged_m8_demo_sequence_dir,

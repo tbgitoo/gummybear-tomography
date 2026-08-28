@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from tomography_ml_validation.milestone_11.m10_hierarchical_export import (
+from tomography_ml_huggingface.m10_hierarchical_export import (
     export_gummybear_hierarchical_fusion,
 )
-from tomography_ml_validation.milestone_11.m10_hierarchical_inference import (
+from tomography_ml_huggingface.m10_hierarchical_inference import (
     load_gummybear_hierarchical_fusion,
     run_hub_contract_smoke_inference,
 )

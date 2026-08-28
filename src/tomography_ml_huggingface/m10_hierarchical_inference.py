@@ -14,13 +14,13 @@ from tomography_ml.localization.builders import count_parameters
 from tomography_ml.localization.localize_multiview import (
     HierarchicalLightThenCameraFusionLocalizer,
 )
-from tomography_ml_validation.milestone_11.hub_download import (
+from tomography_ml_huggingface.hub_download import (
     DEFAULT_HUB_DOWNLOAD_TIMEOUT_S,
     HubDownloadError,
     download_hub_model_snapshot,
 )
-from tomography_ml_validation.milestone_11.hub_model_card import CONFIG_NAME, WEIGHTS_NAME
-from tomography_ml_validation.milestone_11.m10_hierarchical_export import (
+from tomography_ml_huggingface.hub_model_card import CONFIG_NAME, WEIGHTS_NAME
+from tomography_ml_huggingface.m10_hierarchical_export import (
     ARCHITECTURE,
     DESCRIBE_VARIANT_ID,
     MODEL_KEY,

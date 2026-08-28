@@ -22,12 +22,12 @@ from tomography_ml.localization.builders import (
     materialize_lazy_modules,
 )
 from tomography_ml.studies.single_view_m8 import make_m8_single_view_model
-from tomography_ml_validation.milestone_11.hub_download import (
+from tomography_ml_huggingface.hub_download import (
     DEFAULT_HUB_DOWNLOAD_TIMEOUT_S,
     HubDownloadError,
     download_hub_model_snapshot,
 )
-from tomography_ml_validation.milestone_11.model_export import (
+from tomography_ml_huggingface.model_export import (
     ARCH,
     CONFIG_NAME,
     MODEL_KEY,

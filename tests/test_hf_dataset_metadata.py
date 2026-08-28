@@ -1,4 +1,4 @@
-"""Unit tests for Hugging Face metadata export helpers."""
+"""Unit tests for Hugging Face dataset metadata export helpers."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from tomography_ml_validation.huggingface_metadata import (
+from tomography_ml_huggingface.dataset_metadata import (
     _embedded_preview,
     _illumination_angle_deg,
     _image_value,

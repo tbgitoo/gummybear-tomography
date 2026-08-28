@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from tomography_ml_validation.milestone_11.m9_compact_export import (
+from tomography_ml_huggingface.m9_compact_export import (
     export_camera_orbit_compact_09_2b,
 )
-from tomography_ml_validation.milestone_11.m9_compact_inference import (
+from tomography_ml_huggingface.m9_compact_inference import (
     load_camera_orbit_compact_09_2b,
     load_packaged_m9_demo_multiview_example,
     predict_multiview_xyz,

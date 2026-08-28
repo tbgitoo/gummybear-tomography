@@ -2,7 +2,7 @@
 
 **Source:** `plans/00_architecture.md` §5.7  
 **Role:** Publish (1) **optical corpora + checkpoint trees** as a Hub **dataset**, and (2) selected **localisation weights** as Hub **model** repos — without regenerating physics or retraining.  
-**Core:** `tomography_ml_validation.huggingface_metadata` · thin notebook(s) under `notebooks/milestone_11/`  
+**Core:** `tomography_ml_huggingface.dataset_metadata` · thin notebook(s) under `notebooks/milestone_11/`  
 **Install:** `pip install ".[hf]" -c requirements.txt` (PyArrow). Catalog load for indexes also needs the usual ML stack: `.[dl,hf]`. Hub upload uses the standalone [`hf` CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) (agent skill: [HF CLI for AI Agents](https://huggingface.co/docs/hub/en/agents-cli)).  
 **Evidence:** [`notebooks/milestone_11/11_0_huggingface_export.ipynb`](../../notebooks/milestone_11/11_0_huggingface_export.ipynb) (dataset); [`notebooks/milestone_11/11_1_singleview_cnn_fourier_export.ipynb`](../../notebooks/milestone_11/11_1_singleview_cnn_fourier_export.ipynb) (M8 Fourier model → local Hub clone).
 
@@ -80,7 +80,7 @@ checkpoints/{m8,m9,m10}/               # optional companion download
 ```
 
 ```python
-from tomography_ml_validation.huggingface_metadata import export_huggingface_metadata
+from tomography_ml_huggingface.dataset_metadata import export_huggingface_metadata
 export_huggingface_metadata(ROOT)
 
 from datasets import load_dataset

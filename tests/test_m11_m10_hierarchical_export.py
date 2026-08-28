@@ -11,7 +11,7 @@ import torch
 from tomography_ml.localization.localize_multiview import (
     HierarchicalLightThenCameraFusionLocalizer,
 )
-from tomography_ml_validation.milestone_11.m10_hierarchical_export import (
+from tomography_ml_huggingface.m10_hierarchical_export import (
     DESCRIBE_VARIANT_ID,
     STATE_KEY,
     VARIANT_ID,

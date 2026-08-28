@@ -599,7 +599,7 @@ From the repository root (after optical corpora exist on disk):
 
 ```bash
 pip install ".[hf]" -c requirements.txt
-python -m tomography_ml_validation.huggingface_metadata
+python -m tomography_ml_huggingface.dataset_metadata
 ```
 
 Upload `data/huggingface_metadata/` together with the zip archives

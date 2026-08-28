@@ -9,10 +9,10 @@ import huggingface_hub
 import huggingface_hub.constants as hf_constants
 import pytest
 
-from tomography_ml_validation.milestone_11.model_export import (
+from tomography_ml_huggingface.model_export import (
     export_singleview_cnn_fourier,
 )
-from tomography_ml_validation.milestone_11.model_inference import (
+from tomography_ml_huggingface.model_inference import (
     HubDownloadError,
     download_singleview_cnn_fourier,
     load_packaged_m8_demo_example,

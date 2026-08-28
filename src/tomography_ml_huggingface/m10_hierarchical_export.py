@@ -19,11 +19,11 @@ from tomography_ml.localization.localize_multiview import (
     HierarchicalLightThenCameraFusionLocalizer,
 )
 from tomography_ml.studies.study_checkpoints import M10_HIERARCHICAL_LIGHT_THEN_CAMERA
-from tomography_ml_validation.milestone_11.hf_local import (
+from tomography_ml_huggingface.hf_local import (
     HfModelLocalPaths,
     resolve_hf_model_paths,
 )
-from tomography_ml_validation.milestone_11.hub_model_card import (
+from tomography_ml_huggingface.hub_model_card import (
     DATASET_HUB_ID,
     FINAL_REPORT_URL,
     ModelCardEvalSpec,
