@@ -160,18 +160,13 @@ def _model_card_markdown(
         "",
         "coordinates of the embedded particle.",
         "",
-        f"This Hub repo publishes **M9 {PROTOCOL} only**: the **global average pooling (GAP)**",
-        "end-to-end trunk. It is **not** the 09_2A Fourier-pooling variant from the same",
-        "M9 Step 2 ladder.",
-        "",
         "",
         "## Architecture",
         "",
         "Per-view **GAP (pooled) CNN trunk** → camera **sin/cos geometry tokens** →",
         "**compact fusion MLP** (`e2e_pooled_geometry_fusion`).",
         "",
-        f"Final Report **M9 Step 2 / {PROTOCOL}** — compact head (`{STATE_KEY}`),",
-        "not the larger 09_3 head and not 09_2A Fourier.",
+        f"Final Report **M9 Step 2 / {PROTOCOL}** — compact head (`{STATE_KEY}`).",
         "",
         f"- Hub: [{hub_id}]({hub_url})",
         "- Companion dataset: "
@@ -256,11 +251,6 @@ def _model_card_markdown(
         f"({REPO_URL}/blob/master/"
         "notebooks/milestone_11/11_2_test_camera_orbit_compact_09_2b.ipynb) "
         f"in the [{REPO_URL.split('//')[-1]}]({REPO_URL}) repository.",
-        "",
-        "Export notebook: "
-        "[11_2_camera_orbit_compact_09_2b_export.ipynb]"
-        f"({REPO_URL}/blob/master/"
-        "notebooks/milestone_11/11_2_camera_orbit_compact_09_2b_export.ipynb).",
         "",
     ]
     return "\n".join(lines)

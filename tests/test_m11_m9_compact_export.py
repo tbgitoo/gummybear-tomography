@@ -70,7 +70,10 @@ def test_export_camera_orbit_compact_09_2b_to_tmp(tmp_path: Path) -> None:
     assert "pipeline_tag: image-feature-extraction" in readme
     assert "model-index:" in readme
     assert "tbhugging/gummybear-tomography" in readme
-    assert "checkpoints/m9/m09_e2e_pooled_geometry_fusion.pt" in readme
+    assert "11_2_test_camera_orbit_compact_09_2b.ipynb" in readme
+    assert "11_2_camera_orbit_compact_09_2b_export.ipynb" not in readme
+    assert "This Hub repo publishes" not in readme
+    assert "not the larger 09_3" not in readme
 
     n_views = cfg["n_views"]
     h, w = cfg["image_height"], cfg["image_width"]
