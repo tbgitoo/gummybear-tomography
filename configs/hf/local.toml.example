@@ -9,3 +9,8 @@ hub_id = "tbhugging/singleview_cnn_fourier"
 hub_url = "https://huggingface.co/tbhugging/singleview_cnn_fourier"
 # Absolute path to a local `git clone` of the Hub model repo:
 local_clone = "/path/to/local/clone/of/singleview_cnn_fourier"
+
+[models.camera_orbit_compact_09_2b]
+hub_id = "tbhugging/camera_orbit_compact_09_2b"
+hub_url = "https://huggingface.co/tbhugging/camera_orbit_compact_09_2b"
+local_clone = "/path/to/local/clone/of/camera_orbit_compact_09_2b"

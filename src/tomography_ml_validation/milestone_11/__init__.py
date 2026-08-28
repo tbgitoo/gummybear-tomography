@@ -5,6 +5,10 @@ from tomography_ml_validation.huggingface_metadata import (
     export_huggingface_metadata,
     main as export_cli_main,
 )
+from tomography_ml_validation.milestone_11.m9_compact_export import (
+    export_camera_orbit_compact_09_2b,
+    resolve_camera_orbit_compact_09_2b_paths,
+)
 from tomography_ml_validation.milestone_11.model_export import (
     export_singleview_cnn_fourier,
     resolve_singleview_cnn_fourier_paths,
@@ -22,7 +26,9 @@ __all__ = [
     "METADATA_SUBDIR",
     "export_huggingface_metadata",
     "export_cli_main",
+    "export_camera_orbit_compact_09_2b",
     "export_singleview_cnn_fourier",
+    "resolve_camera_orbit_compact_09_2b_paths",
     "resolve_singleview_cnn_fourier_paths",
     "DEFAULT_HUB_DOWNLOAD_TIMEOUT_S",
     "HubDownloadError",
