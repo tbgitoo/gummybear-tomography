@@ -251,11 +251,16 @@ def _model_card_markdown(
         "",
         "## Inference",
         "",
-        "Export / smoke-check notebook: "
+        "For an example with worked download, model instanciation and inference, see: "
+        "[11_2_test_camera_orbit_compact_09_2b.ipynb]"
+        f"({REPO_URL}/blob/master/"
+        "notebooks/milestone_11/11_2_test_camera_orbit_compact_09_2b.ipynb) "
+        f"in the [{REPO_URL.split('//')[-1]}]({REPO_URL}) repository.",
+        "",
+        "Export notebook: "
         "[11_2_camera_orbit_compact_09_2b_export.ipynb]"
         f"({REPO_URL}/blob/master/"
-        "notebooks/milestone_11/11_2_camera_orbit_compact_09_2b_export.ipynb) "
-        f"in the [{REPO_URL.split('//')[-1]}]({REPO_URL}) repository.",
+        "notebooks/milestone_11/11_2_camera_orbit_compact_09_2b_export.ipynb).",
         "",
     ]
     return "\n".join(lines)

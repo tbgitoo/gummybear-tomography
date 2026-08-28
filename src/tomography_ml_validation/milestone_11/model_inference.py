@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import json
-import tempfile
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -12,11 +10,7 @@ from typing import Any, Mapping
 import numpy as np
 import torch
 
-from gummybear.paths import (
-    display_path,
-    display_safe_warnings,
-    install_display_safe_warning_paths,
-)
+from gummybear.paths import display_path
 from tomography_ml.gummybear_data_catalog.task_dataset import (
     IMAGE_NORMALIZE_PER_IMAGE_ZSCORE,
     apply_image_normalize,
@@ -28,6 +22,11 @@ from tomography_ml.localization.builders import (
     materialize_lazy_modules,
 )
 from tomography_ml.studies.single_view_m8 import make_m8_single_view_model
+from tomography_ml_validation.milestone_11.hub_download import (
+    DEFAULT_HUB_DOWNLOAD_TIMEOUT_S,
+    HubDownloadError,
+    download_hub_model_snapshot,
+)
 from tomography_ml_validation.milestone_11.model_export import (
     ARCH,
     CONFIG_NAME,
@@ -38,11 +37,25 @@ from tomography_ml_validation.milestone_11.model_export import (
 DEFAULT_HUB_ID = "tbhugging/singleview_cnn_fourier"
 DEFAULT_EXAMPLE_SEQUENCE = "bear_m8_high_000004"
 DEFAULT_KEEP_ANGLE_DEG = 180.0
-DEFAULT_HUB_DOWNLOAD_TIMEOUT_S = 30.0
 
-
-class HubDownloadError(RuntimeError):
-    """Published Hub snapshot could not be fetched (no local-cache fallback)."""
+# Re-export shared Hub download symbols for existing imports.
+__all__ = [
+    "DEFAULT_EXAMPLE_SEQUENCE",
+    "DEFAULT_HUB_DOWNLOAD_TIMEOUT_S",
+    "DEFAULT_HUB_ID",
+    "DEFAULT_KEEP_ANGLE_DEG",
+    "ExampleInferenceSample",
+    "HubDownloadError",
+    "InferenceResult",
+    "LoadedHubFourierLocalizer",
+    "MODEL_KEY",
+    "download_singleview_cnn_fourier",
+    "load_packaged_m8_demo_example",
+    "load_singleview_cnn_fourier",
+    "load_singleview_cnn_fourier_from_hub",
+    "predict_xyz",
+    "run_packaged_demo_inference",
+]
 
 
 @dataclass(frozen=True)
@@ -85,82 +98,13 @@ def download_singleview_cnn_fourier(
     local_dir: Path | str | None = None,
     timeout_s: float = DEFAULT_HUB_DOWNLOAD_TIMEOUT_S,
 ) -> Path:
-    """Fetch the published Hub snapshot over the network (no cache fallback).
-
-    Always talks to Hugging Face: ``force_download=True``, Hub cache unused,
-    ``local_files_only`` forbidden. Writes into ``local_dir`` or a fresh temp
-    directory. Offline mode, missing network, or a hung request raise
-    :class:`HubDownloadError` after ``timeout_s`` seconds.
-    """
-    timeout_s = float(timeout_s)
-    if timeout_s <= 0:
-        raise ValueError(f"timeout_s must be > 0; got {timeout_s}")
-
-    # tqdm / huggingface_hub emit import-time warnings with absolute
-    # site-packages paths; install the showwarning patch before importing.
-    install_display_safe_warning_paths()
-
-    with display_safe_warnings():
-        try:
-            from huggingface_hub import snapshot_download
-            from huggingface_hub.constants import is_offline_mode
-        except ImportError as exc:  # pragma: no cover
-            raise ImportError(
-                "huggingface_hub is required for Hub download. "
-                'Install with: pip install ".[hf]" -c requirements.txt'
-            ) from exc
-
-        if is_offline_mode():
-            raise HubDownloadError(
-                f"Cannot download {hub_id}: Hugging Face offline mode is enabled "
-                "(HF_HUB_OFFLINE). This helper tests the published remote repo and "
-                "does not use a local cache."
-            )
-
-        dest = (
-            Path(local_dir)
-            if local_dir is not None
-            else Path(tempfile.mkdtemp(prefix="gummybear_hub_"))
-        )
-        dest.mkdir(parents=True, exist_ok=True)
-
-        kwargs: dict[str, Any] = {
-            "repo_id": hub_id,
-            "repo_type": "model",
-            "local_dir": str(dest),
-            "force_download": True,
-            "local_files_only": False,
-            "etag_timeout": min(timeout_s, 10.0),
-        }
-        if revision is not None:
-            kwargs["revision"] = revision
-
-        def _fetch() -> Path:
-            with display_safe_warnings():
-                return Path(snapshot_download(**kwargs))
-
-        executor = ThreadPoolExecutor(max_workers=1)
-        try:
-            future = executor.submit(_fetch)
-            try:
-                return future.result(timeout=timeout_s)
-            except TimeoutError:
-                future.cancel()
-                raise HubDownloadError(
-                    f"Timed out after {timeout_s:g}s downloading {hub_id} from "
-                    "Hugging Face. Check network connectivity; this helper does "
-                    "not fall back to a local cache."
-                ) from None
-            except HubDownloadError:
-                raise
-            except Exception as exc:
-                raise HubDownloadError(
-                    f"Could not download {hub_id} from Hugging Face: {exc}. "
-                    "This helper tests the published remote repo and does not "
-                    "fall back to a local cache."
-                ) from exc
-        finally:
-            executor.shutdown(wait=False, cancel_futures=True)
+    """Fetch the published Hub snapshot over the network (no cache fallback)."""
+    return download_hub_model_snapshot(
+        hub_id,
+        revision=revision,
+        local_dir=local_dir,
+        timeout_s=timeout_s,
+    )
 
 
 def load_singleview_cnn_fourier(
@@ -339,22 +283,3 @@ def run_packaged_demo_inference(
         euclidean_error=err,
         sample=sample,
     )
-
-
-__all__ = [
-    "DEFAULT_EXAMPLE_SEQUENCE",
-    "DEFAULT_HUB_DOWNLOAD_TIMEOUT_S",
-    "DEFAULT_HUB_ID",
-    "DEFAULT_KEEP_ANGLE_DEG",
-    "ExampleInferenceSample",
-    "HubDownloadError",
-    "InferenceResult",
-    "LoadedHubFourierLocalizer",
-    "MODEL_KEY",
-    "download_singleview_cnn_fourier",
-    "load_packaged_m8_demo_example",
-    "load_singleview_cnn_fourier",
-    "load_singleview_cnn_fourier_from_hub",
-    "predict_xyz",
-    "run_packaged_demo_inference",
-]
